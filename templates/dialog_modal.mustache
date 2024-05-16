@@ -30,16 +30,31 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
     Example context (json):
     {
+        "history": {
+            "message":"content",
+            "senderself":"1",
+        }
     }
 }}
-<div class="block_ai_interface-dialog">
-    <div class="block_ai_interface-output">
-     bla blas saflel
-        {{#history}}
 
-        {{/history}}
-    </div>
-    <div class="block_ai_interface-input">
-        <textarea class="form-control" id="block_ai_interface-input-id" placeholder="{{#str}} input, block_ai_interface {{/str}}"></textarea>
-    </div>
-</div>
+
+{{< core/modal }}
+    {{$title}} 
+        <div>{{title}}</div>
+        <div id="aimenu"><i class="fal fa-bars"></i></div>
+    {{/title}}
+    {{$body}}
+        <div class="block_ai_interface-dialog">
+            <div class="block_ai_interface-output">
+                {{#history}}
+                    {{> block_ai_interface/message }}
+                {{/history}}
+            </div>
+            <div class="block_ai_interface-input">
+                <textarea class="form-control" id="block_ai_interface-input-id" placeholder="{{#str}} input, block_ai_interface {{/str}}"></textarea>
+            </div>
+        </div>
+    {{/body}}
+    {{$footer}}
+    {{/footer}}
+{{/ core/modal }}

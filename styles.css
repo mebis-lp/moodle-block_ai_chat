@@ -31,12 +31,52 @@
     max-width: 1000px;
     min-height: 500px;
 }
+.ai_interface_modal .modal-title {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+.ai_interface_modal #aimenu {
+    display: flex;
+    align-self: center;
+}
 .ai_interface_modal .modal-body {
     display: flex;
+    padding: 2rem;
 }
 .ai_interface_modal .modal-body .block_ai_interface-dialog {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     width: 100%;
+}
+.ai_interface_modal .content {
+    padding: .5rem 1rem .5rem 1rem;
+    margin-bottom: .5rem;
+    position: relative;
+}
+.ai_interface_modal .identity {
+    padding-left: 1rem;
+    font-weight: bold;
+}
+.ai_interface_modal .identity {
+    padding-left: 1rem;
+    font-weight: bold;
+}
+.ai_interface_modal .content:hover {
+    background-color: var(--color-gray-light);
+}
+.ai_interface_modal .message .copy {
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: .5rem .75rem .75rem .75rem;
+}
+.ai_interface_modal .message.ai:hover .copy {
+    visibility: visible;
+    cursor: pointer;
+}
+.ai_interface_modal .block_ai_interface-input {
+    margin-top: .15rem;
 }

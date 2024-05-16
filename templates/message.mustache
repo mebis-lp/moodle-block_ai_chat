@@ -21,11 +21,20 @@
 
     Example context (json):
     {
-        "title":"AI Companion",
-        "arialabel":"Open AI Companion",
+        "message":"content",
+        "senderself":"0",
     }
 }}
-<button title="{{title}}" class="btn btn-icon" id="ai_interface_button"
-    aria-haspopup="dialog" aria-controls="ai_interface_id" aria-expanded="false" aria-label="{{arialabel}}">
-    <i class="icon fa fa-robot" aria-hidden="true"></i>
-</button>
+{{#senderself}}
+<div class="message agent">
+    <div class="identity">Du</div>
+{{/senderself}}
+{{^senderself}}
+<div class="message ai">
+    <div class="identity">KI</div>
+{{/senderself}}
+    <div class="content">
+        <a class="copy"><i class="fa fa-copy"></i></a>
+        {{content}} 
+    </div>
+</div>

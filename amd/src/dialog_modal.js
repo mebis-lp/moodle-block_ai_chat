@@ -1,4 +1,3 @@
-<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,19 +14,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Language file for block_ai_interface
+ * TODO describe module dialog_modal
  *
- * @package    block_ai_interface
- * @copyright  2024 ISB Bayern
- * @author     Tobias Garske
+ * @module     block_ai_interface/dialog_modal
+ * @copyright  2024 Tobias Garske, ISB Bayern
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['ai_interface'] = 'AI Interface';
-$string['ai_interface:addinstance'] = 'Add a AI Interface block';
-$string['ai_interface:myaddinstance'] = 'Add a AI Interface block to my moodle';
-$string['dialog'] = 'AI Dialog';
-$string['enable'] = 'Activate interface';
-$string['input'] = 'Ask the AI Model';
-$string['pluginname'] = 'AI Interface';
-$string['privacy:metadata'] = 'This plugin doesn\'t store personal data.';
+import Modal from 'core/modal';
+
+export default class DialogModal extends Modal {
+    static TYPE = "block_ai_interface/dialog_modal";
+    static TEMPLATE = "block_ai_interface/dialog_modal";
+
+    configure(modalConfig) {
+
+        // super.configure(modalConfig);
+
+        // Accept our own custom arguments too.
+        if (modalConfig.titletest) {
+            this.setTitletest(modalConfig.titletest);
+        }
+    }
+
+    setTitletest(value) {
+        this.titletest = value;
+    }
+}
