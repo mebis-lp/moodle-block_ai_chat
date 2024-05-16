@@ -53,6 +53,20 @@ class block_ai_interface extends block_base {
     }
 
     /**
+     * Adds the block content to the page header.
+     *
+     * @return void
+     * @throws coding_exception
+     * @throws moodle_exception
+     */
+    public function specialization(): void {
+        if (!empty($this->instance->visible)) {
+            $this->get_content();
+            $this->page->add_header_action($this->content->text);
+        }
+    }
+
+    /**
      * Returns the block content. Content is cached for performance reasons.
      *
      * @return stdClass
