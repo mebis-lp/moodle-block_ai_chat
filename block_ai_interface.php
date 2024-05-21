@@ -85,13 +85,8 @@ class block_ai_interface extends block_base {
         $context = new stdClass;
         $context->sesskey = sesskey();
 
-        $params = new stdClass;
-        $params->title = get_string('dialog', 'block_ai_interface');
-        $this->page->requires->js_call_amd(
-            'block_ai_interface/dialog',
-            'init',
-            [$params]
-        );
+        $aioutput = $this->page->get_renderer('block_ai_interface');
+        $this->content->text = $aioutput->render_ai_interface_content();
 
         $this->content->text = $OUTPUT->render_from_template('block_ai_interface/floatingbutton', $context);
 
@@ -113,6 +108,6 @@ class block_ai_interface extends block_base {
      * @return array
      */
     public function applicable_formats(): array {
-        return ['site-index' => true, 'course-view' => true, 'mod' => true];
+        return ['site-index' => true, 'course-view' => true, 'mod' => true, 'my' => true];
     }
 }

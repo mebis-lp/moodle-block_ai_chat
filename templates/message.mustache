@@ -22,19 +22,31 @@
     Example context (json):
     {
         "message":"content",
-        "senderself":"0",
+        "sender":"",
     }
 }}
-{{#senderself}}
+{{! Show message from user or ai }}
+{{#sender}}
 <div class="message agent">
     <div class="identity">Du</div>
-{{/senderself}}
-{{^senderself}}
+{{/sender}}
+{{^sender}}
 <div class="message ai">
     <div class="identity">KI</div>
-{{/senderself}}
+{{/sender}}
     <div class="content">
         <a class="copy"><i class="fa fa-copy"></i></a>
         {{content}} 
     </div>
 </div>
+{{! Insert placeholder in case of pending question }}
+{{^answer}}
+<div class="message ai">
+    <div class="identity">KI</div>
+    <div class="content awaitanswer">
+        <a class="copy"><i class="fa fa-copy"></i></a>
+        <div class="spinner-grow text-secondary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>    
+{{/answer}}

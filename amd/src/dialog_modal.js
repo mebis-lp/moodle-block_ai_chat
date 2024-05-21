@@ -28,8 +28,13 @@ export default class DialogModal extends Modal {
     static TEMPLATE = "block_ai_interface/dialog_modal";
 
     configure(modalConfig) {
+        // Show this modal on instantiation.
+        modalConfig.show = false;
 
-        // super.configure(modalConfig);
+        // Remove from the DOM on close.
+        modalConfig.removeOnClose = false;
+
+        super.configure(modalConfig);
 
         // Accept our own custom arguments too.
         if (modalConfig.titletest) {

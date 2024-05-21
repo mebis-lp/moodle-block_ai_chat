@@ -26,8 +26,11 @@
 $string['ai_interface'] = 'AI Interface';
 $string['ai_interface:addinstance'] = 'Add a AI Interface block';
 $string['ai_interface:myaddinstance'] = 'Add a AI Interface block to my moodle';
+$string['delete'] = 'Delete current Dialog';
 $string['dialog'] = 'AI Dialog';
 $string['enable'] = 'Activate interface';
 $string['input'] = 'Ask the AI Model';
+$string['history'] = 'Show History';
+$string['newconversation'] = 'Start new Thread';
 $string['pluginname'] = 'AI Interface';
 $string['privacy:metadata'] = 'This plugin doesn\'t store personal data.';

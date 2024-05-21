@@ -36,9 +36,9 @@
     justify-content: space-between;
     width: 100%;
 }
-.ai_interface_modal #aimenu {
-    display: flex;
-    align-self: center;
+
+.block_ai_interface_action_menu {
+    
 }
 .ai_interface_modal .modal-body {
     display: flex;
@@ -79,4 +79,9 @@
 }
 .ai_interface_modal .block_ai_interface-input {
     margin-top: .15rem;
+}
+.ai_fake_block {
+    visibility: hidden;
+    height: 0;
+    margin: 0;
 }

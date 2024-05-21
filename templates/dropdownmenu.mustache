@@ -1,0 +1,36 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block_ai_interface/dropdownmenu
+
+    TODO describe template dropdownmenu
+
+    Example context (json):
+    {
+    }
+}}
+<div class="block_ai_interface_action_menu">
+    <button class="block_ai_interface_menu_trigger btn btn-icon icon-no-margin p-0" data-toggle="dropdown"><i class="fal fa-bars"></i></button>
+    <ul class="dropdown-menu dropdown-menu-right">
+        <li class="nav-item">
+            <a class="dropdown-item" href="#" id="block_ai_interface_new_dialog">{{#pix}} t/messages, core, {{#str}} newconversation, block_ai_interface {{/str}} {{/pix}}{{#str}} newconversation, block_ai_interface {{/str}}</a>
+        </li>
+        <li class="nav-item">
+            <a class="dropdown-item" href="#" data-action="delete_dialog" data-id="{{id}}">{{#pix}} t/delete, core, {{#str}} delete, block_ai_interface {{/str}} {{/pix}}{{#str}} delete, block_ai_interface {{/str}}</a>
+        </li>
+    </ul>
+</div>

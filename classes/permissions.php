@@ -14,19 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace block_ai_interface;
+
+use core\oauth2\rest;
+
 /**
- * Version information for block_ai_interface
+ * Class to set permissions.
  *
  * @package    block_ai_interface
- * @copyright  2024 ISB Bayern
- * @author     Tobias Garske
+ * @copyright  2024 Tobias Garske, ISB Bayern
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+class permissions {
 
-defined('MOODLE_INTERNAL') || die();
+    /**
+     * Can view ai_interface
+     *
+     * @return bool True if the user has the permission. Otherwise false.
+     */
+    public static function can_view_ai() {
+        global $USER;
 
-$plugin->release = '0.1';
-$plugin->version = 2024051508;
-$plugin->requires = 2023010101;
-$plugin->component = 'block_ai_interface';
-$plugin->maturity = MATURITY_ALPHA;
+        return true;
+        // return (is_siteadmin() || has_capability('block/mbsteachshare:coursetemplatemanager', $coursecontext));
+    }
+
+}
