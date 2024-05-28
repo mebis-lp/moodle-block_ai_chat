@@ -71,16 +71,18 @@ class save_interaction extends external_api {
         // TODO validate context fails for some reason.
         // self::validate_context(\context_course::instance($contextid));
 
-        return [];
+        return ['id' => 9];
     }
 
     /**
      * Describes the return structure of the service..
      *
-     * @return external_
+     * @return external_single_structure the return structure
      */
     public static function execute_returns() {
-        return new external_single_structure([]);
+        return new external_single_structure([
+            'id' => new external_value(PARAM_INT, 'Itemid, meaning conversation id.'),
+        ]);
     }
 }
 

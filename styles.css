@@ -79,6 +79,7 @@
 }
 .ai_interface_modal .block_ai_interface-input {
     margin-top: .15rem;
+    padding-bottom: .5rem;
 }
 .ai_fake_block {
     visibility: hidden;

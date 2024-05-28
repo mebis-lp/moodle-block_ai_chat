@@ -128,6 +128,12 @@ const enterQuestion = (question) => {
 
         return;
     }).catch((error) => displayException(error));
+
+    // Scroll the modal content to the bottom.
+    setTimeout(() => {
+        let modalContent = document.querySelector('.ai_interface_modal .modal-body');
+        modalContent.scrollTop = modalContent.scrollHeight;
+    }, 100);
 };
 
 /**
@@ -144,9 +150,10 @@ const showReply = (text) => {
  */
 const newDialog = () => {
     console.log("newDialog called");
-    // Add current convo to history, if not already there.
-    if (allConversations.find(x => x.id === conversation.id) === 'undefined') {
+    // Add current convo to history and local representation, if not already there.
+    if (allConversations.find(x => x.id === conversation.id) === undefined) {
         addToHistory([conversation]);
+        allConversations.push(conversation);
     }
     conversation = {
         id: 0,
@@ -243,13 +250,15 @@ const getConversations = async() => {
  */
 const addToHistory = (convos) => {
     convos.forEach((convo) => {
-
         // Conditionally shorten menu title.
         let title = convo.messages[0].message;
         if (convo.messages[0].message.length > 50) {
             title = convo.messages[0].message.substring(0, 50);
             title += ' ...';
         }
+
+        console.log(convo);
+        console.log(convo.id);
 
         // Add entry in menu.
         const templateData = {
@@ -276,7 +285,7 @@ const addToHistory = (convos) => {
 const showConversation = (id = 0) => {
     // Change conversation or get last conversation.
     if (id !== 0) {
-        conversation = allConversations.find(x => x.id === id)
+        conversation = allConversations.find(x => x.id === id);
     } else if (typeof allConversations[0] !== 'undefined') {
         conversation = allConversations.at(-1);
     }
@@ -297,7 +306,18 @@ document.showConversation = showConversation;
  * @param {*} reply
  */
 const saveConversation = async(question, reply) => {
-    await externalServices.saveInteraction(question, reply, conversation.id, userid, contextid);
+    // Add to local representation.
+    let message = {'message': question, 'sender': 'user'};
+    conversation.messages.push(message);
+    message = {'message': reply, 'sender': 'ai'};
+    conversation.messages.push(message);
+    // Persistent saving, getting back a conversationid.
+    const convid = await externalServices.saveInteraction(question, reply, conversation.id, userid, contextid);
+    console.log("id");
+    console.log(convid.id);
+    if (conversation.id === 0) {
+        conversation.id = convid.id;
+    }
 };
 
 /**
