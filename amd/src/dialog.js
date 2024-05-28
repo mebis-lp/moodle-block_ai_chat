@@ -50,8 +50,6 @@ export const init = async(params) => {
 
     // Load conversations.
     getConversations();
-
-    console.log(contextid);
 };
 
 /**
@@ -118,6 +116,10 @@ const enterQuestion = (question) => {
         // Write back answer.
         showReply(requestresult.result);
 
+        // Attach copy listener.
+        let copy = document.querySelector('.ai_interface_modal .awaitanswer .copy');
+        copyToClipboard(copy);
+
         // Save new question and answer.
         saveConversation(question, requestresult.result);
 
@@ -133,7 +135,7 @@ const enterQuestion = (question) => {
  * @param {string} text
  */
 const showReply = (text) => {
-    let field = document.querySelector('.ai_interface_modal .awaitanswer div');
+    let field = document.querySelector('.ai_interface_modal .awaitanswer .text div');
     field.replaceWith(text);
 };
 
@@ -142,6 +144,10 @@ const showReply = (text) => {
  */
 const newDialog = () => {
     console.log("newDialog called");
+    // Add current convo to history, if not already there.
+    if (allConversations.find(x => x.id === conversation.id) === 'undefined') {
+        addToHistory([conversation]);
+    }
     conversation = {
         id: 0,
         messages: [],
@@ -182,14 +188,22 @@ const showMessage = (text, sender = '', answer = true) => {
     };
     // Call the function to load and render our template.
     Templates.renderForPromise('block_ai_interface/message', templateData)
-    // It returns a promise that needs to be resoved.
-    .then(({html, js}) => {
+        // It returns a promise that needs to be resoved.
+        .then(({html, js}) => {
         // Append results.
         Templates.appendNodeContents('.block_ai_interface-output', html, js);
             return true;
         })
         // Deal with this exception.
         .catch(ex => displayException(ex));
+};
+
+/**
+ * Show answer from local_ai_manager.
+ * @param {*} e
+ */
+const logThis = (e) => {
+console.log(e);
 };
 
 const showMessages = () => {
@@ -207,6 +221,9 @@ const showMessages = () => {
     }
 };
 
+/**
+ * Clear output div.
+ */
 const clearMessages = () => {
     console.log("clearMessages called");
     const output = document.querySelector('.block_ai_interface-output');
@@ -214,7 +231,7 @@ const clearMessages = () => {
 };
 
 /**
- * WS Get all conversations.
+ * Webservice Get all conversations.
  */
 const getConversations = async() => {
     allConversations = await externalServices.getAllConversations(userid, contextid);
@@ -222,6 +239,7 @@ const getConversations = async() => {
 
 /**
  * Add conversations to history.
+ * @param {*} convos Conversations
  */
 const addToHistory = (convos) => {
     convos.forEach((convo) => {
@@ -264,13 +282,17 @@ const showConversation = (id = 0) => {
     }
     clearMessages();
     showMessages();
-    setModalHeader();
+    // Wait till elements can be interacted with.
+    setTimeout(() => {
+        setModalHeader();
+        attachCopyListener();
+    }, 235);
 };
 // Make globally accessible since it is used to show history in dropdownmenuitem.mustache.
 document.showConversation = showConversation;
 
 /**
- * Save conversation.
+ * Webservice Save conversation.
  * @param {*} question
  * @param {*} reply
  */
@@ -327,10 +349,18 @@ const focustextarea = () => {
     }, interval);
 };
 
+/**
+ * Attach event listener.
+ * @param {*} textarea
+ */
 const addTextareaListener = (textarea) => {
     textarea.addEventListener('keydown', textareaOnKeydown);
 };
 
+/**
+ * Action for textarea submission.
+ * @param {*} event
+ */
 const textareaOnKeydown = (event) => {
     // TODO check for mobile devices.
     if (event.key === 'Enter') {
@@ -338,4 +368,32 @@ const textareaOnKeydown = (event) => {
         event.preventDefault();
         event.target.value = '';
     }
+};
+
+/**
+ * Attach copy listener to all elements.
+ */
+const attachCopyListener = () => {
+    const elements = document.querySelectorAll(".ai_interface_modal .copy");
+    elements.forEach((element) => {
+        element.addEventListener('mousedown', function() {
+            copyToClipboard(element);
+        });
+    });
+}
+
+/**
+ * Copy ai reply to clipboard.
+ * @param {*} element
+ */
+const copyToClipboard = (element) => {
+
+    // Find the adjacent text container.
+    const textElement = element.nextElementSibling;
+
+    // Get the text content.
+    const textToCopy = textElement.innerText || textElement.textContent;
+
+    // Copy to clipboard using the Clipboard API.
+    navigator.clipboard.writeText(textToCopy);
 };

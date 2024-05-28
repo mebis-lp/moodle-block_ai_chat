@@ -36,7 +36,9 @@
 {{/sender}}
     <div class="content">
         <a class="copy"><i class="fa fa-copy"></i></a>
-        {{content}} 
+        <div class="text">
+            {{content}}
+        </div>
     </div>
 </div>
 {{! Insert placeholder in case of pending question }}
@@ -45,8 +47,10 @@
     <div class="identity">KI</div>
     <div class="content awaitanswer">
         <a class="copy"><i class="fa fa-copy"></i></a>
-        <div class="spinner-grow text-secondary" role="status">
-            <span class="sr-only">Loading...</span>
+        <div class="text">
+            <div class="spinner-grow text-secondary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
         </div>
     </div>    
 {{/answer}}

@@ -60,6 +60,7 @@ class get_all_conversations extends external_api {
         //     'userid' => $userid,
         //     'contextid' => $contextid,
         // ]);
+        // TODO validate context fails for some reason.
         // self::validate_context(\context_course::instance($contextid));
 
         // TODO read from local_ai_manager and get all own conversations.
