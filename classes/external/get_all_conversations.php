@@ -16,13 +16,11 @@
 
 namespace block_ai_interface\external;
 
-use block_recentlyaccesseditems\external;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_multiple_structure;
 use core_external\external_value;
-use objects;
 
 /**
  * Class get_all_conversations, to retrieve all visible conversations.
@@ -55,82 +53,78 @@ class get_all_conversations extends external_api {
      * @throws dml_exception
      */
     public static function execute(int $userid, int $contextid): array {
-        global $DB;
-        // self::validate_parameters(self::execute_parameters(), [
-        //     'userid' => $userid,
-        //     'contextid' => $contextid,
-        // ]);
-        // TODO validate context fails for some reason.
-        // self::validate_context(\context_course::instance($contextid));
+        global $DB, $USER;
+        self::validate_parameters(self::execute_parameters(), [
+            'userid' => $userid,
+            'contextid' => $contextid,
+        ]);
+        self::validate_context(\core\context_helper::instance_by_id($contextid));
+        // Make sure the user has the proper capability.        
+        // require_capability('tool/dataprivacy:managedatarequests', $context);
 
-        // TODO read from local_ai_manager and get all own conversations.
+        if ($USER->id !== $userid ) {
+            // Evtl. noch admincheck.
+            // return;
+        }
+
+        // TODO read from local_ai_manager and get all own conversations.$re
         // As well as from pupils having a teacher role.
-        return [
-            (object) [
-                'id' => 123,
-                'messages' => [
-                    (object) ["message" => "Wo kann ich aAAAAAAAAA AAAACCCCCCC asdflkas lföla df ?", "sender" => "user"],
-                    (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
-                    (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk cvbnbvnbvn dkasfj", "sender" => "ai"],
-                    (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
-                    (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk cvbnbvnbvn dkasfj", "sender" => "ai"],
-                    (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
-                    (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk cvbnbvnbvn dkasfj", "sender" => "ai"],
-                    (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
-                    (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk cvbnbvnbvn dkasfj", "sender" => "ai"],
-                    (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
-                    (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk cvbnbvnbvn dkasfj", "sender" => "ai"],
-                    (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
-                    (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk cvbnbvnbvn dkasfj", "sender" => "ai"],
-                    (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
-                    (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk cvbnbvnbvn dkasfj", "sender" => "ai"],
-                    (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
-                    (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk cvbnbvnbvn dkasfj", "sender" => "ai"],
-                    (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
-                    (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk cvbnbvnbvn dkasfj", "sender" => "ai"],
-                    (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
-                    (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk cvbnbvnbvn dkasfj", "sender" => "ai"],
-                    (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
-                    (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk cvbnbvnbvn dkasfj", "sender" => "ai"],
-                    (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
-                    (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk cvbnbvnbvn dkasfj", "sender" => "ai"],
-                    (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
-                    (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk cvbnbvnbvn dkasfj", "sender" => "ai"],
-                    (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
-                    (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
+
+        $result = [];
+        $response = \local_ai_manager\ai_manager_utils::get_log_entries('block_ai_interface', $contextid, $USER->id);
+        // Get the latest log entries unique by itemid.
+        foreach ($response as $value) {
+            // Ignore values without itemid.
+            if (empty($value->itemid)) {
+                continue;
+            }
+            if (empty($result[$value->itemid])) {
+                $result[$value->itemid] = $value;
+            } else {
+                if ($result[$value->itemid]->timecreated < $value->timecreated) {
+                    $result[$value->itemid] = $value;
+                }
+            }
+        }
+        // Convert to expected format.
+        foreach ($result as $value) {
+            $messages = [
+                [
+                    'message' => $value->prompttext,
+                    'sender' => 'user',
                 ],
-            ],
-            (object) [
-                'id' => 1234,
-                'messages' => [
-                    (object) ["message" => "Hallo, also dfklsöl dk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasf dk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjj", "sender" => "user"],
-                    (object) ["message" => "vcbnbcvn fd sdfgdfgg dkasfj", "sender" => "ai"],
-                    (object) ["message" => "dfklsöl dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk dfklsöl dkasfj", "sender" => "ai"],
-                    (object) ["message" => "dfklsöl dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk dfklsöl dkasfj", "sender" => "ai"],
-                    (object) ["message" => "dfklsöl dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk dfklsöl dkasfj", "sender" => "ai"],
-                    (object) ["message" => "dfklsöl dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk dfklsöl dkasfj", "sender" => "ai"],
-                    (object) ["message" => "dfklsöl dk dfklsöl dkasfj", "sender" => "user"],
-                    (object) ["message" => "dfklsöl dk dfklsöl dkasfj", "sender" => "ai"],
+                [
+                    'message' => $value->promptcompletion,
+                    'sender' => 'ai',
                 ],
-            ],
-        ];
+            ];
+            $messages = array_merge(json_decode($value->requestoptions, true)['conversationcontext'], $messages);
+            $result[$value->itemid] = [
+                'id' => $value->itemid,
+                'messages' => $messages,
+            ];
+        }
+        return $result;
+
+        // return [
+        //     (object) [
+        //         'id' => 123,
+        //         'messages' => [
+        //             (object) ["message" => "Wo kann ich aAAAAAAAAA AAAACCCCCCC asdflkas lföla df ?", "sender" => "user"],
+        //             (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
+        //             (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
+        //             (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
+        //         ],
+        //     ],
+        //     (object) [
+        //         'id' => 1234,
+        //         'messages' => [
+        //             (object) ["message" => "Hallo, also dfklsöl dk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasf dk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjj", "sender" => "user"],
+        //             (object) ["message" => "dfklsöl dk dfklsöl dkasfj", "sender" => "user"],
+        //             (object) ["message" => "dfklsöl dk dfklsöl dkasfj", "sender" => "ai"],
+        //         ],
+        //     ],
+        // ];
 
     }
 

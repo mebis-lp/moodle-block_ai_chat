@@ -36,8 +36,8 @@ $functions = [
         'ajax'          => true,
         'capabilities'  => '', // TODO add cap
     ],
-    'block_ai_interface_save_interaction' => [
-        'classname'     => 'block_ai_interface\external\save_interaction',
+    'block_ai_interface_get_new_conversation_id' => [
+        'classname'     => 'block_ai_interface\external\get_new_conversation_id',
         'methodname'    => 'execute',
         'description'   => 'Save question and reply, get back the conversationid.',
         'type'          => 'write',

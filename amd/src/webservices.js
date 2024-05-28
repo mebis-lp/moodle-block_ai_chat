@@ -41,25 +41,13 @@ export const getAllConversations = (
 
 /**
  * Get all converstations a User can see.
- * @param {string} question
- * @param {string} reply
- * @param {int} conversationid
- * @param {int} userid
  * @param {int} contextid
  * @returns {mixed}
  */
-export const saveInteraction = (
-    question,
-    reply,
-    conversationid,
-    userid,
+export const getNewConversationId = (
     contextid,
 ) => fetchMany([{
-    methodname: 'block_ai_interface_save_interaction',
+    methodname: 'block_ai_interface_get_new_conversation_id',
     args: {
-        question,
-        reply,
-        conversationid,
-        userid,
         contextid,
 }}])[0];

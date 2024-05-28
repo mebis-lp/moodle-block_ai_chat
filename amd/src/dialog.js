@@ -3,6 +3,7 @@ import * as externalServices from 'block_ai_interface/webservices';
 import Templates from 'core/templates';
 import {exception as displayException} from 'core/notification';
 import {makeRequest} from 'local_ai_manager/make_request';
+import { getNewConversationId } from './webservices';
 
 // Declare variables.
 // Modal.
@@ -64,6 +65,7 @@ async function showModal() {
     const textarea = document.getElementById('block_ai_interface-input-id');
     addTextareaListener(textarea);
 
+    console.log(firstLoad);
     if (firstLoad) {
         // Show conversation.
         // Todo - firstload rewrite header, element is null.
@@ -90,44 +92,80 @@ async function showModal() {
  * Send input to ai connector.
  * @param {*} question
  */
-const enterQuestion = (question) => {
+const enterQuestion = async(question) => {
 
     // Remove listener, so another question cant be triggered.
     const textarea = document.getElementById('block_ai_interface-input-id');
     textarea.removeEventListener('keydown', textareaOnKeydown);
 
+    // Deny changing dialogs until answer present?
+
     // Add to conversation.
     showMessage(question, 'self', false);
+
+    // For first message, add a system message.
+    if (conversation.messages.length === 0) {
+        conversation.messages.push({
+            'message': 'Answer in german',
+            'sender': 'system',
+        });
+    }
 
     // Options, with conversation history.
     const options = {
         'component': 'block_ai_interface',
         'contextid': contextid,
-        'messages': conversation,
+        'conversationcontext': conversation.messages,
     };
 
-    // Send to local_ai_manager.
-    askLocalAiManager('chat', question, options).then(requestresult => {
-        if (requestresult.string == 'error') {
-            // Requestresult errorhandling.
-            return;
+    // For a new conversation, get an id.
+    if (conversation.id === 0) {
+        try {
+            let idresult = await externalServices.getNewConversationId(contextid);
+            conversation.id = idresult.id;
+        } catch (error) {
+            displayException(error);
         }
+        options.forcenewitemid = true;
+    }
+    options.itemid = conversation.id;
 
-        // Write back answer.
-        showReply(requestresult.result);
 
-        // Attach copy listener.
-        let copy = document.querySelector('.ai_interface_modal .awaitanswer .copy');
-        copyToClipboard(copy);
+    // Send to local_ai_manager.
+    let requestresult = await askLocalAiManager('chat', question, options);
+    // If code 409, conversationid is already taken, get new one.
+    while (requestresult.code == 409) {
+        // Todo test, sleep and falsify db entry so error is triggered and a new id is given.
+        try {
+            let idresult = await externalServices.getNewConversationId(contextid);
+            conversation.id = idresult.id;
+            options.itemid = conversation.id;
+        } catch (error) {
+            displayException(error);
+        }
+        // Retry with new id.
+        requestresult = await askLocalAiManager('chat', question, options);
+    }
 
-        // Save new question and answer.
-        saveConversation(question, requestresult.result);
-
-        // Readd textarea listener.
-        addTextareaListener(textarea);
-
+    if (requestresult.code != 200) {
+        // Requestresult errorhandling.
+        errorHandling();
         return;
-    }).catch((error) => displayException(error));
+    }
+
+    // Write back answer.
+    showReply(requestresult.result);
+
+    // Attach copy listener.
+    let copy = document.querySelector('.ai_interface_modal .awaitanswer .copy');
+    copyToClipboard(copy);
+
+    // Save new question and answer.
+    saveConversationLocally(question, requestresult.result);
+
+    // Readd textarea listener.
+    addTextareaListener(textarea);
+
 
     // Scroll the modal content to the bottom.
     setTimeout(() => {
@@ -151,10 +189,12 @@ const showReply = (text) => {
 const newDialog = () => {
     console.log("newDialog called");
     // Add current convo to history and local representation, if not already there.
-    if (allConversations.find(x => x.id === conversation.id) === undefined) {
+    console.log(allConversations.find(x => x.id === conversation.id));
+    if (allConversations.find(x => x.id === conversation.id) === 'undefined') {
         addToHistory([conversation]);
         allConversations.push(conversation);
     }
+    // Reset local conservation.
     conversation = {
         id: 0,
         messages: [],
@@ -172,8 +212,12 @@ const newDialog = () => {
  * @returns {string}
  */
 const askLocalAiManager = async(purpose, prompt, options = []) => {
-    let result = await makeRequest(purpose, prompt, JSON.stringify(options));
-    console.log(result);
+    let result;
+    try {
+        result = await makeRequest(purpose, prompt, JSON.stringify(options));
+    } catch (error) {
+        displayException(error);
+    }
     return result;
 };
 
@@ -184,6 +228,10 @@ const askLocalAiManager = async(purpose, prompt, options = []) => {
  * @param {*} answer Is answer in history
  */
 const showMessage = (text, sender = '', answer = true) => {
+    // Skip if sender is system.
+    if (sender === 'system') {
+        return;
+    }
     // Imitate bool for message.mustache logic {{#sender}}.
     if (sender === 'ai') {
         sender = '';
@@ -205,13 +253,6 @@ const showMessage = (text, sender = '', answer = true) => {
         .catch(ex => displayException(ex));
 };
 
-/**
- * Show answer from local_ai_manager.
- * @param {*} e
- */
-const logThis = (e) => {
-console.log(e);
-};
 
 const showMessages = () => {
     console.log("showMessages called");
@@ -241,7 +282,12 @@ const clearMessages = () => {
  * Webservice Get all conversations.
  */
 const getConversations = async() => {
-    allConversations = await externalServices.getAllConversations(userid, contextid);
+    console.log("allConversations called");
+    try {
+        allConversations = await externalServices.getAllConversations(userid, contextid);
+    } catch (error) {
+        displayException(error);
+    }
 };
 
 /**
@@ -250,13 +296,12 @@ const getConversations = async() => {
  */
 const addToHistory = (convos) => {
     convos.forEach((convo) => {
-        // Conditionally shorten menu title.
-        let title = convo.messages[0].message;
-        if (convo.messages[0].message.length > 50) {
-            title = convo.messages[0].message.substring(0, 50);
+        // Conditionally shorten menu title, skip system message.
+        let title = convo.messages[1].message;
+        if (convo.messages[1].message.length > 50) {
+            title = convo.messages[1].message.substring(0, 50);
             title += ' ...';
         }
-
         console.log(convo);
         console.log(convo.id);
 
@@ -284,10 +329,13 @@ const addToHistory = (convos) => {
  */
 const showConversation = (id = 0) => {
     // Change conversation or get last conversation.
+    console.log("showConversation called");
+    console.log(typeof allConversations[0]);
     if (id !== 0) {
         conversation = allConversations.find(x => x.id === id);
     } else if (typeof allConversations[0] !== 'undefined') {
-        conversation = allConversations.at(-1);
+        console.log("last item allconv");
+        conversation = allConversations.at(0);
     }
     clearMessages();
     showMessages();
@@ -305,19 +353,12 @@ document.showConversation = showConversation;
  * @param {*} question
  * @param {*} reply
  */
-const saveConversation = async(question, reply) => {
+const saveConversationLocally = (question, reply) => {
     // Add to local representation.
     let message = {'message': question, 'sender': 'user'};
     conversation.messages.push(message);
     message = {'message': reply, 'sender': 'ai'};
     conversation.messages.push(message);
-    // Persistent saving, getting back a conversationid.
-    const convid = await externalServices.saveInteraction(question, reply, conversation.id, userid, contextid);
-    console.log("id");
-    console.log(convid.id);
-    if (conversation.id === 0) {
-        conversation.id = convid.id;
-    }
 };
 
 /**
@@ -326,7 +367,7 @@ const saveConversation = async(question, reply) => {
  */
 const setModalHeader = (empty = false) => {
     let modalheader = document.querySelector('.ai_interface_modal .modal-title div');
-    if (modalheader !== null) {
+    if (modalheader !== null && (conversation.messages.length > 0 || empty)) {
         let title = '';
         if (!empty) {
             title = ' - ' + conversation.messages[0].message;
@@ -417,3 +458,8 @@ const copyToClipboard = (element) => {
     // Copy to clipboard using the Clipboard API.
     navigator.clipboard.writeText(textToCopy);
 };
+
+const errorHandling = (code) => {
+    // Replace spinner with error message.
+
+}

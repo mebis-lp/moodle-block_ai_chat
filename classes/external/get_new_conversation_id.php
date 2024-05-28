@@ -19,18 +19,16 @@ namespace block_ai_interface\external;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_single_structure;
-use core_external\external_multiple_structure;
 use core_external\external_value;
-use objects;
 
 /**
- * Class save_interaction.
+ * Class get_new_conversation_id.
  *
  * @package    block_ai_interface
  * @copyright  2024 Tobias Garske, ISB Bayern
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class save_interaction extends external_api {
+class get_new_conversation_id extends external_api {
 
     /**
      * Describes the parameters.
@@ -39,10 +37,6 @@ class save_interaction extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'question' => new external_value(PARAM_TEXT, 'Question of user.', VALUE_REQUIRED),
-            'reply' => new external_value(PARAM_TEXT, 'Reply of Ai.', VALUE_REQUIRED),
-            'conversationid' => new external_value(PARAM_INT, 'Id of conversation.', VALUE_REQUIRED),
-            'userid' => new external_value(PARAM_INT, 'Id of user.', VALUE_REQUIRED),
             'contextid' => new external_value(PARAM_INT, 'Course contextid.', VALUE_REQUIRED),
         ]);
     }
@@ -50,28 +44,19 @@ class save_interaction extends external_api {
     /**
      * Execute the service.
      *
-     * @param string $question
-     * @param string $reply
-     * @param int $conversationid
-     * @param int $userid
      * @param int $contextid
      * @return array
      * @throws invalid_parameter_exception
      * @throws dml_exception
      */
-    public static function execute(string $question, string $reply, int $conversationid,  int $userid, int $contextid): array {
+    public static function execute(int $contextid): array {
         global $DB;
         self::validate_parameters(self::execute_parameters(), [
-            'question' => $question,
-            'reply' => $reply,
-            'conversationid' => $conversationid,
-            'userid' => $userid,
             'contextid' => $contextid,
         ]);
-        // TODO validate context fails for some reason.
-        // self::validate_context(\context_course::instance($contextid));
+        self::validate_context(\core\context_helper::instance_by_id($contextid));
 
-        return ['id' => 9];
+        return ['id' => \local_ai_manager\ai_manager_utils::get_next_free_itemid('block_ai_interface', $contextid)];
     }
 
     /**

@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->release = '0.1';
-$plugin->version = 2024051508;
+$plugin->version = 2024051510;
 $plugin->requires = 2023010101;
 $plugin->component = 'block_ai_interface';
 $plugin->maturity = MATURITY_ALPHA;
