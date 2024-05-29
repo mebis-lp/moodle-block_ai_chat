@@ -116,10 +116,14 @@ const showConversation = (id = 0) => {
     // Change conversation or get last conversation.
     console.log("showConversation called");
     if (id !== 0) {
+        // First new dialog.
         conversation = allConversations.find(x => x.id === id);
     } else if (typeof allConversations[0] !== 'undefined') {
         console.log("last item allconv");
         conversation = allConversations.at(0);
+    } else if (allConversations.length === 0) {
+        // Last conversation has been deleted.
+        newDialog(true);
     }
     clearMessages();
     showMessages();
@@ -170,6 +174,7 @@ const enterQuestion = async(question) => {
         }
         options.forcenewitemid = true;
     }
+    // Pass itemid / conversationid.
     options.itemid = conversation.id;
 
 
@@ -177,7 +182,6 @@ const enterQuestion = async(question) => {
     let requestresult = await manager.askLocalAiManager('chat', question, options);
     // If code 409, conversationid is already taken, get new one.
     while (requestresult.code == 409) {
-        // Todo test, sleep and falsify db entry so error is triggered and a new id is given.
         try {
             let idresult = await externalServices.getNewConversationId(contextid);
             conversation.id = idresult.id;
@@ -192,15 +196,18 @@ const enterQuestion = async(question) => {
     // Write back answer.
     showReply(requestresult.result);
 
+    // Ai is done.
+    aiAtWork = false;
+
     // Attach copy listener.
+    // Todo, doesnt always work, sometimes shows another message.
     let copy = document.querySelector('.ai_interface_modal .awaitanswer .copy');
-    helper.copyToClipboard(copy);
+    copy.addEventListener('mousedown', () => {
+        helper.copyToClipboard(copy);
+    });
 
     // Save new question and answer.
     saveConversationLocally(question, requestresult.result);
-
-    // Ai is done.
-    aiAtWork = false;
 };
 
 /**
@@ -278,7 +285,6 @@ const deleteCurrentDialog = async() => {
             if (deleted) {
                 removeFromHistory();
                 showConversation();
-                // newDialog(true);
             }
         } catch (error) {
             displayException(error);
@@ -293,35 +299,37 @@ const deleteCurrentDialog = async() => {
  */
 const addToHistory = (convos) => {
     convos.forEach(async(convo) => {
-        // Conditionally shorten menu title, skip system message.
-        let title = convo.messages[1].message;
-        if (convo.messages[1].message.length > 50) {
-            title = convo.messages[1].message.substring(0, 50);
-            title += ' ...';
-        }
+        if (typeof convo.messages[1] !== 'undefined') {
+            // Conditionally shorten menu title, skip system message.
+            let title = convo.messages[1].message;
+            if (convo.messages[1].message.length > 50) {
+                title = convo.messages[1].message.substring(0, 50);
+                title += ' ...';
+            }
 
-        // Add entry in menu.
-        const templateData = {
-            "title": title,
-            "conversationid": convo.id,
-        };
-
-        const {html, js} = await Templates.renderForPromise('block_ai_interface/dropdownmenuitem', templateData);
-        Templates.appendNodeContents('.block_ai_interface_action_menu .dropdown-menu', html, js);
-
-        // If we add only one item, it is a new item and not the first and should be on top of history.
-        if (convos.length === 1 && allConversations.length > 1) {
-            console.log("move item to top called");
-            // Make sure elements are in place to be worked with.
-            const dropdown = document.querySelector('.block_ai_interface_action_menu .dropdown-menu');
-            // Select the last element.
-            const lastItem = dropdown.lastElementChild;
-            // Get the reference element for the third position.
-            const thirdChild = dropdown.children[2];
-            // Remove the last item from its current position.
-            dropdown.removeChild(lastItem);
-            // Insert the last item at the new position (before the third child).
-            dropdown.insertBefore(lastItem, thirdChild);
+            // Add entry in menu.
+            const templateData = {
+                "title": title,
+                "conversationid": convo.id,
+            };
+    
+            const {html, js} = await Templates.renderForPromise('block_ai_interface/dropdownmenuitem', templateData);
+            Templates.appendNodeContents('.block_ai_interface_action_menu .dropdown-menu', html, js);
+    
+            // If we add only one item, it is a new item and not the first and should be on top of history.
+            if (convos.length === 1 && allConversations.length > 1) {
+                console.log("move item to top called");
+                // Make sure elements are in place to be worked with.
+                const dropdown = document.querySelector('.block_ai_interface_action_menu .dropdown-menu');
+                // Select the last element.
+                const lastItem = dropdown.lastElementChild;
+                // Get the reference element for the third position.
+                const thirdChild = dropdown.children[2];
+                // Remove the last item from its current position.
+                dropdown.removeChild(lastItem);
+                // Insert the last item at the new position (before the third child).
+                dropdown.insertBefore(lastItem, thirdChild);
+            }
         }
     });
 
@@ -336,11 +344,12 @@ const addToHistory = (convos) => {
  * Remove currrent conversation from history.
  */
 const removeFromHistory = () => {
-    if (conversation.id !== 0) {
+    // Cant remove if new or not yet in history.
+    if (conversation.id !== 0 && allConversations.find(x => x.id === conversation.id) !== undefined) {
         // Remove from dropdown.
         const element = document.querySelector('.block_ai_interface_action_menu [data-id="' + conversation.id + '"]');
         element.remove();
-        // Remove from allConversations array.
+        // Build new allConversations array without deleted one.
         allConversations = allConversations.filter(obj => obj.id !== conversation.id);
     }
 };
@@ -373,8 +382,8 @@ const clearMessages = () => {
  */
 const setModalHeader = (empty = false) => {
     let modalheader = document.querySelector('.ai_interface_modal .modal-title div');
+    let title = '';
     if (modalheader !== null && (conversation.messages.length > 0 || empty)) {
-        let title = '';
         if (!empty) {
             title = ' - ' + conversation.messages[1].message;
             if (conversation.messages[1].message.length > 50) {
