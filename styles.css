@@ -81,6 +81,17 @@
     margin-top: .15rem;
     padding-bottom: .5rem;
 }
+.ai_interface_modal .block_ai_interface-input form {
+    display: flex;
+}
+.ai_interface_modal .block_ai_interface-input textarea {
+    border-top-right-radius: unset;
+    border-bottom-right-radius: unset;
+}
+.ai_interface_modal .block_ai_interface-input button {
+    border-top-left-radius: unset;
+    border-bottom-left-radius: unset;
+}
 .ai_interface_modal .dropdown-menu.addscroll {
     max-height: 455px;
     overflow-y: scroll;

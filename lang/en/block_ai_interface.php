@@ -34,3 +34,4 @@ $string['history'] = 'Show History';
 $string['newconversation'] = 'Start new Thread';
 $string['pluginname'] = 'AI Interface';
 $string['privacy:metadata'] = 'This plugin doesn\'t store personal data.';
+$string['submit'] = 'Submit';

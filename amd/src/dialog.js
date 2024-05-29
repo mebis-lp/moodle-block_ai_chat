@@ -23,6 +23,8 @@ let userid = 0;
 let contextid = 0;
 // First load.
 let firstLoad = true;
+// AI in process of answering.
+let aiAtWork = false;
 
 export const init = async(params) => {
     userid = params.userid;
@@ -40,7 +42,6 @@ export const init = async(params) => {
     // Add class for styling when modal is displayed.
     modal.getRoot().on('modal:shown', function(e) {
         e.target.classList.add("ai_interface_modal");
-        e.target.scrollTo(0, e.target.scrollHeight);
     });
 
     // Load conversations.
@@ -62,8 +63,13 @@ async function showModal() {
     await modal.show();
 
     // Add listener for input submission.
+    const form = document.getElementById('block_ai_form');
+    form.addEventListener("submit", (event) => {
+        submitForm(event);
+    });
     const textarea = document.getElementById('block_ai_interface-input-id');
     addTextareaListener(textarea);
+
 
     if (firstLoad) {
         // Show conversation.
@@ -93,10 +99,6 @@ async function showModal() {
  * @param {*} question
  */
 const enterQuestion = async(question) => {
-
-    // Remove listener, so another question cant be triggered.
-    const textarea = document.getElementById('block_ai_interface-input-id');
-    textarea.removeEventListener('keydown', textareaOnKeydown);
 
     // Deny changing dialogs until answer present?
 
@@ -147,12 +149,6 @@ const enterQuestion = async(question) => {
         requestresult = await askLocalAiManager('chat', question, options);
     }
 
-    if (requestresult.code != 200) {
-        // Requestresult errorhandling.
-        errorHandling();
-        return;
-    }
-
     // Write back answer.
     showReply(requestresult.result);
 
@@ -163,8 +159,8 @@ const enterQuestion = async(question) => {
     // Save new question and answer.
     saveConversationLocally(question, requestresult.result);
 
-    // Readd textarea listener.
-    addTextareaListener(textarea);
+    // Ai is done.
+    aiAtWork = false;
 };
 
 /**
@@ -178,6 +174,7 @@ const showReply = (text) => {
 
 /**
  * Create new / Reset dialog.
+ * @param {bool} deleted
  */
 const newDialog = (deleted = false) => {
     console.log("newDialog called");
@@ -343,9 +340,7 @@ const removeFromHistory = () => {
         const element = document.querySelector('.block_ai_interface_action_menu [data-id="' + conversation.id + '"]');
         element.remove();
         // Remove from allConversations array.
-        console.log(allConversations);
         allConversations = allConversations.filter(obj => obj.id !== conversation.id);
-        console.log(allConversations);
     }
 };
 
@@ -406,12 +401,8 @@ const setModalHeader = (empty = false) => {
  * Focus textarea.
  */
 const focustextarea = () => {
-    // To set focus multiple times, focus has to be reset.
-    const rand = document.getElementsByTagName('input');
-    rand[0].focus();
     const textarea = document.getElementById('block_ai_interface-input-id');
     textarea.focus();
-
 };
 
 /**
@@ -437,10 +428,26 @@ const addTextareaListener = (textarea) => {
  */
 const textareaOnKeydown = (event) => {
     // TODO check for mobile devices.
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && !aiAtWork && !event.shiftKey) {
+        aiAtWork = true;
         enterQuestion(event.target.value);
         event.preventDefault();
         event.target.value = '';
+    }
+};
+
+/**
+ * Submit form.
+ * @param {*} event
+ */
+const submitForm = (event) => {
+    event.preventDefault();
+    // Var aiAtWork to make it impossible to submit multiple questions at once.
+    if (!aiAtWork) {
+        aiAtWork = true;
+        const textarea = document.getElementById('block_ai_interface-input-id');
+        enterQuestion(textarea.value);
+        textarea.value = '';
     }
 };
 
@@ -471,8 +478,3 @@ const copyToClipboard = (element) => {
     // Copy to clipboard using the Clipboard API.
     navigator.clipboard.writeText(textToCopy);
 };
-
-const errorHandling = (code) => {
-    // Replace spinner with error message.
-
-}
