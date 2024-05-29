@@ -43,14 +43,14 @@ export const init = async(params) => {
         e.target.scrollTo(0, e.target.scrollHeight);
     });
 
+    // Load conversations.
+    await getConversations();
+
     // Attach listener to the ai button to call modal.
     let button = document.getElementById("ai_interface_button");
     button.addEventListener('mousedown', function() {
         showModal(params);
     });
-
-    // Load conversations.
-    getConversations();
 };
 
 /**
@@ -59,16 +59,15 @@ export const init = async(params) => {
 async function showModal() {
 
     // Show modal.
-    modal.show();
+    await modal.show();
 
     // Add listener for input submission.
     const textarea = document.getElementById('block_ai_interface-input-id');
     addTextareaListener(textarea);
 
-    console.log(firstLoad);
     if (firstLoad) {
         // Show conversation.
-        // Todo - firstload rewrite header, element is null.
+        // Todo - Evtl. noch firstload verschönern, spinner für header und content z.b.
         showConversation();
 
         // Add history to dropdownmenu.
@@ -79,13 +78,14 @@ async function showModal() {
         btnNewDialog.addEventListener('mousedown', () => {
             newDialog();
         });
+        const btnDeleteDialog = document.getElementById('block_ai_interface_new_dialog');
+        btnDeleteDialog.addEventListener('mousedown', () => {
+            newDialog();
+        });
         firstLoad = false;
     }
 
-    // Wait for the modal to show and set focus.
-    setTimeout(function() {
-        focustextarea();
-    }, 300);
+    focustextarea();
 }
 
 /**
@@ -100,7 +100,7 @@ const enterQuestion = async(question) => {
 
     // Deny changing dialogs until answer present?
 
-    // Add to conversation.
+    // Add to conversation, answer not yet available.
     showMessage(question, 'self', false);
 
     // For first message, add a system message.
@@ -165,13 +165,6 @@ const enterQuestion = async(question) => {
 
     // Readd textarea listener.
     addTextareaListener(textarea);
-
-
-    // Scroll the modal content to the bottom.
-    setTimeout(() => {
-        let modalContent = document.querySelector('.ai_interface_modal .modal-body');
-        modalContent.scrollTop = modalContent.scrollHeight;
-    }, 100);
 };
 
 /**
@@ -189,8 +182,7 @@ const showReply = (text) => {
 const newDialog = () => {
     console.log("newDialog called");
     // Add current convo to history and local representation, if not already there.
-    console.log(allConversations.find(x => x.id === conversation.id));
-    if (allConversations.find(x => x.id === conversation.id) === 'undefined') {
+    if (allConversations.find(x => x.id === conversation.id) === undefined) {
         addToHistory([conversation]);
         allConversations.push(conversation);
     }
@@ -221,13 +213,20 @@ const askLocalAiManager = async(purpose, prompt, options = []) => {
     return result;
 };
 
+const showMessages = () => {
+    console.log("showMessages called");
+    conversation.messages.forEach((val) => {
+        showMessage(val.message, val.sender);
+    });
+};
+
 /**
  * Show answer from local_ai_manager.
  * @param {*} text
  * @param {*} sender User or Ai
  * @param {*} answer Is answer in history
  */
-const showMessage = (text, sender = '', answer = true) => {
+const showMessage = async(text, sender = '', answer = true) => {
     // Skip if sender is system.
     if (sender === 'system') {
         return;
@@ -242,31 +241,11 @@ const showMessage = (text, sender = '', answer = true) => {
         "answer": answer,
     };
     // Call the function to load and render our template.
-    Templates.renderForPromise('block_ai_interface/message', templateData)
-        // It returns a promise that needs to be resoved.
-        .then(({html, js}) => {
-        // Append results.
-        Templates.appendNodeContents('.block_ai_interface-output', html, js);
-            return true;
-        })
-        // Deal with this exception.
-        .catch(ex => displayException(ex));
-};
+    const {html, js} = await Templates.renderForPromise('block_ai_interface/message', templateData);
+    Templates.appendNodeContents('.block_ai_interface-output', html, js);
 
-
-const showMessages = () => {
-    console.log("showMessages called");
-    conversation.messages.forEach((val) => {
-        showMessage(val.message, val.sender);
-    });
-
-    // Scroll to bottom, when changing conversations.
-    const modaldiv = document.querySelector('.ai_interface_modal');
-    if (modaldiv !== null) {
-        setTimeout(() => {
-            modaldiv.scrollTo(0, modaldiv.scrollHeight);
-        }, 5);
-    }
+    // Scroll the modal content to the bottom.
+    scrollToBottom();
 };
 
 /**
@@ -284,6 +263,7 @@ const clearMessages = () => {
 const getConversations = async() => {
     console.log("allConversations called");
     try {
+        // Ist hier await nötig um in init auf den Button listener zu warten?
         allConversations = await externalServices.getAllConversations(userid, contextid);
     } catch (error) {
         displayException(error);
@@ -295,31 +275,44 @@ const getConversations = async() => {
  * @param {*} convos Conversations
  */
 const addToHistory = (convos) => {
-    convos.forEach((convo) => {
+    convos.forEach(async(convo) => {
         // Conditionally shorten menu title, skip system message.
         let title = convo.messages[1].message;
         if (convo.messages[1].message.length > 50) {
             title = convo.messages[1].message.substring(0, 50);
             title += ' ...';
         }
-        console.log(convo);
-        console.log(convo.id);
 
         // Add entry in menu.
         const templateData = {
             "title": title,
             "conversationid": convo.id,
         };
-        Templates.renderForPromise('block_ai_interface/dropdownmenuitem', templateData)
-            // It returns a promise that needs to be resoved.
-            .then(({html, js}) => {
-                // Append results.
-                Templates.appendNodeContents('.block_ai_interface_action_menu .dropdown-menu', html, js);
-                return true;
-            })
-            // Deal with this exception.
-            .catch(ex => displayException(ex));
+
+        const {html, js} = await Templates.renderForPromise('block_ai_interface/dropdownmenuitem', templateData);
+        Templates.appendNodeContents('.block_ai_interface_action_menu .dropdown-menu', html, js);
+
+        // If we add only one item, it is a new item and should be on top of history.
+        if (convos.length === 1) {
+            console.log("move item to top called");
+            // Make sure elements are in place to be worked with.
+            const dropdown = document.querySelector('.block_ai_interface_action_menu .dropdown-menu');
+            // Select the last element.
+            const lastItem = dropdown.lastElementChild;
+            // Get the reference element for the third position.
+            const thirdChild = dropdown.children[2];
+            // Remove the last item from its current position.
+            dropdown.removeChild(lastItem);
+            // Insert the last item at the new position (before the third child).
+            dropdown.insertBefore(lastItem, thirdChild);                
+        }
     });
+
+    // If we have more than 9 items, add scrollbar to menu.
+    if (convos.length > 9) {
+        const dropdown = document.querySelector('.block_ai_interface_action_menu .dropdown-menu');
+        dropdown.classList.add("addscroll");
+    }
 };
 
 
@@ -330,7 +323,6 @@ const addToHistory = (convos) => {
 const showConversation = (id = 0) => {
     // Change conversation or get last conversation.
     console.log("showConversation called");
-    console.log(typeof allConversations[0]);
     if (id !== 0) {
         conversation = allConversations.find(x => x.id === id);
     } else if (typeof allConversations[0] !== 'undefined') {
@@ -339,11 +331,8 @@ const showConversation = (id = 0) => {
     }
     clearMessages();
     showMessages();
-    // Wait till elements can be interacted with.
-    setTimeout(() => {
-        setModalHeader();
-        attachCopyListener();
-    }, 235);
+    setModalHeader();
+    attachCopyListener();
 };
 // Make globally accessible since it is used to show history in dropdownmenuitem.mustache.
 document.showConversation = showConversation;
@@ -370,9 +359,9 @@ const setModalHeader = (empty = false) => {
     if (modalheader !== null && (conversation.messages.length > 0 || empty)) {
         let title = '';
         if (!empty) {
-            title = ' - ' + conversation.messages[0].message;
-            if (conversation.messages[0].message.length > 50) {
-                title = ' - ' + conversation.messages[0].message.substring(0, 50);
+            title = ' - ' + conversation.messages[1].message;
+            if (conversation.messages[1].message.length > 50) {
+                title = ' - ' + conversation.messages[1].message.substring(0, 50);
                 title += ' ...';
             }
         }
@@ -381,33 +370,24 @@ const setModalHeader = (empty = false) => {
 };
 
 /**
- * Focus textarea, also wait till element is visible.
+ * Focus textarea.
  */
 const focustextarea = () => {
-    let elapsed = 0;
-    const interval = 25;
-    const timeout = 2000;
+    // To set focus multiple times, focus has to be reset.
+    const rand = document.getElementsByTagName('input');
+    rand[0].focus();
+    const textarea = document.getElementById('block_ai_interface-input-id');
+    textarea.focus();
 
-    const checkInterval = setInterval(() => {
-        // Check if the textarea exists.
-        const textarea = document.getElementById('block_ai_interface-input-id');
-        // textarea is a bad check, test with transition to be completed.
-        if (textarea) {
-            clearInterval(checkInterval);
-            // To set focus multiple times, focus has to be reset.
-            const rand = document.getElementsByTagName('input');
-            rand[0].focus();
-            textarea.focus();
-        }
+};
 
-        // Increment elapsed time.
-        elapsed += interval;
-
-        // Check if the timeout has been reached.
-        if (elapsed >= timeout) {
-            clearInterval(checkInterval);
-        }
-    }, interval);
+/**
+ * Scroll to bottom of modal body.
+ */
+const scrollToBottom = () => {
+    console.log("scroll to bottom called");
+    const modalContent = document.querySelector('.ai_interface_modal .modal-body');
+    modalContent.scrollTop = modalContent.scrollHeight;
 };
 
 /**

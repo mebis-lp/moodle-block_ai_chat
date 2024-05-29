@@ -81,6 +81,11 @@
     margin-top: .15rem;
     padding-bottom: .5rem;
 }
+.ai_interface_modal .dropdown-menu.addscroll {
+    max-height: 455px;
+    overflow-y: scroll;
+}
+
 .ai_fake_block {
     visibility: hidden;
     height: 0;
