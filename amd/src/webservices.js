@@ -51,3 +51,22 @@ export const getNewConversationId = (
     args: {
         contextid,
 }}])[0];
+
+/**
+ * Get all converstations a User can see.
+ * @param {int} contextid
+ * @param {int} userid
+ * @param {int} conversationid
+ * @returns {mixed}
+ */
+export const deleteConversation = (
+    contextid,
+    userid,
+    conversationid,
+) => fetchMany([{
+    methodname: 'block_ai_interface_delete_conversation',
+    args: {
+        contextid,
+        userid,
+        conversationid,
+}}])[0];

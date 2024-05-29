@@ -78,9 +78,9 @@ async function showModal() {
         btnNewDialog.addEventListener('mousedown', () => {
             newDialog();
         });
-        const btnDeleteDialog = document.getElementById('block_ai_interface_new_dialog');
-        btnDeleteDialog.addEventListener('mousedown', () => {
-            newDialog();
+        const btnDeleteDialog = document.getElementById('block_ai_interface_delete_dialog');
+        btnDeleteDialog.addEventListener('click', () => {
+            deleteCurrentDialog();
         });
         firstLoad = false;
     }
@@ -179,10 +179,10 @@ const showReply = (text) => {
 /**
  * Create new / Reset dialog.
  */
-const newDialog = () => {
+const newDialog = (deleted = false) => {
     console.log("newDialog called");
     // Add current convo to history and local representation, if not already there.
-    if (allConversations.find(x => x.id === conversation.id) === undefined) {
+    if (allConversations.find(x => x.id === conversation.id) === undefined && !deleted) {
         addToHistory([conversation]);
         allConversations.push(conversation);
     }
@@ -193,6 +193,25 @@ const newDialog = () => {
     };
     clearMessages();
     setModalHeader(true);
+};
+
+/**
+ * Delete /hide current dialog.
+ */
+const deleteCurrentDialog = async() => {
+    console.log("deleteCurrentDialog called");
+    if (conversation.id !== 0) {
+        try {
+            const deleted = await externalServices.deleteConversation(contextid, userid, conversation.id);
+            if (deleted) {
+                removeFromHistory();
+                showConversation();
+                // newDialog(true);
+            }
+        } catch (error) {
+            displayException(error);
+        }
+    }
 };
 
 /**
@@ -315,6 +334,20 @@ const addToHistory = (convos) => {
     }
 };
 
+/**
+ * Remove currrent conversation from history.
+ */
+const removeFromHistory = () => {
+    if (conversation.id !== 0) {
+        // Remove from dropdown.
+        const element = document.querySelector('.block_ai_interface_action_menu [data-id="' + conversation.id + '"]');
+        element.remove();
+        // Remove from allConversations array.
+        console.log(allConversations);
+        allConversations = allConversations.filter(obj => obj.id !== conversation.id);
+        console.log(allConversations);
+    }
+};
 
 /**
  * Function to set conversation.

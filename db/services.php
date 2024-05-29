@@ -44,4 +44,12 @@ $functions = [
         'ajax'          => true,
         'capabilities'  => '', // TODO add cap
     ],
+    'block_ai_interface_delete_conversation' => [
+        'classname'     => 'block_ai_interface\external\delete_conversation',
+        'methodname'    => 'execute',
+        'description'   => 'Delete/Hide conversation from history.',
+        'type'          => 'write',
+        'ajax'          => true,
+        'capabilities'  => '', // TODO add cap
+    ],
 ];
