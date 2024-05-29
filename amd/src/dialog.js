@@ -126,9 +126,8 @@ const showConversation = (id = 0) => {
         newDialog(true);
     }
     clearMessages();
-    showMessages();
     setModalHeader();
-    helper.attachCopyListener();
+    showMessages();
 };
 // Make globally accessible since it is used to show history in dropdownmenuitem.mustache.
 document.showConversation = showConversation;
@@ -249,6 +248,11 @@ const showMessage = async(text, sender = '', answer = true) => {
     // Call the function to load and render our template.
     const {html, js} = await Templates.renderForPromise('block_ai_interface/message', templateData);
     Templates.appendNodeContents('.block_ai_interface-output', html, js);
+
+    // Add copy listener for replys.
+    if (sender === '') {
+        helper.attachCopyListenerLast();
+    }
 
     // Scroll the modal content to the bottom.
     helper.scrollToBottom();

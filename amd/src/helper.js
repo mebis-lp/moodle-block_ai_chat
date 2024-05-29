@@ -2,7 +2,7 @@
  * Copy ai reply to clipboard.
  * @param {*} element
  */
-export const copyToClipboard = (element) => {
+export const copyToClipboard = async(element) => {
 
     // Find the adjacent text container.
     const textElement = element.nextElementSibling;
@@ -12,17 +12,24 @@ export const copyToClipboard = (element) => {
 
     // Copy to clipboard using the Clipboard API.
     navigator.clipboard.writeText(textToCopy);
+
+    // Briefly show toast.
+    const toast = element.previousElementSibling;
+    toast.style.visibility = 'visible';
+    setTimeout(() => {
+       toast.style.visibility = 'hidden'; 
+    }, 750);
+
 };
 
 /**
  * Attach copy listener to all elements.
  */
-export const attachCopyListener = () => {
+export const attachCopyListenerLast = () => {
     const elements = document.querySelectorAll(".ai_interface_modal .copy");
-    elements.forEach((element) => {
-        element.addEventListener('mousedown', function() {
-            copyToClipboard(element);
-        });
+    const last = elements[elements.length - 1];
+    last.addEventListener('click', function() {
+        copyToClipboard(last);
     });
 };
 

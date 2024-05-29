@@ -26,6 +26,7 @@
 $string['ai_interface'] = 'AI Interface';
 $string['ai_interface:addinstance'] = 'Add a AI Interface block';
 $string['ai_interface:myaddinstance'] = 'Add a AI Interface block to my moodle';
+$string['copied'] = 'Copied';
 $string['delete'] = 'Delete current Dialog';
 $string['dialog'] = 'AI Dialog';
 $string['enable'] = 'Activate interface';

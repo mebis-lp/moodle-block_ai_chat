@@ -77,6 +77,16 @@
     visibility: visible;
     cursor: pointer;
 }
+.ai_interface_modal .copiedtoast {
+    position: absolute;
+    top: -15px;
+    right: 0;
+    font-size: small;
+    border: 1px solid;
+    padding: 1px 3px;
+    background: white;
+    visibility: hidden;
+}
 .ai_interface_modal .block_ai_interface-input {
     display: flex;
     margin-top: .15rem;
