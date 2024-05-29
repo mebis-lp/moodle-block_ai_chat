@@ -2,8 +2,8 @@ import DialogModal from 'block_ai_interface/dialog_modal';
 import * as externalServices from 'block_ai_interface/webservices';
 import Templates from 'core/templates';
 import {exception as displayException} from 'core/notification';
-import {makeRequest} from 'local_ai_manager/make_request';
-import { getNewConversationId } from './webservices';
+import * as helper from 'block_ai_interface/helper';
+import * as manager from 'block_ai_interface/ai_manager';
 
 // Declare variables.
 // Modal.
@@ -63,12 +63,12 @@ async function showModal() {
     await modal.show();
 
     // Add listener for input submission.
-    const form = document.getElementById('block_ai_form');
-    form.addEventListener("submit", (event) => {
-        submitForm(event);
-    });
     const textarea = document.getElementById('block_ai_interface-input-id');
     addTextareaListener(textarea);
+    const button = document.getElementById('block_ai_interface-submit-id');
+    button.addEventListener("click", (event) => {
+        clickSubmitButton(event);
+    });
 
 
     if (firstLoad) {
@@ -91,8 +91,44 @@ async function showModal() {
         firstLoad = false;
     }
 
-    focustextarea();
+    helper.focustextarea();
 }
+
+
+/**
+ * Webservice Get all conversations.
+ */
+const getConversations = async() => {
+    console.log("allConversations called");
+    try {
+        // Ist hier await nötig um in init auf den Button listener zu warten?
+        allConversations = await externalServices.getAllConversations(userid, contextid);
+    } catch (error) {
+        displayException(error);
+    }
+};
+
+/**
+ * Function to set conversation.
+ * @param {*} id
+ */
+const showConversation = (id = 0) => {
+    // Change conversation or get last conversation.
+    console.log("showConversation called");
+    if (id !== 0) {
+        conversation = allConversations.find(x => x.id === id);
+    } else if (typeof allConversations[0] !== 'undefined') {
+        console.log("last item allconv");
+        conversation = allConversations.at(0);
+    }
+    clearMessages();
+    showMessages();
+    setModalHeader();
+    helper.attachCopyListener();
+};
+// Make globally accessible since it is used to show history in dropdownmenuitem.mustache.
+document.showConversation = showConversation;
+
 
 /**
  * Send input to ai connector.
@@ -101,6 +137,10 @@ async function showModal() {
 const enterQuestion = async(question) => {
 
     // Deny changing dialogs until answer present?
+    if (question == '') {
+        aiAtWork = false;
+        return;
+    }
 
     // Add to conversation, answer not yet available.
     showMessage(question, 'self', false);
@@ -134,7 +174,7 @@ const enterQuestion = async(question) => {
 
 
     // Send to local_ai_manager.
-    let requestresult = await askLocalAiManager('chat', question, options);
+    let requestresult = await manager.askLocalAiManager('chat', question, options);
     // If code 409, conversationid is already taken, get new one.
     while (requestresult.code == 409) {
         // Todo test, sleep and falsify db entry so error is triggered and a new id is given.
@@ -146,7 +186,7 @@ const enterQuestion = async(question) => {
             displayException(error);
         }
         // Retry with new id.
-        requestresult = await askLocalAiManager('chat', question, options);
+        requestresult = await manager.askLocalAiManager('chat', question, options);
     }
 
     // Write back answer.
@@ -154,7 +194,7 @@ const enterQuestion = async(question) => {
 
     // Attach copy listener.
     let copy = document.querySelector('.ai_interface_modal .awaitanswer .copy');
-    copyToClipboard(copy);
+    helper.copyToClipboard(copy);
 
     // Save new question and answer.
     saveConversationLocally(question, requestresult.result);
@@ -170,6 +210,41 @@ const enterQuestion = async(question) => {
 const showReply = (text) => {
     let field = document.querySelector('.ai_interface_modal .awaitanswer .text div');
     field.replaceWith(text);
+};
+
+const showMessages = () => {
+    console.log("showMessages called");
+    conversation.messages.forEach((val) => {
+        showMessage(val.message, val.sender);
+    });
+};
+
+/**
+ * Show answer from local_ai_manager.
+ * @param {*} text
+ * @param {*} sender User or Ai
+ * @param {*} answer Is answer in history
+ */
+const showMessage = async(text, sender = '', answer = true) => {
+    // Skip if sender is system.
+    if (sender === 'system') {
+        return;
+    }
+    // Imitate bool for message.mustache logic {{#sender}}.
+    if (sender === 'ai') {
+        sender = '';
+    }
+    const templateData = {
+        "sender": sender,
+        "content": text,
+        "answer": answer,
+    };
+    // Call the function to load and render our template.
+    const {html, js} = await Templates.renderForPromise('block_ai_interface/message', templateData);
+    Templates.appendNodeContents('.block_ai_interface-output', html, js);
+
+    // Scroll the modal content to the bottom.
+    helper.scrollToBottom();
 };
 
 /**
@@ -211,80 +286,6 @@ const deleteCurrentDialog = async() => {
     }
 };
 
-/**
- * Get the async answer from the local_ai_manager.
- *
- * @param {string} purpose
- * @param {string} prompt
- * @param {array} options
- * @returns {string}
- */
-const askLocalAiManager = async(purpose, prompt, options = []) => {
-    let result;
-    try {
-        result = await makeRequest(purpose, prompt, JSON.stringify(options));
-    } catch (error) {
-        displayException(error);
-    }
-    return result;
-};
-
-const showMessages = () => {
-    console.log("showMessages called");
-    conversation.messages.forEach((val) => {
-        showMessage(val.message, val.sender);
-    });
-};
-
-/**
- * Show answer from local_ai_manager.
- * @param {*} text
- * @param {*} sender User or Ai
- * @param {*} answer Is answer in history
- */
-const showMessage = async(text, sender = '', answer = true) => {
-    // Skip if sender is system.
-    if (sender === 'system') {
-        return;
-    }
-    // Imitate bool for message.mustache logic {{#sender}}.
-    if (sender === 'ai') {
-        sender = '';
-    }
-    const templateData = {
-        "sender": sender,
-        "content": text,
-        "answer": answer,
-    };
-    // Call the function to load and render our template.
-    const {html, js} = await Templates.renderForPromise('block_ai_interface/message', templateData);
-    Templates.appendNodeContents('.block_ai_interface-output', html, js);
-
-    // Scroll the modal content to the bottom.
-    scrollToBottom();
-};
-
-/**
- * Clear output div.
- */
-const clearMessages = () => {
-    console.log("clearMessages called");
-    const output = document.querySelector('.block_ai_interface-output');
-    output.innerHTML = '';
-};
-
-/**
- * Webservice Get all conversations.
- */
-const getConversations = async() => {
-    console.log("allConversations called");
-    try {
-        // Ist hier await nötig um in init auf den Button listener zu warten?
-        allConversations = await externalServices.getAllConversations(userid, contextid);
-    } catch (error) {
-        displayException(error);
-    }
-};
 
 /**
  * Add conversations to history.
@@ -308,8 +309,8 @@ const addToHistory = (convos) => {
         const {html, js} = await Templates.renderForPromise('block_ai_interface/dropdownmenuitem', templateData);
         Templates.appendNodeContents('.block_ai_interface_action_menu .dropdown-menu', html, js);
 
-        // If we add only one item, it is a new item and should be on top of history.
-        if (convos.length === 1) {
+        // If we add only one item, it is a new item and not the first and should be on top of history.
+        if (convos.length === 1 && allConversations.length > 1) {
             console.log("move item to top called");
             // Make sure elements are in place to be worked with.
             const dropdown = document.querySelector('.block_ai_interface_action_menu .dropdown-menu');
@@ -320,7 +321,7 @@ const addToHistory = (convos) => {
             // Remove the last item from its current position.
             dropdown.removeChild(lastItem);
             // Insert the last item at the new position (before the third child).
-            dropdown.insertBefore(lastItem, thirdChild);                
+            dropdown.insertBefore(lastItem, thirdChild);
         }
     });
 
@@ -345,27 +346,6 @@ const removeFromHistory = () => {
 };
 
 /**
- * Function to set conversation.
- * @param {*} id
- */
-const showConversation = (id = 0) => {
-    // Change conversation or get last conversation.
-    console.log("showConversation called");
-    if (id !== 0) {
-        conversation = allConversations.find(x => x.id === id);
-    } else if (typeof allConversations[0] !== 'undefined') {
-        console.log("last item allconv");
-        conversation = allConversations.at(0);
-    }
-    clearMessages();
-    showMessages();
-    setModalHeader();
-    attachCopyListener();
-};
-// Make globally accessible since it is used to show history in dropdownmenuitem.mustache.
-document.showConversation = showConversation;
-
-/**
  * Webservice Save conversation.
  * @param {*} question
  * @param {*} reply
@@ -376,6 +356,15 @@ const saveConversationLocally = (question, reply) => {
     conversation.messages.push(message);
     message = {'message': reply, 'sender': 'ai'};
     conversation.messages.push(message);
+};
+
+/**
+ * Clear output div.
+ */
+const clearMessages = () => {
+    console.log("clearMessages called");
+    const output = document.querySelector('.block_ai_interface-output');
+    output.innerHTML = '';
 };
 
 /**
@@ -395,23 +384,6 @@ const setModalHeader = (empty = false) => {
         }
         modalheader.innerHTML = modaltitle + title;
     }
-};
-
-/**
- * Focus textarea.
- */
-const focustextarea = () => {
-    const textarea = document.getElementById('block_ai_interface-input-id');
-    textarea.focus();
-};
-
-/**
- * Scroll to bottom of modal body.
- */
-const scrollToBottom = () => {
-    console.log("scroll to bottom called");
-    const modalContent = document.querySelector('.ai_interface_modal .modal-body');
-    modalContent.scrollTop = modalContent.scrollHeight;
 };
 
 /**
@@ -438,10 +410,8 @@ const textareaOnKeydown = (event) => {
 
 /**
  * Submit form.
- * @param {*} event
  */
-const submitForm = (event) => {
-    event.preventDefault();
+const clickSubmitButton = () => {
     // Var aiAtWork to make it impossible to submit multiple questions at once.
     if (!aiAtWork) {
         aiAtWork = true;
@@ -449,32 +419,4 @@ const submitForm = (event) => {
         enterQuestion(textarea.value);
         textarea.value = '';
     }
-};
-
-/**
- * Attach copy listener to all elements.
- */
-const attachCopyListener = () => {
-    const elements = document.querySelectorAll(".ai_interface_modal .copy");
-    elements.forEach((element) => {
-        element.addEventListener('mousedown', function() {
-            copyToClipboard(element);
-        });
-    });
-}
-
-/**
- * Copy ai reply to clipboard.
- * @param {*} element
- */
-const copyToClipboard = (element) => {
-
-    // Find the adjacent text container.
-    const textElement = element.nextElementSibling;
-
-    // Get the text content.
-    const textToCopy = textElement.innerText || textElement.textContent;
-
-    // Copy to clipboard using the Clipboard API.
-    navigator.clipboard.writeText(textToCopy);
 };

@@ -78,11 +78,9 @@
     cursor: pointer;
 }
 .ai_interface_modal .block_ai_interface-input {
+    display: flex;
     margin-top: .15rem;
     padding-bottom: .5rem;
-}
-.ai_interface_modal .block_ai_interface-input form {
-    display: flex;
 }
 .ai_interface_modal .block_ai_interface-input textarea {
     border-top-right-radius: unset;
