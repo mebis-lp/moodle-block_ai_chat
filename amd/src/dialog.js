@@ -4,6 +4,7 @@ import Templates from 'core/templates';
 import {exception as displayException} from 'core/notification';
 import * as helper from 'block_ai_interface/helper';
 import * as manager from 'block_ai_interface/ai_manager';
+import {getString} from 'core/str';
 
 // Declare variables.
 // Modal.
@@ -179,17 +180,10 @@ const enterQuestion = async(question) => {
 
     // Send to local_ai_manager.
     let requestresult = await manager.askLocalAiManager('chat', question, options);
-    // If code 409, conversationid is already taken, get new one.
-    while (requestresult.code == 409) {
-        try {
-            let idresult = await externalServices.getNewConversationId(contextid);
-            conversation.id = idresult.id;
-            options.itemid = conversation.id;
-        } catch (error) {
-            displayException(error);
-        }
-        // Retry with new id.
-        requestresult = await manager.askLocalAiManager('chat', question, options);
+
+    // Handle errors.
+    if (requestresult.code != '200') {
+        requestresult = await errorHandling(requestresult, question, options);
     }
 
     // Write back answer.
@@ -432,4 +426,38 @@ const clickSubmitButton = () => {
         enterQuestion(textarea.value);
         textarea.value = '';
     }
+};
+
+/**
+ * Handle error from local_ai_manager.
+ * @param {*} requestresult
+ * @param {*} question
+ * @param {*} options
+ * @returns {object}
+ */
+const errorHandling = async(requestresult, question, options) => {
+
+    // If code 409, conversationid is already taken, try get new a one.
+    if (requestresult.code == 409) {
+        while (requestresult.code == 409) {
+            try {
+                let idresult = await externalServices.getNewConversationId(contextid);
+                conversation.id = idresult.id;
+                options.itemid = conversation.id;
+            } catch (error) {
+                displayException(error);
+            }
+            // Retry with new id.
+            requestresult = await manager.askLocalAiManager('chat', question, options);
+            return requestresult;
+        }
+    }
+
+    // If any other errorcode, alert with errormessage.
+    const errorString = await getString('errorwithcode', 'block_ai_interface', requestresult.code);
+    await alert(errorString, requestresult.result);
+
+    // And write generic error message in chatbot.
+    requestresult.result = await getString('error', 'block_ai_interface');
+    return requestresult;
 };
