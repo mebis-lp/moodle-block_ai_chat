@@ -15,6 +15,14 @@
 
     border: 1px solid var(--color-secondary-border);
 }
+@media (max-width: 576px) {
+    #ai_interface_button {
+        top: 80vh;
+        right: .5rem;
+        bottom: unset;
+    }
+}
+
 .drawer-right.show #ai_interface_button,
 .show-drawer-right #ai_interface_button {
     right: calc(315px + 2rem);
@@ -71,7 +79,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    padding: .5rem .75rem .75rem .75rem;
+    padding: .5rem .75rem 2.5rem 2.75rem;
 }
 .ai_interface_modal .message.ai:hover .copy {
     visibility: visible;

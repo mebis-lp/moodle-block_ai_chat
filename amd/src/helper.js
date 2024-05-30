@@ -2,7 +2,7 @@
  * Copy ai reply to clipboard.
  * @param {*} element
  */
-export const copyToClipboard = async(element) => {
+export const copyToClipboard = (element) => {
 
     // Find the adjacent text container.
     const textElement = element.nextElementSibling;
