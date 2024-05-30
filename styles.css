@@ -1,7 +1,7 @@
 #ai_interface_button {
     visibility: visible;
     position: fixed;
-    bottom: calc(2rem + 36px);
+    bottom: 1.9rem;
     right: 2rem;
     width: 36px;
     transition: 0.2s;
@@ -17,7 +17,7 @@
 }
 @media (max-width: 576px) {
     #ai_interface_button {
-        top: 80vh;
+        top: 79vh;
         right: .5rem;
         bottom: unset;
     }
@@ -43,10 +43,6 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-}
-
-.block_ai_interface_action_menu {
-    
 }
 .ai_interface_modal .modal-body {
     display: flex;

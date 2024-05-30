@@ -182,7 +182,7 @@ const enterQuestion = async(question) => {
     let requestresult = await manager.askLocalAiManager('chat', question, options);
 
     // Handle errors.
-    if (requestresult.code != '200') {
+    if (requestresult.code != 200) {
         requestresult = await errorHandling(requestresult, question, options);
     }
 
@@ -389,7 +389,7 @@ const setModalHeader = (empty = false) => {
                 title += ' ...';
             }
         }
-        modalheader.innerHTML = modaltitle + title;
+        modalheader.textContent = modaltitle + title;
     }
 };
 
