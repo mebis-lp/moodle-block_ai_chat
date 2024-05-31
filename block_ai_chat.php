@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Block class for block_ai_interface
+ * Block class for block_ai_chat
  *
- * @package    block_ai_interface
+ * @package    block_ai_chat
  * @copyright  2024 ISB Bayern
  * @author     Tobias Garske
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class block_ai_interface extends block_base {
+class block_ai_chat extends block_base {
 
     /**
      * Initialize block
@@ -31,7 +31,7 @@ class block_ai_interface extends block_base {
      * @throws coding_exception
      */
     public function init(): void {
-        $this->title = get_string('ai_interface', 'block_ai_interface');
+        $this->title = get_string('ai_chat', 'block_ai_chat');
     }
 
     /**
@@ -85,10 +85,10 @@ class block_ai_interface extends block_base {
         $context = new stdClass;
         $context->sesskey = sesskey();
 
-        $aioutput = $this->page->get_renderer('block_ai_interface');
-        $this->content->text = $aioutput->render_ai_interface_content();
+        $aioutput = $this->page->get_renderer('block_ai_chat');
+        $this->content->text = $aioutput->render_ai_chat_content();
 
-        $this->content->text = $OUTPUT->render_from_template('block_ai_interface/floatingbutton', $context);
+        $this->content->text = $OUTPUT->render_from_template('block_ai_chat/floatingbutton', $context);
 
         return $dummy;
     }

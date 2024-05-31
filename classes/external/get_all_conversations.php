@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace block_ai_interface\external;
+namespace block_ai_chat\external;
 
 use core_external\external_api;
 use core_external\external_function_parameters;
@@ -25,7 +25,7 @@ use core_external\external_value;
 /**
  * Class get_all_conversations, to retrieve all visible conversations.
  *
- * @package    block_ai_interface
+ * @package    block_ai_chat
  * @copyright  2024 Tobias Garske, ISB Bayern
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -71,7 +71,7 @@ class get_all_conversations extends external_api {
         // As well as from pupils having a teacher role.
 
         $result = [];
-        $response = \local_ai_manager\ai_manager_utils::get_log_entries('block_ai_interface', $contextid, $USER->id);
+        $response = \local_ai_manager\ai_manager_utils::get_log_entries('block_ai_chat', $contextid, $USER->id);
         // Get the latest log entries unique by itemid.
         foreach ($response as $value) {
             // Ignore values without itemid.

@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for block_ai_interface
+ * Version information for block_ai_chat
  *
- * @package    block_ai_interface
+ * @package    block_ai_chat
  * @copyright  2024 ISB Bayern
  * @author     Tobias Garske
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,5 +28,5 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->release = '0.1';
 $plugin->version = 2024051512;
 $plugin->requires = 2023010101;
-$plugin->component = 'block_ai_interface';
+$plugin->component = 'block_ai_chat';
 $plugin->maturity = MATURITY_ALPHA;

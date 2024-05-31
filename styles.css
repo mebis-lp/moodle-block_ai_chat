@@ -1,4 +1,4 @@
-#ai_interface_button {
+#ai_chat_button {
     visibility: visible;
     position: fixed;
     bottom: 1.9rem;
@@ -16,72 +16,72 @@
     border: 1px solid var(--color-secondary-border);
 }
 @media (max-width: 576px) {
-    #ai_interface_button {
+    #ai_chat_button {
         top: 79vh;
         right: .5rem;
         bottom: unset;
     }
 }
 
-.drawer-right.show #ai_interface_button,
-.show-drawer-right #ai_interface_button {
+.drawer-right.show #ai_chat_button,
+.show-drawer-right #ai_chat_button {
     right: calc(315px + 2rem);
 }
-#ai_interface_button .icon {
+#ai_chat_button .icon {
     width: auto;
     margin-right: 0;
 }
-#ai_interface_button:hover {
+#ai_chat_button:hover {
     filter: hue-rotate(10deg) brightness(90%);
 }
 
-.ai_interface_modal .modal-dialog {
+.ai_chat_modal .modal-dialog {
     max-width: 1000px;
     min-height: 500px;
 }
-.ai_interface_modal .modal-title {
+.ai_chat_modal .modal-title {
     display: flex;
     justify-content: space-between;
     width: 100%;
 }
-.ai_interface_modal .modal-body {
+.ai_chat_modal .modal-body {
     display: flex;
     padding: 2rem;
 }
-.ai_interface_modal .modal-body .block_ai_interface-dialog {
+.ai_chat_modal .modal-body .block_ai_chat-dialog {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     width: 100%;
 }
-.ai_interface_modal .content {
+.ai_chat_modal .content {
     padding: .5rem 1rem .5rem 1rem;
     margin-bottom: .5rem;
     position: relative;
 }
-.ai_interface_modal .identity {
+.ai_chat_modal .identity {
     padding-left: 1rem;
     font-weight: bold;
 }
-.ai_interface_modal .identity {
+.ai_chat_modal .identity {
     padding-left: 1rem;
     font-weight: bold;
 }
-.ai_interface_modal .content:hover {
+.ai_chat_modal .content:hover {
     background-color: var(--color-gray-light);
 }
-.ai_interface_modal .message .copy {
+.ai_chat_modal .message .copy {
     visibility: hidden;
     position: absolute;
     top: 0;
     right: 0;
     padding: .5rem .75rem 2.5rem 2.75rem;
 }
-.ai_interface_modal .message.ai:hover .copy {
+.ai_chat_modal .message.ai:hover .copy {
     visibility: visible;
     cursor: pointer;
 }
-.ai_interface_modal .copiedtoast {
+.ai_chat_modal .copiedtoast {
     position: absolute;
     top: -15px;
     right: 0;
@@ -91,22 +91,22 @@
     background: white;
     visibility: hidden;
 }
-.ai_interface_modal .block_ai_interface-input {
+.ai_chat_modal .block_ai_chat-input {
     display: flex;
     margin-top: .15rem;
     padding-bottom: .5rem;
 }
-.ai_interface_modal .block_ai_interface-input textarea {
+.ai_chat_modal .block_ai_chat-input textarea {
     border-top-right-radius: unset;
     border-bottom-right-radius: unset;
     margin-right: 2px;
     border-right: none;
 }
-.ai_interface_modal .block_ai_interface-input button {
+.ai_chat_modal .block_ai_chat-input button {
     border-top-left-radius: unset;
     border-bottom-left-radius: unset;
 }
-.ai_interface_modal .dropdown-menu.addscroll {
+.ai_chat_modal .dropdown-menu.addscroll {
     max-height: 455px;
     overflow-y: scroll;
 }

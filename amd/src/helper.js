@@ -26,7 +26,7 @@ export const copyToClipboard = (element) => {
  * Attach copy listener to all elements.
  */
 export const attachCopyListenerLast = () => {
-    const elements = document.querySelectorAll(".ai_interface_modal .copy");
+    const elements = document.querySelectorAll(".ai_chat_modal .copy");
     const last = elements[elements.length - 1];
     last.addEventListener('click', function() {
         copyToClipboard(last);
@@ -38,7 +38,7 @@ export const attachCopyListenerLast = () => {
  * Focus textarea.
  */
 export const focustextarea = () => {
-    const textarea = document.getElementById('block_ai_interface-input-id');
+    const textarea = document.getElementById('block_ai_chat-input-id');
     textarea.focus();
 };
 
@@ -48,6 +48,6 @@ export const focustextarea = () => {
  */
 export const scrollToBottom = () => {
     console.log("scroll to bottom called");
-    const modalContent = document.querySelector('.ai_interface_modal .modal-body');
+    const modalContent = document.querySelector('.ai_chat_modal .modal-body');
     modalContent.scrollTop = modalContent.scrollHeight;
 };

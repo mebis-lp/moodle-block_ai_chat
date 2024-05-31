@@ -16,7 +16,7 @@
 /**
  * TODO describe module dialog_modal
  *
- * @module     block_ai_interface/dialog_modal
+ * @module     block_ai_chat/dialog_modal
  * @copyright  2024 Tobias Garske, ISB Bayern
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -24,8 +24,8 @@
 import Modal from 'core/modal';
 
 export default class DialogModal extends Modal {
-    static TYPE = "block_ai_interface/dialog_modal";
-    static TEMPLATE = "block_ai_interface/dialog_modal";
+    static TYPE = "block_ai_chat/dialog_modal";
+    static TEMPLATE = "block_ai_chat/dialog_modal";
 
     configure(modalConfig) {
         // Show this modal on instantiation.

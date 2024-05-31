@@ -1,9 +1,9 @@
-import DialogModal from 'block_ai_interface/dialog_modal';
-import * as externalServices from 'block_ai_interface/webservices';
+import DialogModal from 'block_ai_chat/dialog_modal';
+import * as externalServices from 'block_ai_chat/webservices';
 import Templates from 'core/templates';
 import {alert, exception as displayException} from 'core/notification';
-import * as helper from 'block_ai_interface/helper';
-import * as manager from 'block_ai_interface/ai_manager';
+import * as helper from 'block_ai_chat/helper';
+import * as manager from 'block_ai_chat/ai_manager';
 import {getString} from 'core/str';
 
 // Declare variables.
@@ -46,7 +46,7 @@ export const init = async(params) => {
 
     // Add class for styling when modal is displayed.
     modal.getRoot().on('modal:shown', function(e) {
-        e.target.classList.add("ai_interface_modal");
+        e.target.classList.add("ai_chat_modal");
     });
 
     // Load conversations.
@@ -57,14 +57,14 @@ export const init = async(params) => {
     maxHistory = conversationcontextLimit.limit;
 
     // Attach listener to the ai button to call modal.
-    let button = document.getElementById("ai_interface_button");
+    let button = document.getElementById("ai_chat_button");
     button.addEventListener('mousedown', function() {
         showModal(params);
     });
 };
 
 /**
- * Show ai_interface modal.
+ * Show ai_chat modal.
  */
 async function showModal() {
 
@@ -72,9 +72,9 @@ async function showModal() {
     await modal.show();
 
     // Add listener for input submission.
-    const textarea = document.getElementById('block_ai_interface-input-id');
+    const textarea = document.getElementById('block_ai_chat-input-id');
     addTextareaListener(textarea);
-    const button = document.getElementById('block_ai_interface-submit-id');
+    const button = document.getElementById('block_ai_chat-submit-id');
     button.addEventListener("click", (event) => {
         clickSubmitButton(event);
     });
@@ -88,11 +88,11 @@ async function showModal() {
         addToHistory(allConversations);
 
         // Add listeners for dropdownmenu.
-        const btnNewDialog = document.getElementById('block_ai_interface_new_dialog');
+        const btnNewDialog = document.getElementById('block_ai_chat_new_dialog');
         btnNewDialog.addEventListener('mousedown', () => {
             newDialog();
         });
-        const btnDeleteDialog = document.getElementById('block_ai_interface_delete_dialog');
+        const btnDeleteDialog = document.getElementById('block_ai_chat_delete_dialog');
         btnDeleteDialog.addEventListener('click', () => {
             deleteCurrentDialog();
         });
@@ -173,7 +173,7 @@ const enterQuestion = async(question) => {
 
     // Options, with conversation history.
     const options = {
-        'component': 'block_ai_interface',
+        'component': 'block_ai_chat',
         'contextid': contextid,
         'conversationcontext': convHistory,
     };
@@ -208,7 +208,7 @@ const enterQuestion = async(question) => {
 
     // Attach copy listener.
     // Todo, doesnt always work, sometimes shows another message.
-    let copy = document.querySelector('.ai_interface_modal .awaitanswer .copy');
+    let copy = document.querySelector('.ai_chat_modal .awaitanswer .copy');
     copy.addEventListener('mousedown', () => {
         helper.copyToClipboard(copy);
     });
@@ -222,7 +222,7 @@ const enterQuestion = async(question) => {
  * @param {string} text
  */
 const showReply = (text) => {
-    let field = document.querySelector('.ai_interface_modal .awaitanswer .text div');
+    let field = document.querySelector('.ai_chat_modal .awaitanswer .text div');
     field.replaceWith(text);
 };
 
@@ -254,8 +254,8 @@ const showMessage = async(text, sender = '', answer = true) => {
         "answer": answer,
     };
     // Call the function to load and render our template.
-    const {html, js} = await Templates.renderForPromise('block_ai_interface/message', templateData);
-    Templates.appendNodeContents('.block_ai_interface-output', html, js);
+    const {html, js} = await Templates.renderForPromise('block_ai_chat/message', templateData);
+    Templates.appendNodeContents('.block_ai_chat-output', html, js);
 
     // Add copy listener for replys.
     if (sender === '') {
@@ -325,14 +325,14 @@ const addToHistory = (convos) => {
                 "conversationid": convo.id,
             };
     
-            const {html, js} = await Templates.renderForPromise('block_ai_interface/dropdownmenuitem', templateData);
-            Templates.appendNodeContents('.block_ai_interface_action_menu .dropdown-menu', html, js);
+            const {html, js} = await Templates.renderForPromise('block_ai_chat/dropdownmenuitem', templateData);
+            Templates.appendNodeContents('.block_ai_chat_action_menu .dropdown-menu', html, js);
     
             // If we add only one item, it is a new item and not the first and should be on top of history.
             if (convos.length === 1 && allConversations.length > 1) {
                 console.log("move item to top called");
                 // Make sure elements are in place to be worked with.
-                const dropdown = document.querySelector('.block_ai_interface_action_menu .dropdown-menu');
+                const dropdown = document.querySelector('.block_ai_chat_action_menu .dropdown-menu');
                 // Select the last element.
                 const lastItem = dropdown.lastElementChild;
                 // Get the reference element for the third position.
@@ -347,7 +347,7 @@ const addToHistory = (convos) => {
 
     // If we have more than 9 items, add scrollbar to menu.
     if (convos.length > 9) {
-        const dropdown = document.querySelector('.block_ai_interface_action_menu .dropdown-menu');
+        const dropdown = document.querySelector('.block_ai_chat_action_menu .dropdown-menu');
         dropdown.classList.add("addscroll");
     }
 };
@@ -359,7 +359,7 @@ const removeFromHistory = () => {
     // Cant remove if new or not yet in history.
     if (conversation.id !== 0 && allConversations.find(x => x.id === conversation.id) !== undefined) {
         // Remove from dropdown.
-        const element = document.querySelector('.block_ai_interface_action_menu [data-id="' + conversation.id + '"]');
+        const element = document.querySelector('.block_ai_chat_action_menu [data-id="' + conversation.id + '"]');
         element.remove();
         // Build new allConversations array without deleted one.
         allConversations = allConversations.filter(obj => obj.id !== conversation.id);
@@ -384,7 +384,7 @@ const saveConversationLocally = (question, reply) => {
  */
 const clearMessages = () => {
     console.log("clearMessages called");
-    const output = document.querySelector('.block_ai_interface-output');
+    const output = document.querySelector('.block_ai_chat-output');
     output.innerHTML = '';
 };
 
@@ -393,7 +393,7 @@ const clearMessages = () => {
  * @param {*} empty
  */
 const setModalHeader = (empty = false) => {
-    let modalheader = document.querySelector('.ai_interface_modal .modal-title div');
+    let modalheader = document.querySelector('.ai_chat_modal .modal-title div');
     let title = '';
     if (modalheader !== null && (conversation.messages.length > 0 || empty)) {
         if (!empty) {
@@ -436,7 +436,7 @@ const clickSubmitButton = () => {
     // Var aiAtWork to make it impossible to submit multiple questions at once.
     if (!aiAtWork) {
         aiAtWork = true;
-        const textarea = document.getElementById('block_ai_interface-input-id');
+        const textarea = document.getElementById('block_ai_chat-input-id');
         enterQuestion(textarea.value);
         textarea.value = '';
     }
@@ -468,7 +468,7 @@ const errorHandling = async(requestresult, question, options) => {
     }
 
     // If any other errorcode, alert with errormessage.
-    const errorString = await getString('errorwithcode', 'block_ai_interface', requestresult.code);
+    const errorString = await getString('errorwithcode', 'block_ai_chat', requestresult.code);
     await alert(errorString, requestresult.result);
 
     // Change answer styling to differentiate from ai.
@@ -480,7 +480,7 @@ const errorHandling = async(requestresult, question, options) => {
     senderdiv.textContent = 'System';
 
     // And write generic error message in chatbot.
-    requestresult.result = await getString('error', 'block_ai_interface');
+    requestresult.result = await getString('error', 'block_ai_chat');
 
     return requestresult;
 };
@@ -500,8 +500,8 @@ const checkMessageHistoryLengthLimit = async(messages) => {
 
         // Show warning once per session.
         if (!maxHistoryWarnings.has(conversation.id)) {
-            const maxHistoryString = await getString('maxhistory', 'block_ai_interface', maxHistory);
-            const warningErrorString = await getString('maxhistoryreached', 'block_ai_interface', maxHistory);
+            const maxHistoryString = await getString('maxhistory', 'block_ai_chat', maxHistory);
+            const warningErrorString = await getString('maxhistoryreached', 'block_ai_chat', maxHistory);
             await alert(maxHistoryString, warningErrorString);
             // Remember warning.
             maxHistoryWarnings.add(conversation.id);

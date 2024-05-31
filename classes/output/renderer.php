@@ -15,24 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renderer for content of block ai_interface.
+ * Renderer for content of block ai_chat.
  *
- * @package    block_ai_interface
+ * @package    block_ai_chat
  * @copyright  2024 Tobias Garske, ISB Bayern
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace block_ai_interface\output;
+namespace block_ai_chat\output;
 
 use plugin_renderer_base;
-use block_ai_interface\permissions;
+use block_ai_chat\permissions;
 
 class renderer extends plugin_renderer_base {
     /**
      * Defer to template.
      * @return string html for the page
      */
-    public function render_ai_interface_content() {
+    public function render_ai_chat_content() {
         global $USER, $COURSE;
 
         // Do permissioncheck in renderer since renderer is called by fake block in drawers.php.
@@ -41,15 +41,15 @@ class renderer extends plugin_renderer_base {
         }
 
         $params = new \stdClass;
-        $params->title = get_string('dialog', 'block_ai_interface');
+        $params->title = get_string('dialog', 'block_ai_chat');
         $params->userid = $USER->id;
         $params->contextid = \context_course::instance($COURSE->id)->id;
         $this->page->requires->js_call_amd(
-            'block_ai_interface/dialog',
+            'block_ai_chat/dialog',
             'init',
             [$params]
         );
 
-        return  parent::render_from_template('block_ai_interface/floatingbutton', $params);
+        return  parent::render_from_template('block_ai_chat/floatingbutton', $params);
     }
 }

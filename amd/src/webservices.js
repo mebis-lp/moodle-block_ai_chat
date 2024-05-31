@@ -10,7 +10,7 @@ export const getAllConversations = (
     userid,
     contextid,
 ) => fetchMany([{
-    methodname: 'block_ai_interface_get_all_conversations',
+    methodname: 'block_ai_chat_get_all_conversations',
     args: {
         userid,
         contextid
@@ -24,7 +24,7 @@ export const getAllConversations = (
 export const getNewConversationId = (
     contextid,
 ) => fetchMany([{
-    methodname: 'block_ai_interface_get_new_conversation_id',
+    methodname: 'block_ai_chat_get_new_conversation_id',
     args: {
         contextid,
 }}])[0];
@@ -41,7 +41,7 @@ export const deleteConversation = (
     userid,
     conversationid,
 ) => fetchMany([{
-    methodname: 'block_ai_interface_delete_conversation',
+    methodname: 'block_ai_chat_delete_conversation',
     args: {
         contextid,
         userid,
@@ -56,7 +56,7 @@ export const deleteConversation = (
 export const getConversationcontextLimit = (
     contextid,
 ) => fetchMany([{
-    methodname: 'block_ai_interface_get_conversationcontext_limit',
+    methodname: 'block_ai_chat_get_conversationcontext_limit',
     args: {
         contextid
 }}])[0];

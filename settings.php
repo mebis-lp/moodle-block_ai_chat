@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Admin settings for block_ai_interface
+ * Admin settings for block_ai_chat
  *
- * @package    block_ai_interface
+ * @package    block_ai_chat
  * @copyright  2024 ISB Bayern
  * @author     Tobias Garske
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,8 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox(
-        'block_ai_interface/enable',
-        get_string('enable', 'block_ai_interface'),
+        'block_ai_chat/enable',
+        get_string('enable', 'block_ai_chat'),
         '',
         0,
         PARAM_INT)

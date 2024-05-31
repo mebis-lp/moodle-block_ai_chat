@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace block_ai_interface\external;
+namespace block_ai_chat\external;
 
 use core_external\external_api;
 use core_external\external_function_parameters;
@@ -24,7 +24,7 @@ use core_external\external_value;
 /**
  * Class delete_conversation.
  *
- * @package    block_ai_interface
+ * @package    block_ai_chat
  * @copyright  2024 Tobias Garske, ISB Bayern
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -63,7 +63,7 @@ class delete_conversation extends external_api {
         // Check userid and USER-id ?
         // Delete conversation.
         $response = \local_ai_manager\ai_manager_utils::delete_log_entries(
-            'block_ai_interface', $contextid, $USER->id, $conversationid
+            'block_ai_chat', $contextid, $USER->id, $conversationid
         );
         // Maybe response missing?
 

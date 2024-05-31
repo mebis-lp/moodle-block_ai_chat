@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Capabilities for block_ai_interface
+ * Capabilities for block_ai_chat
  *
- * @package    block_ai_interface
+ * @package    block_ai_chat
  * @copyright  2024 ISB Bayern
  * @author     Tobias Garske
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
 
-    'block/ai_interface:myaddinstance' => [
+    'block/ai_chat:myaddinstance' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => [
@@ -37,7 +37,7 @@ $capabilities = [
         'clonepermissionsfrom' => 'moodle/my:manageblocks',
     ],
 
-    'block/ai_interface:addinstance' => [
+    'block/ai_chat:addinstance' => [
         'riskbitmask' => RISK_SPAM | RISK_XSS,
 
         'captype' => 'write',

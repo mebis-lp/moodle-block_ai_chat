@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace block_ai_interface\external;
+namespace block_ai_chat\external;
 
 use core_external\external_api;
 use core_external\external_function_parameters;
@@ -24,7 +24,7 @@ use core_external\external_value;
 /**
  * Class get_new_conversation_id.
  *
- * @package    block_ai_interface
+ * @package    block_ai_chat
  * @copyright  2024 Tobias Garske, ISB Bayern
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -56,7 +56,7 @@ class get_new_conversation_id extends external_api {
         ]);
         self::validate_context(\core\context_helper::instance_by_id($contextid));
 
-        return ['id' => \local_ai_manager\ai_manager_utils::get_next_free_itemid('block_ai_interface', $contextid)];
+        return ['id' => \local_ai_manager\ai_manager_utils::get_next_free_itemid('block_ai_chat', $contextid)];
     }
 
     /**

@@ -14,12 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace block_ai_interface\privacy;
+namespace block_ai_chat\privacy;
 
 /**
- * Privacy provider for block_ai_interface
+ * Privacy provider for block_ai_chat
  *
- * @package    block_ai_interface
+ * @package    block_ai_chat
  * @copyright  2024 ISB Bayern
  * @author     Tobias Garske
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

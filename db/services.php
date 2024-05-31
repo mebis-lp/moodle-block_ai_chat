@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * External functions and service declaration for AI Interface
+ * External functions and service declaration for ai_chat
  *
  * Documentation: {@link https://moodledev.io/docs/apis/subsystems/external/description}
  *
- * @package    block_ai_interface
+ * @package    block_ai_chat
  * @category   webservice
  * @copyright  2024 Tobias Garske, ISB Bayern
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,32 +28,32 @@
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
-    'block_ai_interface_get_all_conversations' => [
-        'classname'     => 'block_ai_interface\external\get_all_conversations',
+    'block_ai_chat_get_all_conversations' => [
+        'classname'     => 'block_ai_chat\external\get_all_conversations',
         'methodname'    => 'execute',
         'description'   => 'Get all conversations.',
         'type'          => 'read',
         'ajax'          => true,
         'capabilities'  => '', // TODO add cap
     ],
-    'block_ai_interface_get_new_conversation_id' => [
-        'classname'     => 'block_ai_interface\external\get_new_conversation_id',
+    'block_ai_chat_get_new_conversation_id' => [
+        'classname'     => 'block_ai_chat\external\get_new_conversation_id',
         'methodname'    => 'execute',
         'description'   => 'Save question and reply, get back the conversationid.',
         'type'          => 'write',
         'ajax'          => true,
         'capabilities'  => '', // TODO add cap
     ],
-    'block_ai_interface_delete_conversation' => [
-        'classname'     => 'block_ai_interface\external\delete_conversation',
+    'block_ai_chat_delete_conversation' => [
+        'classname'     => 'block_ai_chat\external\delete_conversation',
         'methodname'    => 'execute',
         'description'   => 'Delete/Hide conversation from history.',
         'type'          => 'write',
         'ajax'          => true,
         'capabilities'  => '', // TODO add cap
     ],
-    'block_ai_interface_get_conversationcontext_limit' => [
-        'classname'     => 'block_ai_interface\external\get_conversationcontext_limit',
+    'block_ai_chat_get_conversationcontext_limit' => [
+        'classname'     => 'block_ai_chat\external\get_conversationcontext_limit',
         'methodname'    => 'execute',
         'description'   => 'Get limit for messages to pass to query.',
         'type'          => 'read',

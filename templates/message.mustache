@@ -15,9 +15,9 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block_ai_interface/floatingbutton
+    @template block_ai_chat/floatingbutton
 
-    Button to call ai interface modal
+    Button to call ai_chat modal
 
     Example context (json):
     {
@@ -35,7 +35,7 @@
     <div class="identity">KI</div>
 {{/sender}}
     <div class="content">
-        <div class="copiedtoast">{{#str}} copied, block_ai_interface {{/str}}</div>
+        <div class="copiedtoast">{{#str}} copied, block_ai_chat {{/str}}</div>
         <a class="copy"><i class="fa fa-copy"></i></a>
         <div class="text">
             {{content}}
@@ -47,7 +47,7 @@
 <div class="message ai">
     <div class="identity">KI</div>
     <div class="content awaitanswer">
-        <div class="copiedtoast">{{#str}} copied, block_ai_interface {{/str}}</div>
+        <div class="copiedtoast">{{#str}} copied, block_ai_chat {{/str}}</div>
         <a class="copy"><i class="fa fa-copy"></i></a>
         <div class="text">
             <div class="spinner-grow text-secondary" role="status">

@@ -15,21 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Language file for block_ai_interface
+ * Language file for block_ai_chat
  *
- * @package    block_ai_interface
+ * @package    block_ai_chat
  * @copyright  2024 ISB Bayern
  * @author     Tobias Garske
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['ai_interface'] = 'AI Interface';
-$string['ai_interface:addinstance'] = 'Add a AI Interface block';
-$string['ai_interface:myaddinstance'] = 'Add a AI Interface block to my moodle';
+$string['ai_chat'] = 'AI Chat';
+$string['ai_chat:addinstance'] = 'Add a AI Chat block';
+$string['ai_chat:myaddinstance'] = 'Add a AI Chat block to my moodle';
 $string['copied'] = 'Copied';
 $string['delete'] = 'Delete current Dialog';
 $string['dialog'] = 'AI Dialog';
-$string['enable'] = 'Activate interface';
+$string['enable'] = 'Activate Chat';
 $string['error'] = 'An Error occured, please try again.';
 $string['errorwithcode'] = 'An Error occured with code: {$a}';
 $string['input'] = 'Ask the AI Model';
@@ -38,6 +38,6 @@ $string['maxhistory'] = 'Conversation history restriction';
 $string['maxhistoryreached'] = 'Please be aware, that dialog history is restricted to {$a} messages.
     Older messages wont be included';
 $string['newconversation'] = 'Start new Thread';
-$string['pluginname'] = 'AI Interface';
+$string['pluginname'] = 'AI Chat';
 $string['privacy:metadata'] = 'This plugin doesn\'t store personal data.';
 $string['submit'] = 'Submit';
