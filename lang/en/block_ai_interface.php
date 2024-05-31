@@ -34,6 +34,9 @@ $string['error'] = 'An Error occured, please try again.';
 $string['errorwithcode'] = 'An Error occured with code: {$a}';
 $string['input'] = 'Ask the AI Model';
 $string['history'] = 'Show History';
+$string['maxhistory'] = 'Conversation history restriction';
+$string['maxhistoryreached'] = 'Please be aware, that dialog history is restricted to {$a} messages.
+    Older messages wont be included';
 $string['newconversation'] = 'Start new Thread';
 $string['pluginname'] = 'AI Interface';
 $string['privacy:metadata'] = 'This plugin doesn\'t store personal data.';

@@ -105,27 +105,6 @@ class get_all_conversations extends external_api {
             ];
         }
         return $result;
-
-        // return [
-        //     (object) [
-        //         'id' => 123,
-        //         'messages' => [
-        //             (object) ["message" => "Wo kann ich aAAAAAAAAA AAAACCCCCCC asdflkas lföla df ?", "sender" => "user"],
-        //             (object) ["message" => "BBBBBBB BBBBBBBBB BBBBB", "sender" => "ai"],
-        //             (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
-        //             (object) ["message" => "bcvnbcvnbvn dk dfklsöl dkasfj", "sender" => "user"],
-        //         ],
-        //     ],
-        //     (object) [
-        //         'id' => 1234,
-        //         'messages' => [
-        //             (object) ["message" => "Hallo, also dfklsöl dk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasf dk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjdk dfklsöl dkasfjj", "sender" => "user"],
-        //             (object) ["message" => "dfklsöl dk dfklsöl dkasfj", "sender" => "user"],
-        //             (object) ["message" => "dfklsöl dk dfklsöl dkasfj", "sender" => "ai"],
-        //         ],
-        //     ],
-        // ];
-
     }
 
     /**

@@ -1,7 +1,7 @@
 import DialogModal from 'block_ai_interface/dialog_modal';
 import * as externalServices from 'block_ai_interface/webservices';
 import Templates from 'core/templates';
-import {exception as displayException} from 'core/notification';
+import {alert, exception as displayException} from 'core/notification';
 import * as helper from 'block_ai_interface/helper';
 import * as manager from 'block_ai_interface/ai_manager';
 import {getString} from 'core/str';
@@ -26,6 +26,10 @@ let contextid = 0;
 let firstLoad = true;
 // AI in process of answering.
 let aiAtWork = false;
+// Maximum history included in query.
+let maxHistory = 5;
+// Remember warnings for maximum history in this session.
+let maxHistoryWarnings = new Set();
 
 export const init = async(params) => {
     userid = params.userid;
@@ -47,6 +51,10 @@ export const init = async(params) => {
 
     // Load conversations.
     await getConversations();
+
+    // Get conversationcontext message limit.
+    let conversationcontextLimit = await externalServices.getConversationcontextLimit(contextid);
+    maxHistory = conversationcontextLimit.limit;
 
     // Attach listener to the ai button to call modal.
     let button = document.getElementById("ai_interface_button");
@@ -70,7 +78,6 @@ async function showModal() {
     button.addEventListener("click", (event) => {
         clickSubmitButton(event);
     });
-
 
     if (firstLoad) {
         // Show conversation.
@@ -114,13 +121,17 @@ const getConversations = async() => {
  * @param {*} id
  */
 const showConversation = (id = 0) => {
-    // Change conversation or get last conversation.
     console.log("showConversation called");
+    // Dissallow changing conversations when question running.
+    if (aiAtWork) {
+        return;
+    }
+    // Change conversation or get last conversation.
     if (id !== 0) {
-        // First new dialog.
+        // Set selected conversation.
         conversation = allConversations.find(x => x.id === id);
     } else if (typeof allConversations[0] !== 'undefined') {
-        console.log("last item allconv");
+        // Set last conversation.
         conversation = allConversations.at(0);
     } else if (allConversations.length === 0) {
         // Last conversation has been deleted.
@@ -157,11 +168,14 @@ const enterQuestion = async(question) => {
         });
     }
 
+    // Ceck history for length limit.
+    const convHistory = checkMessageHistoryLengthLimit();
+
     // Options, with conversation history.
     const options = {
         'component': 'block_ai_interface',
         'contextid': contextid,
-        'conversationcontext': conversation.messages,
+        'conversationcontext': convHistory,
     };
 
     // For a new conversation, get an id.
@@ -174,9 +188,9 @@ const enterQuestion = async(question) => {
         }
         options.forcenewitemid = true;
     }
+
     // Pass itemid / conversationid.
     options.itemid = conversation.id;
-
 
     // Send to local_ai_manager.
     let requestresult = await manager.askLocalAiManager('chat', question, options);
@@ -457,7 +471,44 @@ const errorHandling = async(requestresult, question, options) => {
     const errorString = await getString('errorwithcode', 'block_ai_interface', requestresult.code);
     await alert(errorString, requestresult.result);
 
+    // Change answer styling to differentiate from ai.
+    const answerdivs = document.querySelectorAll('.awaitanswer');
+    const answerdiv = answerdivs[answerdivs.length - 1];
+    const messagediv = answerdiv.closest('.message');
+    messagediv.classList.add('text-danger');
+    const senderdiv = messagediv.querySelector('.identity');
+    senderdiv.textContent = 'System';
+
     // And write generic error message in chatbot.
     requestresult.result = await getString('error', 'block_ai_interface');
+
     return requestresult;
+};
+
+/**
+ * Check historic messages for max length.
+ * @returns {array}
+ */
+const checkMessageHistoryLengthLimit = async() => {
+    const length = conversation.messages.length;
+    console.log("checkHistoryLengthLimit called");
+    console.log(conversation.messages);
+    if (length > maxHistory) {
+        // Cut history.
+        let tmpMessages = conversation.messages;
+        let rebuildMessages = [conversation.messages[0], ...tmpMessages.slice(-maxHistory)];
+        console.log(rebuildMessages);
+
+        // Show warning once per session.
+        if (!maxHistoryWarnings.has(conversation.id)) {
+            const maxHistoryString = await getString('maxhistory', 'block_ai_interface', maxHistory);
+            const warningErrorString = await getString('maxhistoryreached', 'block_ai_interface', maxHistory);
+            await alert(maxHistoryString, warningErrorString);
+            // Remember warning.
+            maxHistoryWarnings.add(conversation.id);
+        }
+        return rebuildMessages;
+    }
+    // Limit not reached, return messages.
+    return conversation.messages;
 };

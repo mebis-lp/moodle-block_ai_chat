@@ -52,4 +52,12 @@ $functions = [
         'ajax'          => true,
         'capabilities'  => '', // TODO add cap
     ],
+    'block_ai_interface_get_conversationcontext_limit' => [
+        'classname'     => 'block_ai_interface\external\get_conversationcontext_limit',
+        'methodname'    => 'execute',
+        'description'   => 'Get limit for messages to pass to query.',
+        'type'          => 'read',
+        'ajax'          => true,
+        'capabilities'  => '', // TODO add cap
+    ],
 ];

@@ -47,3 +47,16 @@ export const deleteConversation = (
         userid,
         conversationid,
 }}])[0];
+
+/**
+ * Get conversationcontext message limit.
+ * @param {int} contextid
+ * @returns {mixed}
+ */
+export const getConversationcontextLimit = (
+    contextid,
+) => fetchMany([{
+    methodname: 'block_ai_interface_get_conversationcontext_limit',
+    args: {
+        contextid
+}}])[0];
