@@ -52,7 +52,7 @@ class delete_conversation extends external_api {
      * @throws dml_exception
      */
     public static function execute(int $contextid, int $userid, int $conversationid): array {
-        global $DB;
+        global $USER;
         self::validate_parameters(self::execute_parameters(), [
             'contextid' => $contextid,
             'userid' => $userid,
@@ -60,7 +60,12 @@ class delete_conversation extends external_api {
         ]);
         self::validate_context(\core\context_helper::instance_by_id($contextid));
 
-        // TODO delete
+        // Check userid and USER-id ?
+        // Delete conversation.
+        $response = \local_ai_manager\ai_manager_utils::delete_log_entries(
+            'block_ai_interface', $contextid, $USER->id, $conversationid
+        );
+        // Maybe response missing?
 
         return ['result' => true];
     }

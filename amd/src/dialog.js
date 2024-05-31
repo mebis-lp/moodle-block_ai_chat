@@ -169,7 +169,7 @@ const enterQuestion = async(question) => {
     }
 
     // Ceck history for length limit.
-    const convHistory = checkMessageHistoryLengthLimit();
+    const convHistory = await checkMessageHistoryLengthLimit(conversation.messages);
 
     // Options, with conversation history.
     const options = {
@@ -487,17 +487,16 @@ const errorHandling = async(requestresult, question, options) => {
 
 /**
  * Check historic messages for max length.
+ * @param {array} messages
  * @returns {array}
  */
-const checkMessageHistoryLengthLimit = async() => {
-    const length = conversation.messages.length;
+const checkMessageHistoryLengthLimit = async(messages) => {
+    const length = messages.length;
     console.log("checkHistoryLengthLimit called");
-    console.log(conversation.messages);
     if (length > maxHistory) {
         // Cut history.
-        let tmpMessages = conversation.messages;
-        let rebuildMessages = [conversation.messages[0], ...tmpMessages.slice(-maxHistory)];
-        console.log(rebuildMessages);
+        let shortenedMessages = [messages[0], ...messages.slice(-maxHistory)];
+        console.log(shortenedMessages);
 
         // Show warning once per session.
         if (!maxHistoryWarnings.has(conversation.id)) {
@@ -507,8 +506,8 @@ const checkMessageHistoryLengthLimit = async() => {
             // Remember warning.
             maxHistoryWarnings.add(conversation.id);
         }
-        return rebuildMessages;
+        return shortenedMessages;
     }
     // Limit not reached, return messages.
-    return conversation.messages;
+    return messages;
 };

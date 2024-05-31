@@ -14,8 +14,11 @@ export const askLocalAiManager = async(purpose, prompt, options = []) => {
     try {
         result = await makeRequest(purpose, prompt, JSON.stringify(options));
     } catch (error) {
+        console.log(error);
         result.code = 'aiconnector';
         result.result = error.error + " " + error.message;
+        // For devs.
+        result.result += error.backtrace;
     }
     return result;
 };
