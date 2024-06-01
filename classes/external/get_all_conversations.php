@@ -71,7 +71,7 @@ class get_all_conversations extends external_api {
         // As well as from pupils having a teacher role.
 
         $result = [];
-        $response = \local_ai_manager\ai_manager_utils::get_log_entries('block_ai_chat', $contextid, $USER->id);
+        $response = \local_ai_manager\ai_manager_utils::get_log_entries('block_ai_chat', $contextid, $USER->id, 0, false);
         // Get the latest log entries unique by itemid.
         foreach ($response as $value) {
             // Ignore values without itemid.

@@ -272,6 +272,9 @@ const showMessage = async(text, sender = '', answer = true) => {
  */
 const newDialog = (deleted = false) => {
     console.log("newDialog called");
+    if (aiAtWork) {
+        return;
+    }
     // Add current convo to history and local representation, if not already there.
     if (allConversations.find(x => x.id === conversation.id) === undefined && !deleted) {
         addToHistory([conversation]);
