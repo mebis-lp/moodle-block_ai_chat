@@ -108,6 +108,6 @@ class block_ai_chat extends block_base {
      * @return array
      */
     public function applicable_formats(): array {
-        return ['site-index' => true, 'course-view' => true, 'mod' => true, 'my' => true];
+        return ['course-view' => true, 'mod' => true];
     }
 }
