@@ -62,7 +62,7 @@ class delete_conversation extends external_api {
 
         // Check userid and USER-id ?
         // Delete conversation.
-        $response = \local_ai_manager\ai_manager_utils::delete_log_entries(
+        $response = \local_ai_manager\ai_manager_utils::mark_log_entries_as_deleted(
             'block_ai_chat', $contextid, $USER->id, $conversationid
         );
         // Maybe response missing?

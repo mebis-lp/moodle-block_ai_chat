@@ -116,3 +116,7 @@
     height: 0;
     margin: 0;
 }
+
+#page-footer [data-region="footer-container-popover"] .btn-footer-popover[data-action="footer-popover"] {
+    display: none;
+}
