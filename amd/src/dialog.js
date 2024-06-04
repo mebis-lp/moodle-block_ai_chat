@@ -5,6 +5,7 @@ import {alert, exception as displayException} from 'core/notification';
 import * as helper from 'block_ai_chat/helper';
 import * as manager from 'block_ai_chat/ai_manager';
 import {getString} from 'core/str';
+import { marked } from "block_ai_chat/vendor/marked.esm";
 
 // Declare variables.
 // Modal.
@@ -207,7 +208,6 @@ const enterQuestion = async(question) => {
     aiAtWork = false;
 
     // Attach copy listener.
-    // Todo, doesnt always work, sometimes shows another message.
     let copy = document.querySelector('.ai_chat_modal .awaitanswer .copy');
     copy.addEventListener('mousedown', () => {
         helper.copyToClipboard(copy);
@@ -221,9 +221,9 @@ const enterQuestion = async(question) => {
  * Render reply.
  * @param {string} text
  */
-const showReply = (text) => {
-    let field = document.querySelector('.ai_chat_modal .awaitanswer .text div');
-    field.replaceWith(text);
+const showReply = async (text) => {
+    let field = document.querySelector('.ai_chat_modal .awaitanswer .text');
+    field.innerHTML = marked.parse(text);
 };
 
 const showMessages = () => {
@@ -250,7 +250,7 @@ const showMessage = async(text, sender = '', answer = true) => {
     }
     const templateData = {
         "sender": sender,
-        "content": text,
+        "content": marked.parse(text),
         "answer": answer,
     };
     // Call the function to load and render our template.
