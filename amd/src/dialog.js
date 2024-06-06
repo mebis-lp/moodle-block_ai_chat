@@ -5,7 +5,8 @@ import {alert, exception as displayException} from 'core/notification';
 import * as helper from 'block_ai_chat/helper';
 import * as manager from 'block_ai_chat/ai_manager';
 import {getString} from 'core/str';
-import { marked } from "block_ai_chat/vendor/marked.esm";
+import {marked} from 'block_ai_chat/vendor/marked.esm';
+import {renderInfoBox} from 'local_ai_manager/render_infobox';
 
 // Declare variables.
 // Modal.
@@ -58,9 +59,10 @@ export const init = async(params) => {
     maxHistory = conversationcontextLimit.limit;
 
     // Attach listener to the ai button to call modal.
-    let button = document.getElementById("ai_chat_button");
-    button.addEventListener('mousedown', function() {
+    let button = document.getElementById('ai_chat_button');
+    button.addEventListener('mousedown', async() => {
         showModal(params);
+        await renderInfoBox('block_ai_chat', userid, '.ai_chat_modal_body [data-content="local_ai_manager_infobox"]');
     });
 };
 
@@ -327,10 +329,10 @@ const addToHistory = (convos) => {
                 "title": title,
                 "conversationid": convo.id,
             };
-    
+
             const {html, js} = await Templates.renderForPromise('block_ai_chat/dropdownmenuitem', templateData);
             Templates.appendNodeContents('.block_ai_chat_action_menu .dropdown-menu', html, js);
-    
+
             // If we add only one item, it is a new item and not the first and should be on top of history.
             if (convos.length === 1 && allConversations.length > 1) {
                 console.log("move item to top called");
