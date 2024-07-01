@@ -102,6 +102,7 @@ class get_all_conversations extends external_api {
             $result[$value->itemid] = [
                 'id' => $value->itemid,
                 'messages' => $messages,
+                'timecreated' => $value->timecreated,
             ];
         }
         return $result;
@@ -122,7 +123,8 @@ class get_all_conversations extends external_api {
                         'sender' => new external_value(PARAM_TEXT, 'Sent by user or ai'),
                     ])
                 ),
-            ]), 'Messages with conversationid.'
+                'timecreated' => new external_value(PARAM_TEXT, 'Creationtimestamp'),
+            ]), 'Messages with conversationid and timestamp.'
         );
     }
 }

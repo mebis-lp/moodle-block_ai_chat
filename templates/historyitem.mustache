@@ -23,8 +23,21 @@
     {
         "title": "Erste Frage",
         "conversationid": 9,
+        "conversationid": Datestring,
+        "last": true,
     }
 }}
-<li class="nav-item" data-id="{{conversationid}}">
-    <a class="dropdown-item" onclick="document.showConversation({{conversationid}})" href="#">{{#pix}} i/duration, core, {{title}} {{/pix}}{{title}}</a>
-</li>
+{{#date}}
+<div class="block_ai-date mt-3 mb-2">
+    {{date}}
+</div>
+{{/date}}
+<div class="" data-id="{{conversationid}}">
+    <a class="" onclick="document.showConversation({{conversationid}})" href="#"><i class="fal fa-comment mr-2"></i>{{title}}</a>
+</div>
+
+{{#last}}
+<button class="btn btn-secondary mt-3 mb-3" id="ai_chat_history_new_dialog">
+    <i class="icon fal fa-comment" aria-hidden="true"></i> {{#str}} newconversation, block_ai_chat {{/str}}
+</button>
+{{/last}}

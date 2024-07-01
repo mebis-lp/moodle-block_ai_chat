@@ -102,13 +102,19 @@
     margin-right: 2px;
     border-right: none;
 }
+.ai_chat_modal .headeroptions {
+    display: flex;
+    align-items: center;
+}
+.ai_chat_modal .headeroptions .badge-pill {
+    display: flex;
+    align-items: center;
+    height: 1.3rem;
+    font-size: 50%;
+}
 .ai_chat_modal .block_ai_chat-input button {
     border-top-left-radius: unset;
     border-bottom-left-radius: unset;
-}
-.ai_chat_modal .dropdown-menu.addscroll {
-    max-height: 455px;
-    overflow-y: scroll;
 }
 
 .ai_fake_block {

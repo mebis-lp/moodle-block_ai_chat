@@ -26,14 +26,18 @@
 $string['ai_chat'] = 'AI Chat';
 $string['ai_chat:addinstance'] = 'Add a AI Chat block';
 $string['ai_chat:myaddinstance'] = 'Add a AI Chat block to my moodle';
+$string['chatwindow'] = 'Open as chatwindow';
 $string['copied'] = 'Copied';
 $string['delete'] = 'Delete current Dialog';
-$string['dialog'] = 'AI Dialog';
+$string['dockright'] = 'Dock on the right';
+$string['newdialog'] = 'New AI Chat';
 $string['enable'] = 'Activate Chat';
 $string['error'] = 'An Error occured, please try again.';
 $string['errorwithcode'] = 'An Error occured with code: {$a}';
 $string['input'] = 'Ask the AI Model';
-$string['history'] = 'Show History';
+$string['openfull'] = 'Use full width';
+$string['history'] = 'History';
+$string['showhistory'] = 'Show History';
 $string['maxhistory'] = 'Conversation history restriction';
 $string['maxhistoryreached'] = 'Please be aware, that dialog history is restricted to {$a} messages.
     Older messages wont be included';
@@ -41,3 +45,4 @@ $string['newconversation'] = 'Start new Thread';
 $string['pluginname'] = 'AI Chat';
 $string['privacy:metadata'] = 'This plugin doesn\'t store personal data.';
 $string['submit'] = 'Submit';
+$string['yesterday'] = 'Yesterday';

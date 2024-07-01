@@ -11,7 +11,11 @@ import {renderInfoBox} from 'local_ai_manager/render_infobox';
 // Declare variables.
 // Modal.
 let modal = {};
-let modaltitle = '';
+let strHistory;
+let strNewDialog;
+let strToday;
+let strYesterday;
+let badge;
 
 // Current conversation.
 let conversation = {
@@ -36,12 +40,15 @@ let maxHistoryWarnings = new Set();
 export const init = async(params) => {
     userid = params.userid;
     contextid = params.contextid;
-    modaltitle = params.title;
+    strNewDialog = params.new;
+    strHistory = params.history;
+    badge = params.badge;
 
     // Build modal.
     modal = await DialogModal.create({
         templateContext: {
-            title: modaltitle,
+            title: strNewDialog,
+            badge: badge,
             // history: history, // history dynamically added.
         },
     });
@@ -64,6 +71,10 @@ export const init = async(params) => {
         showModal(params);
         await renderInfoBox('block_ai_chat', userid, '.ai_chat_modal_body [data-content="local_ai_manager_infobox"]');
     });
+
+    // Get strings.
+    strToday = await getString('today', 'core');
+    strYesterday = await getString('yesterday', 'block_ai_chat');
 };
 
 /**
@@ -87,9 +98,6 @@ async function showModal() {
         // Todo - Evtl. noch firstload verschönern, spinner für header und content z.b.
         showConversation();
 
-        // Add history to dropdownmenu.
-        addToHistory(allConversations);
-
         // Add listeners for dropdownmenu.
         const btnNewDialog = document.getElementById('block_ai_chat_new_dialog');
         btnNewDialog.addEventListener('mousedown', () => {
@@ -98,6 +106,10 @@ async function showModal() {
         const btnDeleteDialog = document.getElementById('block_ai_chat_delete_dialog');
         btnDeleteDialog.addEventListener('click', () => {
             deleteCurrentDialog();
+        });
+        const btnShowHistory = document.getElementById('block_ai_chat_show_history');
+        btnShowHistory.addEventListener('click', () => {
+            showHistory();
         });
         firstLoad = false;
     }
@@ -277,9 +289,8 @@ const newDialog = (deleted = false) => {
     if (aiAtWork) {
         return;
     }
-    // Add current convo to history and local representation, if not already there.
+    // Add current convo local representation, if not already there.
     if (allConversations.find(x => x.id === conversation.id) === undefined && !deleted) {
-        addToHistory([conversation]);
         allConversations.push(conversation);
     }
     // Reset local conservation.
@@ -288,7 +299,7 @@ const newDialog = (deleted = false) => {
         messages: [],
     };
     clearMessages();
-    setModalHeader(true);
+    setModalHeader(strNewDialog);
 };
 
 /**
@@ -309,13 +320,25 @@ const deleteCurrentDialog = async() => {
     }
 };
 
-
 /**
- * Add conversations to history.
- * @param {*} convos Conversations
+ * Show conversation history.
  */
-const addToHistory = (convos) => {
-    convos.forEach(async(convo) => {
+const showHistory = () => {
+    console.log("showHistory called");
+    // Change title and add backlink.
+    let title = '<a href="#" id="block_ai_chat_backlink"><i class="icon fa fa-arrow-left"></i>' + strHistory + '</a>';
+    clearMessages(true);
+    setModalHeader(title);
+    const btnBacklink = document.getElementById('block_ai_chat_backlink');
+    btnBacklink.addEventListener('click', () => {
+        showConversation(conversation.id);
+        clearMessages();
+        setModalHeader();
+    });
+
+    // Render history.
+    let tmpDateString = '';
+    allConversations.forEach(async(convo, key, arr) => {
         if (typeof convo.messages[1] !== 'undefined') {
             // Conditionally shorten menu title, skip system message.
             let title = convo.messages[1].message;
@@ -324,37 +347,61 @@ const addToHistory = (convos) => {
                 title += ' ...';
             }
 
-            // Add entry in menu.
+            // Get date and pass along if new.
+            const now = new Date();
+            const date = new Date(convo.timecreated * 1000);
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+            const twoWeeksAgo = new Date(now);
+            twoWeeksAgo.setDate(now.getDate() - 14);
+
+            const options = {weekday: 'long', day: '2-digit', month: '2-digit'};
+            const monthOptions = {month: 'long', year: '2-digit'};
+
+            let dateString = '';
+            if (date >= today) {
+                dateString = strToday;
+            } else if (date >= yesterday) {
+                dateString = strYesterday;
+            } else if (date >= twoWeeksAgo) {
+                dateString = date.toLocaleDateString(undefined, options);
+            } else {
+                dateString = date.toLocaleDateString(undefined, monthOptions);
+            }
+            if (dateString == tmpDateString) {
+                // Dont show date, if it hasnt changed.
+                dateString = '';
+            } else {
+                // Remember new latest date.
+                tmpDateString = dateString;
+            }
+
+            // Add entry in history.
             const templateData = {
                 "title": title,
                 "conversationid": convo.id,
+                "date": dateString,
             };
 
-            const {html, js} = await Templates.renderForPromise('block_ai_chat/dropdownmenuitem', templateData);
-            Templates.appendNodeContents('.block_ai_chat_action_menu .dropdown-menu', html, js);
+            // Add new Dialog button for the last element.
+            if (Object.is(arr.length - 1, key)) {
+                templateData.last = true;
+            }
 
-            // If we add only one item, it is a new item and not the first and should be on top of history.
-            if (convos.length === 1 && allConversations.length > 1) {
-                console.log("move item to top called");
-                // Make sure elements are in place to be worked with.
-                const dropdown = document.querySelector('.block_ai_chat_action_menu .dropdown-menu');
-                // Select the last element.
-                const lastItem = dropdown.lastElementChild;
-                // Get the reference element for the third position.
-                const thirdChild = dropdown.children[2];
-                // Remove the last item from its current position.
-                dropdown.removeChild(lastItem);
-                // Insert the last item at the new position (before the third child).
-                dropdown.insertBefore(lastItem, thirdChild);
+            // Render history item.
+            const {html, js} = await Templates.renderForPromise('block_ai_chat/historyitem', templateData);
+            Templates.appendNodeContents('.ai_chat_modal .block_ai_chat-output', html, js);
+
+            // Add a listener for the new dialog button.
+            if (Object.is(arr.length - 1, key)) {
+                const btnNewDialog = document.getElementById('ai_chat_history_new_dialog');
+                btnNewDialog.addEventListener('mousedown', () => {
+                    newDialog();
+                });
             }
         }
     });
 
-    // If we have more than 9 items, add scrollbar to menu.
-    if (convos.length > 9) {
-        const dropdown = document.querySelector('.block_ai_chat_action_menu .dropdown-menu');
-        dropdown.classList.add("addscroll");
-    }
 };
 
 /**
@@ -387,28 +434,37 @@ const saveConversationLocally = (question, reply) => {
 /**
  * Clear output div.
  */
-const clearMessages = () => {
+const clearMessages = (hideinput = false) => {
     console.log("clearMessages called");
     const output = document.querySelector('.block_ai_chat-output');
     output.innerHTML = '';
+    // For showing history.
+    let input = document.querySelector('.block_ai_chat-input');
+    if (hideinput) {
+        input.style.display = 'none';
+    } else {
+        input.style.display = 'flex';
+    }
 };
 
 /**
  * Set modal header title.
- * @param {*} empty
+ * @param {*} title
  */
-const setModalHeader = (empty = false) => {
+const setModalHeader = (setTitle = '') => {
     let modalheader = document.querySelector('.ai_chat_modal .modal-title div');
     let title = '';
-    if (modalheader !== null && (conversation.messages.length > 0 || empty)) {
-        if (!empty) {
-            title = ' - ' + conversation.messages[1].message;
+    if (modalheader !== null && (conversation.messages.length > 0 || setTitle.length)) {
+        if (!setTitle.length) {
+            title = conversation.messages[1].message;
             if (conversation.messages[1].message.length > 50) {
-                title = ' - ' + conversation.messages[1].message.substring(0, 50);
+                title = conversation.messages[1].message.substring(0, 50);
                 title += ' ...';
             }
+        } else {
+            title = setTitle;
         }
-        modalheader.textContent = modaltitle + title;
+        modalheader.innerHTML = title;
     }
 };
 

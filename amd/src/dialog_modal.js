@@ -34,6 +34,8 @@ export default class DialogModal extends Modal {
         // Remove from the DOM on close.
         modalConfig.removeOnClose = false;
 
+        // returnFocus: target,
+
         super.configure(modalConfig);
 
         // Accept our own custom arguments too.
