@@ -323,7 +323,7 @@ const deleteCurrentDialog = async() => {
 /**
  * Show conversation history.
  */
-const showHistory = () => {
+const showHistory = async() => {
     console.log("showHistory called");
     // Change title and add backlink.
     let title = '<a href="#" id="block_ai_chat_backlink"><i class="icon fa fa-arrow-left"></i>' + strHistory + '</a>';
@@ -336,9 +336,9 @@ const showHistory = () => {
         setModalHeader();
     });
 
-    // Render history.
-    let tmpDateString = '';
-    allConversations.forEach(async(convo, key, arr) => {
+    // Iterate over conversations and group by date.
+    let groupedByDate = {};
+    allConversations.forEach((convo) => {
         if (typeof convo.messages[1] !== 'undefined') {
             // Conditionally shorten menu title, skip system message.
             let title = convo.messages[1].message;
@@ -347,7 +347,7 @@ const showHistory = () => {
                 title += ' ...';
             }
 
-            // Get date and pass along if new.
+            // Get date and sort convos into a date array.
             const now = new Date();
             const date = new Date(convo.timecreated * 1000);
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -368,40 +368,39 @@ const showHistory = () => {
             } else {
                 dateString = date.toLocaleDateString(undefined, monthOptions);
             }
-            if (dateString == tmpDateString) {
-                // Dont show date, if it hasnt changed.
-                dateString = '';
-            } else {
-                // Remember new latest date.
-                tmpDateString = dateString;
-            }
-
-            // Add entry in history.
-            const templateData = {
+            let convItem = {
                 "title": title,
                 "conversationid": convo.id,
-                "date": dateString,
             };
 
-            // Add new Dialog button for the last element.
-            if (Object.is(arr.length - 1, key)) {
-                templateData.last = true;
+            // Save entry under the date.
+            if (!groupedByDate[dateString]) {
+                groupedByDate[dateString] = [];
             }
-
-            // Render history item.
-            const {html, js} = await Templates.renderForPromise('block_ai_chat/historyitem', templateData);
-            Templates.appendNodeContents('.ai_chat_modal .block_ai_chat-output', html, js);
-
-            // Add a listener for the new dialog button.
-            if (Object.is(arr.length - 1, key)) {
-                const btnNewDialog = document.getElementById('ai_chat_history_new_dialog');
-                btnNewDialog.addEventListener('mousedown', () => {
-                    newDialog();
-                });
-            }
+            groupedByDate[dateString].push(convItem);
         }
     });
 
+    // Convert the grouped objects into an array format that Mustache can iterate over.
+    let convert = {
+        groups: Object.keys(groupedByDate).map(key => ({
+            key: key,
+            objects: groupedByDate[key]
+        }))
+    };
+
+    // Render history.
+    const templateData = {
+        "dates": convert.groups,
+    };
+    const {html, js} = await Templates.renderForPromise('block_ai_chat/history', templateData);
+    Templates.appendNodeContents('.ai_chat_modal .block_ai_chat-output', html, js);
+
+    // Add a listener for the new dialog button.
+    const btnNewDialog = document.getElementById('ai_chat_history_new_dialog');
+    btnNewDialog.addEventListener('mousedown', () => {
+        newDialog();
+    });
 };
 
 /**

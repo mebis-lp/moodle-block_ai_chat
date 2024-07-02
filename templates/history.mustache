@@ -27,17 +27,17 @@
         "last": true,
     }
 }}
-{{#date}}
-<div class="block_ai-date mt-3 mb-2">
-    {{date}}
-</div>
-{{/date}}
-<div class="" data-id="{{conversationid}}">
-    <a class="" onclick="document.showConversation({{conversationid}})" href="#"><i class="fal fa-comment mr-2"></i>{{title}}</a>
-</div>
+{{#dates}}
+    <div class="block_ai-date mt-3 mb-2">
+        {{key}}
+    </div>
+        {{#objects}}
+            <div class="" data-id="{{conversationid}}">
+                <a class="" onclick="document.showConversation({{conversationid}})" href="#"><i class="fal fa-comment mr-2"></i>{{title}}</a>
+            </div>
+        {{/objects}}
+{{/dates}}
 
-{{#last}}
 <button class="btn btn-secondary mt-3 mb-3" id="ai_chat_history_new_dialog">
     <i class="icon fal fa-comment" aria-hidden="true"></i> {{#str}} newconversation, block_ai_chat {{/str}}
 </button>
-{{/last}}
