@@ -53,20 +53,6 @@ class block_ai_chat extends block_base {
     }
 
     /**
-     * Adds the block content to the page header.
-     *
-     * @return void
-     * @throws coding_exception
-     * @throws moodle_exception
-     */
-    public function specialization(): void {
-        if (!empty($this->instance->visible)) {
-            $this->get_content();
-            $this->page->add_header_action($this->content->text);
-        }
-    }
-
-    /**
      * Returns the block content. Content is cached for performance reasons.
      *
      * @return stdClass
@@ -74,23 +60,26 @@ class block_ai_chat extends block_base {
      * @throws moodle_exception
      */
     public function get_content(): stdClass {
-        global $OUTPUT;
-        $dummy = new stdClass;
-        $dummy->text = '';
         if ($this->content !== null) {
-            return $dummy;
+            return $this->content;
+        }
+
+        $this->content = new stdClass();
+        $this->content->text = '';
+        $this->content->footer = '';
+
+        $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
+        if (!$tenant->is_tenant_allowed()) {
+            $this->content->text = get_string('tenantnotallowed', 'local_ai_manager');
+            return $this->content;
         }
 
         $this->content = new stdClass;
-        $context = new stdClass;
-        $context->sesskey = sesskey();
 
         $aioutput = $this->page->get_renderer('block_ai_chat');
         $this->content->text = $aioutput->render_ai_chat_content();
 
-        $this->content->text = $OUTPUT->render_from_template('block_ai_chat/floatingbutton', $context);
-
-        return $dummy;
+        return $this->content;
     }
 
     /**
@@ -109,5 +98,13 @@ class block_ai_chat extends block_base {
      */
     public function applicable_formats(): array {
         return ['course-view' => true, 'mod' => true];
+    }
+
+    public function user_can_addto($page) {
+        $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
+        if (!$tenant->is_tenant_allowed()) {
+            return false;
+        }
+        return parent::user_can_addto($page);
     }
 }
