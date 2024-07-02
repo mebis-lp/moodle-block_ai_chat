@@ -1,14 +1,21 @@
-import DialogModal from 'block_ai_chat/dialog_modal';
+import Modal from 'core/modal';
 import * as externalServices from 'block_ai_chat/webservices';
 import Templates from 'core/templates';
 import {alert, exception as displayException} from 'core/notification';
+import ModalEvents from 'core/modal_events';
 import * as helper from 'block_ai_chat/helper';
 import * as manager from 'block_ai_chat/ai_manager';
 import {getString} from 'core/str';
 import {marked} from 'block_ai_chat/vendor/marked.esm';
 import {renderInfoBox} from 'local_ai_manager/render_infobox';
+import LocalStorage from 'core/localstorage';
 
 // Declare variables.
+const VIEW_CHATWINDOW = 'block_ai_chat_chatwindow';
+const VIEW_OPENFULL = 'block_ai_chat_openfull';
+const VIEW_DOCKRIGHT = 'block_ai_chat_dockright';
+const MODAL_OPEN = 'block_ai_chat_open';
+
 // Modal.
 let modal = {};
 let strHistory;
@@ -16,6 +23,8 @@ let strNewDialog;
 let strToday;
 let strYesterday;
 let badge;
+let viewmode;
+let modalopen = false;
 
 // Current conversation.
 let conversation = {
@@ -36,6 +45,41 @@ let aiAtWork = false;
 let maxHistory = 5;
 // Remember warnings for maximum history in this session.
 let maxHistoryWarnings = new Set();
+
+class DialogModal extends Modal {
+    static TYPE = "block_ai_chat/dialog_modal";
+    static TEMPLATE = "block_ai_chat/dialog_modal";
+
+    configure(modalConfig) {
+        // Show this modal on instantiation.
+        modalConfig.show = false;
+
+        // Remove from the DOM on close.
+        modalConfig.removeOnClose = false;
+
+        modalConfig.isVerticallyCentered = false;
+        // returnFocus: target,
+
+        super.configure(modalConfig);
+
+        // Accept our own custom arguments too.
+        if (modalConfig.titletest) {
+            this.setTitletest(modalConfig.titletest);
+        }
+    }
+
+    setTitletest(value) {
+        this.titletest = value;
+    }
+
+    hide() {
+        super.hide();
+        // Keep track of state, to restrict changes to block_ai_chat modal.
+        modalopen = false;
+        const body = document.querySelector('body');
+        body.classList.remove(MODAL_OPEN);
+    }
+}
 
 export const init = async(params) => {
     userid = params.userid;
@@ -58,8 +102,16 @@ export const init = async(params) => {
         e.target.classList.add("ai_chat_modal");
     });
 
+    // Conditionally prevent outside click event.
+    modal.getRoot().on(ModalEvents.outsideClick, event => {
+        checkOutsideClick(event);
+    });
+
     // Load conversations.
     await getConversations();
+
+    // Check and set viewmode.
+    setView();
 
     // Get conversationcontext message limit.
     let conversationcontextLimit = await externalServices.getConversationcontextLimit(contextid);
@@ -81,9 +133,17 @@ export const init = async(params) => {
  * Show ai_chat modal.
  */
 async function showModal() {
+    // Switch for repeated clicking.
+    if (modalopen) {
+        modal.hide();
+        return;
+    }
 
     // Show modal.
     await modal.show();
+    modalopen = true;
+    const body = document.querySelector('body');
+    body.classList.add(MODAL_OPEN);
 
     // Add listener for input submission.
     const textarea = document.getElementById('block_ai_chat-input-id');
@@ -98,7 +158,8 @@ async function showModal() {
         // Todo - Evtl. noch firstload verschönern, spinner für header und content z.b.
         showConversation();
 
-        // Add listeners for dropdownmenu.
+        // Add listeners for dropdownmenus.
+        // Actions.
         const btnNewDialog = document.getElementById('block_ai_chat_new_dialog');
         btnNewDialog.addEventListener('mousedown', () => {
             newDialog();
@@ -110,6 +171,19 @@ async function showModal() {
         const btnShowHistory = document.getElementById('block_ai_chat_show_history');
         btnShowHistory.addEventListener('click', () => {
             showHistory();
+        });
+        // Views.
+        const btnChatwindow = document.getElementById(VIEW_CHATWINDOW);
+        btnChatwindow.addEventListener('mousedown', () => {
+            setView(VIEW_CHATWINDOW);
+        });
+        const btnFullWidth = document.getElementById(VIEW_OPENFULL);
+        btnFullWidth.addEventListener('mousedown', () => {
+            setView(VIEW_OPENFULL);
+        });
+        const btnDockRight = document.getElementById(VIEW_DOCKRIGHT);
+        btnDockRight.addEventListener('mousedown', () => {
+            setView(VIEW_DOCKRIGHT);
         });
         firstLoad = false;
     }
@@ -570,4 +644,37 @@ const checkMessageHistoryLengthLimit = async(messages) => {
     }
     // Limit not reached, return messages.
     return messages;
+};
+
+/**
+ * Check if modal should close on outside click.
+ * @param {*} event
+ */
+const checkOutsideClick = (event) => {
+    // View openfull acts like a normal modal.
+    if (viewmode != VIEW_OPENFULL) {
+        event.preventDefault();
+    }
+};
+
+/**
+ * Set different viewmodes and save in local storage.
+ * @param {string} mode
+ */
+const setView = (mode = '') => {
+    const key = 'chatmode' + userid;
+    // Check for saved viewmode.
+    let savedmode = LocalStorage.get(key);
+    if (!savedmode && mode == '') {
+        // Set default.
+        mode = VIEW_CHATWINDOW;
+    }
+    // Save viewmode and set global var.
+    LocalStorage.set(key, mode);
+    viewmode = mode;
+
+    // Set viewmode as bodyclass.
+    const body = document.querySelector('body');
+    body.classList.remove(VIEW_CHATWINDOW, VIEW_OPENFULL, VIEW_DOCKRIGHT);
+    body.classList.add(mode);
 };
