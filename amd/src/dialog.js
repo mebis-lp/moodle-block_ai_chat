@@ -174,15 +174,15 @@ async function showModal() {
         });
         // Views.
         const btnChatwindow = document.getElementById(VIEW_CHATWINDOW);
-        btnChatwindow.addEventListener('mousedown', () => {
+        btnChatwindow.addEventListener('click', () => {
             setView(VIEW_CHATWINDOW);
         });
         const btnFullWidth = document.getElementById(VIEW_OPENFULL);
-        btnFullWidth.addEventListener('mousedown', () => {
+        btnFullWidth.addEventListener('click', () => {
             setView(VIEW_OPENFULL);
         });
         const btnDockRight = document.getElementById(VIEW_DOCKRIGHT);
-        btnDockRight.addEventListener('mousedown', () => {
+        btnDockRight.addEventListener('click', () => {
             setView(VIEW_DOCKRIGHT);
         });
         firstLoad = false;
@@ -483,9 +483,6 @@ const showHistory = async() => {
 const removeFromHistory = () => {
     // Cant remove if new or not yet in history.
     if (conversation.id !== 0 && allConversations.find(x => x.id === conversation.id) !== undefined) {
-        // Remove from dropdown.
-        const element = document.querySelector('.block_ai_chat_action_menu [data-id="' + conversation.id + '"]');
-        element.remove();
         // Build new allConversations array without deleted one.
         allConversations = allConversations.filter(obj => obj.id !== conversation.id);
     }
@@ -506,6 +503,7 @@ const saveConversationLocally = (question, reply) => {
 
 /**
  * Clear output div.
+ * @param {*} hideinput
  */
 const clearMessages = (hideinput = false) => {
     console.log("clearMessages called");
@@ -522,7 +520,7 @@ const clearMessages = (hideinput = false) => {
 
 /**
  * Set modal header title.
- * @param {*} title
+ * @param {*} setTitle
  */
 const setModalHeader = (setTitle = '') => {
     let modalheader = document.querySelector('.ai_chat_modal .modal-title div');
