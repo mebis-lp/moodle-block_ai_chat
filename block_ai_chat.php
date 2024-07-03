@@ -44,15 +44,6 @@ class block_ai_chat extends block_base {
     }
 
     /**
-     * Returns true as block shouldn't be shown as block.
-     *
-     * @return bool
-     */
-    public function is_empty(): bool {
-        return true;
-    }
-
-    /**
      * Returns the block content. Content is cached for performance reasons.
      *
      * @return stdClass
