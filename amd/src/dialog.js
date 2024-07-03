@@ -7,7 +7,7 @@ import * as helper from 'block_ai_chat/helper';
 import * as manager from 'block_ai_chat/ai_manager';
 import {getString} from 'core/str';
 import {marked} from 'block_ai_chat/vendor/marked.esm';
-import {renderInfoBox} from 'local_ai_manager/render_infobox';
+import {renderInfoBox, hash} from 'local_ai_manager/render_infobox';
 import LocalStorage from 'core/localstorage';
 
 // Declare variables.
@@ -161,7 +161,7 @@ async function showModal() {
         // Add listeners for dropdownmenus.
         // Actions.
         const btnNewDialog = document.getElementById('block_ai_chat_new_dialog');
-        btnNewDialog.addEventListener('mousedown', () => {
+        btnNewDialog.addEventListener('click', () => {
             newDialog();
         });
         const btnDeleteDialog = document.getElementById('block_ai_chat_delete_dialog');
@@ -310,7 +310,8 @@ const enterQuestion = async(question) => {
  * @param {string} text
  */
 const showReply = async (text) => {
-    let field = document.querySelector('.ai_chat_modal .awaitanswer .text');
+    let fields = document.querySelectorAll('.ai_chat_modal .awaitanswer .text');
+    const field = fields[fields.length - 1];
     field.innerHTML = marked.parse(text);
 };
 
@@ -608,12 +609,10 @@ const errorHandling = async(requestresult, question, options) => {
     const answerdiv = answerdivs[answerdivs.length - 1];
     const messagediv = answerdiv.closest('.message');
     messagediv.classList.add('text-danger');
-    const senderdiv = messagediv.querySelector('.identity');
-    senderdiv.textContent = 'System';
 
     // And write generic error message in chatbot.
     requestresult.result = await getString('error', 'block_ai_chat');
-
+    console.log(requestresult);
     return requestresult;
 };
 
@@ -659,8 +658,8 @@ const checkOutsideClick = (event) => {
  * Set different viewmodes and save in local storage.
  * @param {string} mode
  */
-const setView = (mode = '') => {
-    const key = 'chatmode' + userid;
+const setView = async(mode = '') => {
+    const key = await hash('chatmode' + userid);
     // Check for saved viewmode.
     let savedmode = LocalStorage.get(key);
     if (!savedmode && mode == '') {
