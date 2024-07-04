@@ -77,6 +77,9 @@
 .ai_chat_modal .message.agent .content .ai_chat_icon {
   display: none;
 }
+.ai_chat_modal .message.agent .content p {
+  margin-bottom: 0.1rem;
+}
 .ai_chat_modal .copiedtoast {
   position: absolute;
   top: -15px;
@@ -123,6 +126,14 @@
   align-items: center;
   height: 1.3rem;
   font-size: 50%;
+}
+.ai_chat_modal #block_ai_chat_userquota > div.alert.alert-info {
+  color: var(--color-text-muted);
+  background-color: inherit;
+  font-size: 0.6rem;
+  padding: 0;
+  margin: 0;
+  text-align: right;
 }
 
 .ai_fake_block {

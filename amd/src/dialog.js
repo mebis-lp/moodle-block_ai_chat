@@ -8,6 +8,7 @@ import * as manager from 'block_ai_chat/ai_manager';
 import {getString} from 'core/str';
 import {marked} from 'block_ai_chat/vendor/marked.esm';
 import {renderInfoBox, hash} from 'local_ai_manager/render_infobox';
+import {renderUserQuota} from 'local_ai_manager/userquota';
 import LocalStorage from 'core/localstorage';
 
 // Declare variables.
@@ -185,6 +186,10 @@ async function showModal() {
         btnDockRight.addEventListener('click', () => {
             setView(VIEW_DOCKRIGHT);
         });
+
+        // Show userquota.
+        renderUserQuota('#block_ai_chat_userquota', ['chat']);
+
         firstLoad = false;
     }
 
@@ -303,6 +308,11 @@ const enterQuestion = async(question) => {
 
     // Save new question and answer.
     saveConversationLocally(question, requestresult.result);
+
+    // Update userquota.
+    const userquota = document.getElementById('block_ai_chat_userquota');
+    userquota.innerHTML = '';
+    renderUserQuota('#block_ai_chat_userquota', ['chat']);
 };
 
 /**

@@ -84,6 +84,9 @@
         .ai_chat_icon {
             display: none;
         }
+        p {
+            margin-bottom: .1rem;
+        }
     }
     .copiedtoast {
         position: absolute;
@@ -132,6 +135,17 @@
             font-size: 50%;
         }
     }
+
+    #block_ai_chat_userquota {
+        & > div.alert.alert-info {
+            color: var(--color-text-muted);
+            background-color: inherit;
+            font-size: .6rem;
+            padding: 0;
+            margin: 0;
+            text-align: right;
+        }
+    }
 }
 
 
@@ -159,6 +173,9 @@ body.block_ai_chat_dockright {
     .modal-backdrop.show, .ai_chat_modal {
         width: 0;
         height: 0;
+    }
+    .block_ai_chat-dialog {
+        height: 100%;
     }
 }
 
@@ -192,4 +209,3 @@ body.block_ai_chat_dockright {
         }
     }
 }
-
