@@ -545,7 +545,31 @@ const setModalHeader = (setTitle = '') => {
  * @param {*} textarea
  */
 const addTextareaListener = (textarea) => {
-    textarea.addEventListener('keydown', textareaOnKeydown);
+    textarea.addEventListener('keydown', (event) => {
+        // Handle submission.
+        textareaOnKeydown(event);
+
+        // Handle autgrow.
+        // Reset the height to auto to get the correct scrollHeight.
+        textarea.style.height = 'auto';
+
+        // Fetch the computed styles.
+        const computedStyles = window.getComputedStyle(textarea);
+        const lineHeight = parseFloat(computedStyles.lineHeight);
+        const paddingTop = parseFloat(computedStyles.paddingTop);
+        const paddingBottom = parseFloat(computedStyles.paddingBottom);
+        const borderTop = parseFloat(computedStyles.borderTopWidth);
+        const borderBottom = parseFloat(computedStyles.borderBottomWidth);
+
+        // Calculate the maximum height for four rows plus padding and borders.
+        const maxHeight = (lineHeight * 4) + paddingTop + paddingBottom + borderTop + borderBottom;
+
+        // Calculate the new height based on the scrollHeight.
+        const newHeight = Math.min(textarea.scrollHeight + borderTop + borderBottom, maxHeight);
+
+        // Set the new height.
+        textarea.style.height = newHeight + 'px';
+    });
 };
 
 /**
