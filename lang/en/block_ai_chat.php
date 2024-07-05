@@ -26,6 +26,7 @@
 $string['ai_chat'] = 'AI Chat';
 $string['ai_chat:addinstance'] = 'Add a AI Chat block';
 $string['ai_chat:myaddinstance'] = 'Add a AI Chat block to my moodle';
+$string['awaitanswer'] = 'AI generating ...';
 $string['chatwindow'] = 'Open as chatwindow';
 $string['copied'] = 'Copied';
 $string['delete'] = 'Delete current Dialog';

@@ -22,6 +22,8 @@ use core_external\external_single_structure;
 use core_external\external_multiple_structure;
 use core_external\external_value;
 
+use function PHPUnit\Framework\throwException;
+
 /**
  * Class get_all_conversations, to retrieve all visible conversations.
  *

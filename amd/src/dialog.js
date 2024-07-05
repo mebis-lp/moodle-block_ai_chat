@@ -696,13 +696,18 @@ const setView = async(mode = '') => {
     const key = await hash('chatmode' + userid);
     // Check for saved viewmode.
     let savedmode = LocalStorage.get(key);
-    if (!savedmode && mode == '') {
-        // Set default.
-        mode = VIEW_CHATWINDOW;
+    if (mode == '') {
+        if (!savedmode) {
+            // Set default.
+            mode = VIEW_CHATWINDOW;
+        } else {
+            mode = savedmode;
+        }
     }
     // Save viewmode and set global var.
     LocalStorage.set(key, mode);
     viewmode = mode;
+    console.log(mode);
 
     // Set viewmode as bodyclass.
     const body = document.querySelector('body');

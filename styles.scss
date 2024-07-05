@@ -38,6 +38,9 @@
 
 
 .ai_chat_modal{
+    .modal-dialog {
+        min-height: 400px;
+    }
     .modal-title {
        display: flex;
        justify-content: space-between;
@@ -46,13 +49,14 @@
 
    .modal-body {
        display: flex;
-       padding: 1rem;
+       padding: .5rem 1rem;
 
        .block_ai_chat-dialog {
            display: flex;
            flex-direction: column;
            justify-content: space-between;
            width: 100%;
+           height: 100%;
        }
    }
 
@@ -60,7 +64,6 @@
        display: flex;
        align-items: flex-start;
        padding: .5rem 1rem .5rem 1rem;
-       margin-bottom: .5rem;
        position: relative;
    }
    .message .copy {
@@ -76,6 +79,15 @@
     }
     .message.ai .content {
         padding-left: 0;
+        .text {
+            display: flex;
+            align-self: center;
+            align-items: center;
+            margin-top: .4rem;
+            p {
+                margin-bottom: .3rem;
+            }
+        }
     }
     .message.agent .content {
         background-color: var(--color-gray-light);
@@ -124,6 +136,8 @@
         position: absolute;
         bottom: 1rem;
         right: .5rem;
+        // padding-top: .5rem;
+        // padding-bottom: .5rem;
     }
     .headeroptions {
         display: flex;
@@ -137,13 +151,26 @@
     }
 
     #block_ai_chat_userquota {
-        & > div.alert.alert-info {
+        text-align: right;
+        .local_ai_manager_userquota_infobox {
             color: var(--color-text-muted);
             background-color: inherit;
             font-size: .6rem;
             padding: 0;
             margin: 0;
             text-align: right;
+        }
+    }
+    .ai_chat_modal_body .infobox {
+        display: flex;
+        align-items: center;
+        padding-bottom: .4rem;
+        .local_ai_manager-infobox.alert.alert-success {
+            color: var(--color-text-muted);
+            background-color: inherit;
+            font-size: .6rem;
+            padding: 0;
+            margin: 0;
         }
     }
 }
@@ -174,9 +201,6 @@ body.block_ai_chat_dockright {
         width: 0;
         height: 0;
     }
-    .block_ai_chat-dialog {
-        height: 100%;
-    }
 }
 
 body.block_ai_chat_openfull {
@@ -186,7 +210,7 @@ body.block_ai_chat_openfull {
             min-height: 500px;
         }
         .ai_chat_modal_body {
-            min-width: 80%;
+            max-width: 1080px;
             margin: 0 auto;
         }
     }
