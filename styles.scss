@@ -3,11 +3,8 @@
     position: fixed;
     bottom: 1.9rem;
     right: 2rem;
-    width: 36px;
     transition: 0.2s;
     z-index: 1000;
-    padding-bottom: 4px;
-    margin-bottom: 2px;
 
     display: flex;
     justify-content: center;
@@ -15,17 +12,13 @@
 
     border: 1px solid var(--color-secondary-border);
 
-    .icon {
-        width: auto;
-        margin-right: 0;
-    }
     &:hover {
         filter: hue-rotate(10deg) brightness(90%);
     }
 }
 @media (max-width: 576px) {
     #ai_chat_button {
-        top: 79vh;
+        top: 87vh;
         right: .5rem;
         bottom: unset;
     }
@@ -134,10 +127,9 @@
     }
     .block_ai_chat-input button {
         position: absolute;
+        display: flex;
         bottom: 1rem;
         right: .5rem;
-        // padding-top: .5rem;
-        // padding-bottom: .5rem;
     }
     .headeroptions {
         display: flex;
