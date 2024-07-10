@@ -9,6 +9,7 @@ import {getString} from 'core/str';
 import {marked} from 'block_ai_chat/vendor/marked.esm';
 import {renderInfoBox, hash} from 'local_ai_manager/render_infobox';
 import {renderUserQuota} from 'local_ai_manager/userquota';
+import {getAiConfig} from 'local_ai_manager/config';
 import LocalStorage from 'core/localstorage';
 
 // Declare variables.
@@ -46,6 +47,9 @@ let aiAtWork = false;
 let maxHistory = 5;
 // Remember warnings for maximum history in this session.
 let maxHistoryWarnings = new Set();
+// Tenantconfig.
+let tenantConfig = {};
+let chatConfig = {};
 
 class DialogModal extends Modal {
     static TYPE = "block_ai_chat/dialog_modal";
@@ -83,11 +87,17 @@ class DialogModal extends Modal {
 }
 
 export const init = async(params) => {
+    // Read params.
     userid = params.userid;
     contextid = params.contextid;
     strNewDialog = params.new;
     strHistory = params.history;
     badge = params.badge;
+
+    // Get configuration.
+    const aiConfig = await getAiConfig();
+    tenantConfig = aiConfig;
+    chatConfig = aiConfig.purposes.find(p => p.purpose === "chat");
 
     // Build modal.
     modal = await DialogModal.create({
@@ -251,6 +261,15 @@ const enterQuestion = async(question) => {
         return;
     }
 
+    if (!userAllowed()) {
+        console.log("User not allowed");
+        const notice = await getString('notice', 'block_ai_chat');
+        const message = await getString('noticenewquestion', 'block_ai_chat');
+        await alert(notice, message);
+        aiAtWork = false;
+        return;
+    }
+
     // Add to conversation, answer not yet available.
     showMessage(question, 'self', false);
 
@@ -323,6 +342,7 @@ const showReply = async (text) => {
     let fields = document.querySelectorAll('.ai_chat_modal .awaitanswer .text');
     const field = fields[fields.length - 1];
     field.innerHTML = marked.parse(text);
+    field.classList.remove('small');
 };
 
 const showMessages = () => {
@@ -369,9 +389,16 @@ const showMessage = async(text, sender = '', answer = true) => {
  * Create new / Reset dialog.
  * @param {bool} deleted
  */
-const newDialog = (deleted = false) => {
+const newDialog = async(deleted = false) => {
     console.log("newDialog called");
     if (aiAtWork) {
+        return;
+    }
+    if (!userAllowed()) {
+        const notice = await getString('notice', 'block_ai_chat');
+        const message = await getString('noticenewconversation', 'block_ai_chat');
+        await alert(notice, message);
+        aiAtWork = false;
         return;
     }
     // Add current convo local representation, if not already there.
@@ -714,3 +741,23 @@ const setView = async(mode = '') => {
     body.classList.remove(VIEW_CHATWINDOW, VIEW_OPENFULL, VIEW_DOCKRIGHT);
     body.classList.add(mode);
 };
+
+/**
+ * Is user allowed new queries.
+ * @returns {bool}
+ */
+const userAllowed = () => {
+    if (tenantConfig.tenantenabled === false || tenantConfig.userlocked === true) {
+        return false;
+    }
+
+    if (chatConfig.isconfigured === false ||
+        chatConfig.lockedforrole === false ||
+        chatConfig.limitreached === true ||
+        chatConfig.isconfigured === false
+    ) {
+        return false;
+    }
+    return true;
+};
+

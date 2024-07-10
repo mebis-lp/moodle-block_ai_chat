@@ -51,6 +51,8 @@ class block_ai_chat extends block_base {
      * @throws moodle_exception
      */
     public function get_content(): stdClass {
+        global $USER;
+
         if ($this->content !== null) {
             return $this->content;
         }
@@ -62,6 +64,11 @@ class block_ai_chat extends block_base {
         $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
         if (!$tenant->is_tenant_allowed()) {
             $this->content->text = get_string('tenantnotallowed', 'local_ai_manager');
+            return $this->content;
+        }
+        if (!empty(\local_ai_manager\ai_manager_utils::get_ai_config($USER)['isconfigured']) && \local_ai_manager\ai_manager_utils::get_ai_config($USER)['role'] === \local_ai_manager\local\userinfo::ROLE_BASIC) {
+            // $this->content->text = get_string('tenantnotallowed', 'local_ai_manager');
+            $this->content->text = "werstest";
             return $this->content;
         }
 
