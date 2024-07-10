@@ -82,6 +82,9 @@
                 margin-bottom: .3rem;
             }
         }
+        .ai_chat_icon {
+            margin-top: .8rem;
+        }
     }
     .message.agent .content {
         background-color: var(--color-gray-light);
@@ -111,7 +114,7 @@
         position: relative;
         .ai_chat_icon {
             position: absolute;
-            bottom: 1.15rem;
+            bottom: 1.6rem;
             left: .5rem;
         }        
     }
