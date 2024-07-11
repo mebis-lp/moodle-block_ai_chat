@@ -45,7 +45,10 @@ class renderer extends plugin_renderer_base {
         $params->history = get_string('history', 'block_ai_chat');
         $params->userid = $USER->id;
         $params->contextid = \context_course::instance($COURSE->id)->id;
-        $params->badge = true; // Show a privacy badge for global chat.
+        $params->badge = [
+            'text' => get_string('private', 'block_ai_chat'),
+            'title' => get_string('badgeprivate', 'block_ai_chat'),
+        ];
         $this->page->requires->js_call_amd(
             'block_ai_chat/dialog',
             'init',

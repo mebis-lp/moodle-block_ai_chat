@@ -24,18 +24,18 @@
     }
 }}
 <div class="headeroptions">
-    {{#badge}} <span class="badge badge-pill badge-dark"><i class="fa fa-lock mr-1"></i>Privat</span> {{/badge}}
+    {{#badge}} <span class="badge badge-pill badge-dark" title="{{title}}"><i class="fa fa-lock mr-1"></i>{{text}}</span> {{/badge}}
 
     <div class="dropdown block_ai_chat_action_menu">
         <button class="btn btn-icon icon-no-margin p-0 ml-2" data-toggle="dropdown" aria-expanded="false"><i class="fal fa-ellipsis"></i></button>
         <div class="dropdown-menu dropdown-menu-right">
-            <a class="dropdown-item" href="#" id="block_ai_chat_new_dialog">{{#pix}} t/messages, core, {{#str}} newconversation, block_ai_chat {{/str}} {{/pix}}{{#str}} newconversation, block_ai_chat {{/str}}</a>
+            <a class="dropdown-item" href="#" id="block_ai_chat_new_dialog">{{#pix}} t/messages, core, {{#str}} newdialog, block_ai_chat {{/str}} {{/pix}}{{#str}} newdialog, block_ai_chat {{/str}}</a>
             <a class="dropdown-item" href="#" id="block_ai_chat_show_history">{{#pix}} t/reload, core, {{#str}} showhistory, block_ai_chat {{/str}} {{/pix}}{{#str}} history, block_ai_chat {{/str}}</a>
             <a class="dropdown-item" href="#" id="block_ai_chat_delete_dialog">{{#pix}} t/delete, core, {{#str}} delete, block_ai_chat {{/str}} {{/pix}}{{#str}} delete, block_ai_chat {{/str}}</a>
         </div>
     </div>
 
-    <div class="dropdown block_ai_chat_action_menu">
+    <div class="dropdown block_ai_chat_action_menu views">
         <button class="btn btn-icon icon-no-margin p-0 ml-2" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-window-restore"></i></button>
         <div class="dropdown-menu dropdown-menu-right">
             <a class="dropdown-item" href="#" id="block_ai_chat_chatwindow"><i class="icon fa fa-window-restore"></i>{{#str}} chatwindow, block_ai_chat {{/str}}</a>

@@ -1,7 +1,7 @@
 import Modal from 'core/modal';
 import * as externalServices from 'block_ai_chat/webservices';
 import Templates from 'core/templates';
-import {alert, exception as displayException} from 'core/notification';
+import {alert, exception as displayException, deleteCancelPromise} from 'core/notification';
 import ModalEvents from 'core/modal_events';
 import * as helper from 'block_ai_chat/helper';
 import * as manager from 'block_ai_chat/ai_manager';
@@ -118,9 +118,6 @@ export const init = async(params) => {
         checkOutsideClick(event);
     });
 
-    // Load conversations.
-    await getConversations();
-
     // Check and set viewmode.
     setView();
 
@@ -138,6 +135,17 @@ export const init = async(params) => {
     // Get strings.
     strToday = await getString('today', 'core');
     strYesterday = await getString('yesterday', 'block_ai_chat');
+
+    // Create a MediaQueryList object to check for small screens.
+    const mediaQuery = window.matchMedia("(max-width: 576px)");
+
+    // Attach the event listener to handle changes.
+    mediaQuery.addEventListener('change', handleScreenWidthChange);
+
+    // Initial check for screenwidth.
+    if (window.innerWidth <= 576) {
+        setView(VIEW_OPENFULL);
+    }
 };
 
 /**
@@ -165,6 +173,9 @@ async function showModal() {
     });
 
     if (firstLoad) {
+        // Load conversations.
+        await getConversations();
+
         // Show conversation.
         // Todo - Evtl. noch firstload verschönern, spinner für header und content z.b.
         showConversation();
@@ -417,19 +428,27 @@ const newDialog = async(deleted = false) => {
 /**
  * Delete /hide current dialog.
  */
-const deleteCurrentDialog = async() => {
+const deleteCurrentDialog = () => {
     console.log("deleteCurrentDialog called");
-    if (conversation.id !== 0) {
-        try {
-            const deleted = await externalServices.deleteConversation(contextid, userid, conversation.id);
-            if (deleted) {
-                removeFromHistory();
-                showConversation();
+    deleteCancelPromise(
+        getString('delete', 'block_ai_chat'),
+        getString('deletewarning', 'block_ai_chat'),
+    ).then(async() => {
+        if (conversation.id !== 0) {
+            try {
+                const deleted = await externalServices.deleteConversation(contextid, userid, conversation.id);
+                if (deleted) {
+                    removeFromHistory();
+                    showConversation();
+                }
+            } catch (error) {
+                displayException(error);
             }
-        } catch (error) {
-            displayException(error);
         }
-    }
+        return;
+    }).catch(() => {
+        return;
+    });
 };
 
 /**
@@ -447,6 +466,10 @@ const showHistory = async() => {
         clearMessages();
         setModalHeader();
     });
+
+    // Set modal class to hide info about ratelimits and infobox.
+    let modal = document.querySelector('.ai_chat_modal');
+    modal.classList.add('onhistorypage');
 
     // Iterate over conversations and group by date.
     let groupedByDate = {};
@@ -566,15 +589,14 @@ const setModalHeader = (setTitle = '') => {
     if (modalheader !== null && (conversation.messages.length > 0 || setTitle.length)) {
         if (!setTitle.length) {
             title = conversation.messages[1].message;
-            if (conversation.messages[1].message.length > 50) {
-                title = conversation.messages[1].message.substring(0, 50);
-                title += ' ...';
-            }
         } else {
             title = setTitle;
         }
         modalheader.innerHTML = title;
     }
+    // Remove onhistorypage, since history page is setting it.
+    let modal = document.querySelector('.ai_chat_modal');
+    modal.classList.remove('onhistorypage');
 };
 
 /**
@@ -752,12 +774,26 @@ const userAllowed = () => {
     }
 
     if (chatConfig.isconfigured === false ||
-        chatConfig.lockedforrole === false ||
-        chatConfig.limitreached === true ||
-        chatConfig.isconfigured === false
+        chatConfig.lockedforrole === true ||
+        chatConfig.limitreached === true
     ) {
         return false;
     }
     return true;
 };
 
+/**
+ * Change to openfull view when screen is small.
+ * @param {*} e
+ */
+const handleScreenWidthChange = (e) => {
+    const body = document.querySelector('body');
+    if (e.matches) {
+        // Screen width is less than 576px
+        body.classList.remove(VIEW_CHATWINDOW, VIEW_OPENFULL, VIEW_DOCKRIGHT);
+        body.classList.add(VIEW_OPENFULL);
+    } else {
+        body.classList.remove(VIEW_CHATWINDOW, VIEW_OPENFULL, VIEW_DOCKRIGHT);
+        body.classList.add(viewmode);
+    }
+};

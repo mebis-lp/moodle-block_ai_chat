@@ -40,7 +40,7 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 {{< core/modal }}
     {{$title}}
-        <div>{{title}}</div>
+        <div class="ai_chat_title">{{title}}</div>
         {{> block_ai_chat/headeroptions }}
     {{/title}}
     {{$body}}
@@ -52,7 +52,7 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
                 </div>
                 <div class="block_ai_chat-output">
                 </div>
-                <div>
+                <div class="block_ai_chat-input-wrapper">
                     <div class="block_ai_chat-input">
                         <img src="{{{ config.wwwroot }}}/blocks/ai_chat/pix/ai-icon.svg" alt="" class="ai_chat_icon">
                         <textarea class="form-control" id="block_ai_chat-input-id" rows="1" placeholder="{{#str}} input, block_ai_chat {{/str}}"></textarea>
