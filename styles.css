@@ -180,7 +180,7 @@
   right: 0;
   height: 2rem;
   background: linear-gradient(to bottom, var(--white) 10%, transparent);
-  z-index: 1; /* Ensure the overlay is on top of the content */
+  z-index: 1;
 }
 .ai_chat_modal .ai_chat_modal_body {
   width: 100%;
@@ -240,7 +240,7 @@ body.block_ai_chat_dockright .ai_chat_modal {
 
 body.block_ai_chat_openfull .ai_chat_modal .modal-dialog {
   max-width: 95%;
-  min-height: 500px;
+  min-height: calc(100vh - 3.5rem);
 }
 body.block_ai_chat_openfull .ai_chat_modal .ai_chat_modal_body {
   max-width: 1080px;
