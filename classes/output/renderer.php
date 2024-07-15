@@ -35,11 +35,6 @@ class renderer extends plugin_renderer_base {
     public function render_ai_chat_content() {
         global $USER, $COURSE;
 
-        // Do permissioncheck in renderer since renderer is called by fake block in drawers.php.
-        if (!permissions::can_view_ai()) {
-            return '';
-        }
-
         $params = new \stdClass;
         $params->new = get_string('newdialog', 'block_ai_chat');
         $params->history = get_string('history', 'block_ai_chat');

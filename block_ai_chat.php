@@ -81,7 +81,7 @@ class block_ai_chat extends block_base {
     }
 
     /**
-     * Returns false as there can be only one floating button block on one page to avoid collisions.
+     * Returns false as there can be only one ai_chat block on one page to avoid collisions.
      *
      * @return bool
      */
@@ -95,7 +95,7 @@ class block_ai_chat extends block_base {
      * @return array
      */
     public function applicable_formats(): array {
-        return ['course-view' => true, 'mod' => true];
+        return ['my' => true, 'course-view' => true];
     }
 
     public function user_can_addto($page) {
@@ -105,4 +105,23 @@ class block_ai_chat extends block_base {
         }
         return parent::user_can_addto($page);
     }
+
+    /**
+     * Set instance default, to show block on all pages.
+     *
+     * @return array
+     */
+    public function instance_create() {
+        global $DB;
+
+        // For dashboard let the standard default.
+        if (isset($this->page->context) && $this->page->context::instance()->id != SYSCONTEXTID) {
+            return true;
+        }
+        // For courses set default to all pages.
+        $DB->update_record('block_instances', ['id' => $this->instance->id, 'pagetypepattern' => '*']);
+
+        return true;
+    }
+
 }
