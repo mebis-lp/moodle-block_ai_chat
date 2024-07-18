@@ -321,6 +321,13 @@ body.block_ai_chat_dockright {
         color: var(--color-primary);
     }
 }
+body.block_ai_chat_chatwindow,
+body.block_ai_chat_dockright,
+body.block_ai_chat_openfull {
+    .block_floatingbutton-floatingicons {
+        bottom: calc(2.5rem + 36px);
+    }
+}
 @media (max-width: 576px) {
     .block_ai_chat_action_menu.views {
         display: none;
