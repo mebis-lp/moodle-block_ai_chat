@@ -323,17 +323,17 @@ const enterQuestion = async(question) => {
         requestresult = await errorHandling(requestresult, question, options);
     }
 
-    // Write back answer.
-    showReply(requestresult.result);
-
-    // Ai is done.
-    aiAtWork = false;
-
     // Attach copy listener.
     let copy = document.querySelector('.ai_chat_modal .awaitanswer .copy');
     copy.addEventListener('mousedown', () => {
         helper.copyToClipboard(copy);
     });
+
+    // Write back answer.
+    showReply(requestresult.result);
+
+    // Ai is done.
+    aiAtWork = false;
 
     // Save new question and answer.
     saveConversationLocally(question, requestresult.result);

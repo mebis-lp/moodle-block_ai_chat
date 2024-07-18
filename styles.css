@@ -93,7 +93,8 @@
   width: 1.5rem;
   height: 1.5rem;
 }
-.ai_chat_modal .message.ai .content.awaitanswer .ai_chat_icon {
+.ai_chat_modal .message.ai .content.awaitanswer .ai_chat_icon,
+.ai_chat_modal .message.ai .content.awaitanswer .copy {
   display: none;
 }
 .ai_chat_modal .message.agent .content {

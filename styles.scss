@@ -101,7 +101,8 @@
             height: 1.5rem;
         }
         &.awaitanswer {            
-            .ai_chat_icon {
+            .ai_chat_icon,
+            .copy {
                 display: none;
             }
         }
