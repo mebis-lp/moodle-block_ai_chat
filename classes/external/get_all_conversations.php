@@ -62,7 +62,7 @@ class get_all_conversations extends external_api {
         ]);
         self::validate_context(\core\context_helper::instance_by_id($contextid));
         // Make sure the user has the proper capability.
-        // require_capability('local/ai_manager:use', context::instance_by_id($contextid));
+        require_capability('local/ai_manager:use', \context::instance_by_id($contextid));
 
         // Read from local_ai_manager and get all own conversations.
         $result = [];
@@ -83,18 +83,22 @@ class get_all_conversations extends external_api {
                     'sender' => 'ai',
                 ],
             ];
-            if (!empty($result[$value->itemid])) {
+            if (empty($result[$value->itemid])) {
+                // Add systemprompt for first prompt.
+                $allmessages = array_merge(json_decode($value->requestoptions, true)['conversationcontext'], $tmpmessages);
+                // Remember time created.
+                $tmptimecreated = $value->timecreated;
+                $result[$value->itemid] = [
+                    'id' => $value->itemid,
+                    'messages' => $allmessages,
+                    'timecreated' => $tmptimecreated,
+                ];
+            } else {
                 $allmessages = array_merge($result[$value->itemid]['messages'], $tmpmessages);
                 $result[$value->itemid] = [
                     'id' => $value->itemid,
                     'messages' => $allmessages,
-                    'timecreated' => $value->timecreated,
-                ];
-            } else {
-                // Add systemprompt for first prompt.
-                $allmessages = array_merge(json_decode($value->requestoptions, true)['conversationcontext'], $tmpmessages);
-                $result[$value->itemid] = [
-                    'messages' => $allmessages,
+                    'timecreated' => $tmptimecreated,
                 ];
             }
         }

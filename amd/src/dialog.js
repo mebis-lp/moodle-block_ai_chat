@@ -225,7 +225,9 @@ const getConversations = async() => {
     console.log("allConversations called");
     try {
         allConversations = await externalServices.getAllConversations(userid, contextid);
+        console.log(allConversations);
     } catch (error) {
+        console.log(allConversations);
         displayException(error);
     }
 };

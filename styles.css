@@ -225,6 +225,7 @@
 .ai_chat_modal .block_ai-history-items > div {
   display: flex;
   flex-wrap: nowrap;
+  justify-content: space-between;
   gap: 0.2rem;
 }
 .ai_chat_modal.onhistorypage .infobox,
