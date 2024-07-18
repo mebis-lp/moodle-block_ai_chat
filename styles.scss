@@ -35,12 +35,13 @@
         min-height: 500px;
     }
     .modal-header {
+        width: 100%;
         border-bottom: none;
         .modal-title {
            display: flex;
            justify-content: space-between;
            align-items: center;
-           width: 100%;
+           width: calc(100% - 2rem);
            font-size: 1rem;
            .ai_chat_title {
                 text-overflow: ellipsis;
@@ -143,6 +144,11 @@
         min-height: calc(1.5rem + 2rem);;
         max-height: calc((1.5rem * 4) + 2rem);
         box-sizing: border-box;
+        &::placeholder {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;            
+        }
     }
     .block_ai_chat-input button {
         position: absolute;
@@ -196,6 +202,7 @@
         .infobox {
            display: flex;
            align-items: center;
+           flex-direction: row-reverse;
            padding-bottom: .4rem;
            margin-top: -.5rem;
            .local_ai_manager-infobox.alert.alert-success {

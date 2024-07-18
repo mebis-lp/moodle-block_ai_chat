@@ -30,13 +30,14 @@
   min-height: 500px;
 }
 .ai_chat_modal .modal-header {
+  width: 100%;
   border-bottom: none;
 }
 .ai_chat_modal .modal-header .modal-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
+  width: calc(100% - 2rem);
   font-size: 1rem;
 }
 .ai_chat_modal .modal-header .modal-title .ai_chat_title {
@@ -136,6 +137,11 @@
   max-height: 8rem;
   box-sizing: border-box;
 }
+.ai_chat_modal .block_ai_chat-input textarea::placeholder {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .ai_chat_modal .block_ai_chat-input button {
   position: absolute;
   display: flex;
@@ -188,6 +194,7 @@
 .ai_chat_modal .ai_chat_modal_body .infobox {
   display: flex;
   align-items: center;
+  flex-direction: row-reverse;
   padding-bottom: 0.4rem;
   margin-top: -0.5rem;
 }
