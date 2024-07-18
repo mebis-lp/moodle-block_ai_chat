@@ -61,36 +61,19 @@ class get_all_conversations extends external_api {
             'contextid' => $contextid,
         ]);
         self::validate_context(\core\context_helper::instance_by_id($contextid));
-        // Make sure the user has the proper capability.        
-        // require_capability('tool/dataprivacy:managedatarequests', $context);
+        // Make sure the user has the proper capability.
+        // require_capability('local/ai_manager:use', context::instance_by_id($contextid));
 
-        if ($USER->id !== $userid ) {
-            // Evtl. noch admincheck.
-            // return;
-        }
-
-        // TODO read from local_ai_manager and get all own conversations.$re
-        // As well as from pupils having a teacher role.
-
+        // Read from local_ai_manager and get all own conversations.
         $result = [];
         $response = \local_ai_manager\ai_manager_utils::get_log_entries('block_ai_chat', $contextid, $USER->id, 0, false);
-        // Get the latest log entries unique by itemid.
+        // Go over all log entries and create conversation items.
         foreach ($response as $value) {
             // Ignore values without itemid.
             if (empty($value->itemid)) {
                 continue;
             }
-            if (empty($result[$value->itemid])) {
-                $result[$value->itemid] = $value;
-            } else {
-                if ($result[$value->itemid]->timecreated < $value->timecreated) {
-                    $result[$value->itemid] = $value;
-                }
-            }
-        }
-        // Convert to expected format.
-        foreach ($result as $value) {
-            $messages = [
+            $tmpmessages = [
                 [
                     'message' => $value->prompttext,
                     'sender' => 'user',
@@ -100,12 +83,20 @@ class get_all_conversations extends external_api {
                     'sender' => 'ai',
                 ],
             ];
-            $messages = array_merge(json_decode($value->requestoptions, true)['conversationcontext'], $messages);
-            $result[$value->itemid] = [
-                'id' => $value->itemid,
-                'messages' => $messages,
-                'timecreated' => $value->timecreated,
-            ];
+            if (!empty($result[$value->itemid])) {
+                $allmessages = array_merge($result[$value->itemid]['messages'], $tmpmessages);
+                $result[$value->itemid] = [
+                    'id' => $value->itemid,
+                    'messages' => $allmessages,
+                    'timecreated' => $value->timecreated,
+                ];
+            } else {
+                // Add systemprompt for first prompt.
+                $allmessages = array_merge(json_decode($value->requestoptions, true)['conversationcontext'], $tmpmessages);
+                $result[$value->itemid] = [
+                    'messages' => $allmessages,
+                ];
+            }
         }
         return $result;
     }

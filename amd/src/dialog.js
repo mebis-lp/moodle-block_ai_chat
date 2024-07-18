@@ -224,7 +224,6 @@ async function showModal() {
 const getConversations = async() => {
     console.log("allConversations called");
     try {
-        // Ist hier await nötig um in init auf den Button listener zu warten?
         allConversations = await externalServices.getAllConversations(userid, contextid);
     } catch (error) {
         displayException(error);
@@ -247,7 +246,7 @@ const showConversation = (id = 0) => {
         conversation = allConversations.find(x => x.id === id);
     } else if (typeof allConversations[0] !== 'undefined') {
         // Set last conversation.
-        conversation = allConversations.at(0);
+        conversation = allConversations.at(allConversations.length - 1);
     } else if (allConversations.length === 0) {
         // Last conversation has been deleted.
         newDialog(true);
@@ -350,10 +349,17 @@ const enterQuestion = async(question) => {
  * @param {string} text
  */
 const showReply = async (text) => {
+    // Get textblock.
     let fields = document.querySelectorAll('.ai_chat_modal .awaitanswer .text');
     const field = fields[fields.length - 1];
+    // Use marked to render the reply.
     field.innerHTML = marked.parse(text);
     field.classList.remove('small');
+
+    // Remove awaitanswer class.
+    let awaitdivs = document.querySelectorAll('.ai_chat_modal .awaitanswer');
+    const awaitdiv = awaitdivs[awaitdivs.length - 1];
+    awaitdiv.classList.remove('awaitanswer');
 };
 
 const showMessages = () => {
@@ -475,12 +481,8 @@ const showHistory = async() => {
     let groupedByDate = {};
     allConversations.forEach((convo) => {
         if (typeof convo.messages[1] !== 'undefined') {
-            // Conditionally shorten menu title, skip system message.
+            // Get first prompt.
             let title = convo.messages[1].message;
-            if (convo.messages[1].message.length > 50) {
-                title = convo.messages[1].message.substring(0, 50);
-                title += ' ...';
-            }
 
             // Get date and sort convos into a date array.
             const now = new Date();
@@ -493,6 +495,7 @@ const showHistory = async() => {
             const options = {weekday: 'long', day: '2-digit', month: '2-digit'};
             const monthOptions = {month: 'long', year: '2-digit'};
 
+            // Create a date string.
             let dateString = '';
             if (date >= today) {
                 dateString = strToday;
@@ -503,9 +506,15 @@ const showHistory = async() => {
             } else {
                 dateString = date.toLocaleDateString(undefined, monthOptions);
             }
+
+            // Create a time string.
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+
             let convItem = {
                 "title": title,
                 "conversationid": convo.id,
+                "time": hours + ':' + minutes,
             };
 
             // Save entry under the date.
@@ -756,7 +765,6 @@ const setView = async(mode = '') => {
     // Save viewmode and set global var.
     LocalStorage.set(key, mode);
     viewmode = mode;
-    console.log(mode);
 
     // Set viewmode as bodyclass.
     const body = document.querySelector('body');

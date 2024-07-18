@@ -89,6 +89,13 @@
 .ai_chat_modal .message.ai .content .ai_chat_icon {
   margin-top: 0.8rem;
 }
+.ai_chat_modal .message.ai .content .spinner-border {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.ai_chat_modal .message.ai .content.awaitanswer .ai_chat_icon {
+  display: none;
+}
 .ai_chat_modal .message.agent .content {
   background-color: var(--color-gray-light);
   margin-left: 4rem;
@@ -208,8 +215,22 @@
 .ai_chat_modal .block_ai-history-items {
   padding: 0.5rem;
 }
+.ai_chat_modal .block_ai-history-items a {
+  display: block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.ai_chat_modal .block_ai-history-items > div {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.2rem;
+}
 .ai_chat_modal.onhistorypage .infobox,
 .ai_chat_modal.onhistorypage #block_ai_chat_userquota {
+  display: none;
+}
+.ai_chat_modal.onhistorypage .gradient-overlay {
   display: none;
 }
 

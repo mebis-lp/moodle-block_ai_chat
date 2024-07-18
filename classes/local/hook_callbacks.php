@@ -25,14 +25,26 @@ namespace block_ai_chat\local;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class hook_callbacks {
+    /**
+     * Add a checkbox to add a ai-chat block.
+     *
+     * @param after_form_definition $hook
+     */
     public static function handle_after_form_definition(\core_course\hook\after_form_definition $hook): void {
-        $mform = $hook->mform;
-        $mform->addElement('checkbox', 'addaichat', get_string('addblockinstance', 'block_ai_chat'), 'add_block_ai_chat');
-        $mform->addHelpButton('addaichat', 'addblockinstance', 'block_ai_chat');
-        $mform->setDefaults('addaichat', 1);
-
+        $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
+        if (!$tenant->is_tenant_allowed()) {
+            $mform = $hook->mform;
+            $mform->addElement('checkbox', 'addaichat', get_string('addblockinstance', 'block_ai_chat'), 'add_block_ai_chat');
+            $mform->addHelpButton('addaichat', 'addblockinstance', 'block_ai_chat');
+            $mform->setDefaults('addaichat', 1);
+        }
     }
 
+    /**
+     * Check for addaichat form setting and add/remove ai-chat blockk.
+     *
+     * @param after_form_submission $hook
+     */
     public static function handle_after_form_submission(\core_course\hook\after_form_submission $hook): void {
         global $DB;
         // Get form data.
@@ -66,6 +78,11 @@ class hook_callbacks {
         }
     }
 
+    /**
+     * Check if block instance is present and set addaichat form setting.
+     *
+     * @param after_form_submission $hook
+     */
     public static function handle_after_form_definition_after_data(\core_course\hook\after_form_definition_after_data $hook): void {
         // Get form data.
         $mform = $hook->mform;
@@ -77,7 +94,6 @@ class hook_callbacks {
             // Block present, so set checkbox accordingly.
             $mform->setDefault('addaichat', "checked");
         }
-
     }
 
 }
