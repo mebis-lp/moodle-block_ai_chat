@@ -12,7 +12,7 @@ import {exception as displayException} from 'core/notification';
 export const askLocalAiManager = async(purpose, prompt, options = []) => {
     let result = {};
     try {
-        result = await makeRequest(purpose, prompt, JSON.stringify(options));
+        result = await makeRequest(purpose, prompt, options);
     } catch (error) {
         console.log(error);
         result.code = 'aiconnector';
