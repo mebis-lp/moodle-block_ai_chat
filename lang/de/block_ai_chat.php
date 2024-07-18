@@ -26,6 +26,8 @@
 $string['ai_chat'] = 'KI-Chat';
 $string['ai_chat:addinstance'] = 'KI-Chat Block hinzufügen';
 $string['ai_chat:myaddinstance'] = 'KI-Chat Block zu meiner Startseite hinzufügen';
+$string['addblockinstance'] = 'KI Chat zum Kurs hinzufügen';
+$string['addblockinstance_help'] = 'Fügt den Block KI Chat zum Kurs hinzu';
 $string['awaitanswer'] = 'KI generiert...';
 $string['badgeprivate'] = 'Dein Chatverlauf ist nur für dich sichtbar.';
 $string['badgepublic'] = 'Dein Chatverlauf ist für andere sichtbar.';
@@ -36,6 +38,7 @@ $string['deletewarning'] = 'Löschen des aktuellen Chats bestätigen.';
 $string['dockright'] = 'Rechts andocken';
 $string['newdialog'] = 'Neuer Chat';
 $string['enable'] = 'Chat aktivieren';
+$string['enableaichat'] = 'KI Chat zum Kurs hinzufügen';
 $string['error'] = 'Ein Fehler ist aufgetreten, bitte erneut versuchen.';
 $string['errorwithcode'] = 'Fehler aufgetreten mit Code: {$a}';
 $string['notice'] = 'Hinweis';

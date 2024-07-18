@@ -17,7 +17,7 @@ export const copyToClipboard = (element) => {
     const toast = element.previousElementSibling;
     toast.style.visibility = 'visible';
     setTimeout(() => {
-       toast.style.visibility = 'hidden'; 
+       toast.style.visibility = 'hidden';
     }, 750);
 
 };

@@ -26,6 +26,8 @@
 $string['ai_chat'] = 'AI Chat';
 $string['ai_chat:addinstance'] = 'Add a AI Chat block';
 $string['ai_chat:myaddinstance'] = 'Add a AI Chat block to my moodle';
+$string['addblockinstance'] = 'Add a AI Chat to this course';
+$string['addblockinstance_help'] = 'Adds a block instance of AI Chat to this course';
 $string['awaitanswer'] = 'AI generating...';
 $string['badgeprivate'] = 'Your chat is visible only to you.';
 $string['badgepublic'] = 'Your chat is visible to others.';
@@ -36,6 +38,7 @@ $string['deletewarning'] = 'Please confirm you want to delete this Conversation.
 $string['dockright'] = 'Dock on the right';
 $string['newdialog'] = 'New AI Chat';
 $string['enable'] = 'Activate Chat';
+$string['enableaichat'] = 'Add a AI Chat instance';
 $string['error'] = 'An Error occured, please try again.';
 $string['errorwithcode'] = 'An Error occured with code: {$a}';
 $string['notice'] = 'Notice';

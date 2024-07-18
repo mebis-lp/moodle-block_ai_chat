@@ -14,19 +14,32 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace block_ai_chat\local;
+
 /**
- * Version information for block_ai_chat
+ * Class helper
  *
  * @package    block_ai_chat
- * @copyright  2024 ISB Bayern
- * @author     Tobias Garske
+ * @copyright  2024 Tobias Garske, ISB Bayern
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+class helper {
+    public static function check_block_present($courseid) {
+        global $DB;
 
-defined('MOODLE_INTERNAL') || die();
+        // Check if tenant is enabled for the school.
+        $sql = "SELECT bi.id
+                FROM {block_instances} bi
+                JOIN {context} ctx ON bi.parentcontextid = ctx.id
+                WHERE bi.blockname = :blockname AND ctx.contextlevel = :contextlevel
+                AND ctx.instanceid = :courseid";
 
-$plugin->release = '0.1';
-$plugin->version = 2024051516;
-$plugin->requires = 2023010101;
-$plugin->component = 'block_ai_chat';
-$plugin->maturity = MATURITY_ALPHA;
+        $params = [
+            'blockname' => 'ai_chat',
+            'contextlevel' => CONTEXT_COURSE,
+            'courseid' => $courseid,
+        ];
+
+        return $DB->get_record_sql($sql, $params);
+    }
+}

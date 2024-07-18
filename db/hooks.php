@@ -15,18 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for block_ai_chat
+ * Hook listener callbacks.
  *
  * @package    block_ai_chat
  * @copyright  2024 ISB Bayern
- * @author     Tobias Garske
+ * @author     Philipp Memmel
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->release = '0.1';
-$plugin->version = 2024051516;
-$plugin->requires = 2023010101;
-$plugin->component = 'block_ai_chat';
-$plugin->maturity = MATURITY_ALPHA;
+$callbacks = [
+    [
+        'hook' => \core_course\hook\after_form_definition::class,
+        'callback' => \block_ai_chat\local\hook_callbacks::class . '::handle_after_form_definition',
+    ],
+    [
+        'hook' => \core_course\hook\after_form_submission::class,
+        'callback' => \block_ai_chat\local\hook_callbacks::class . '::handle_after_form_submission',
+    ],
+    [
+        'hook' => \core_course\hook\after_form_definition_after_data::class,
+        'callback' => \block_ai_chat\local\hook_callbacks::class . '::handle_after_form_definition_after_data',
+    ],
+];
