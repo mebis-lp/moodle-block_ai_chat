@@ -63,12 +63,18 @@ class block_ai_chat extends block_base {
 
         $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
         if (!$tenant->is_tenant_allowed()) {
-            $this->content->text = get_string('tenantnotallowed', 'local_ai_manager');
+            if ( \local_ai_manager\ai_manager_utils::get_ai_config($USER)['role'] === \local_ai_manager\local\userinfo::ROLE_EXTENDED) {
+                $this->content->text = get_string('tenantnotallowed', 'local_ai_manager');
+            }
             return $this->content;
         }
         if (!empty(\local_ai_manager\ai_manager_utils::get_ai_config($USER)['isconfigured']) && \local_ai_manager\ai_manager_utils::get_ai_config($USER)['role'] === \local_ai_manager\local\userinfo::ROLE_BASIC) {
             // $this->content->text = get_string('tenantnotallowed', 'local_ai_manager');
-            $this->content->text = "werstest";
+            return $this->content;
+        }
+        // Get the context of the block.
+        $context = \context_block::instance($this->instance->id);
+        if (!has_capability('block/ai_chat:view', $context)) {
             return $this->content;
         }
 

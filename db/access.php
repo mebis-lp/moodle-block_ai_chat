@@ -49,4 +49,14 @@ $capabilities = [
 
         'clonepermissionsfrom' => 'moodle/my:manageblocks',
     ],
+    'block/ai_chat:view' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => [
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_PREVENT,
+        ],
+
+        'clonepermissionsfrom' => 'moodle/my:manageblocks',
+    ],
 ];

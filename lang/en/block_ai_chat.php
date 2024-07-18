@@ -26,6 +26,7 @@
 $string['ai_chat'] = 'AI Chat';
 $string['ai_chat:addinstance'] = 'Add a AI Chat block';
 $string['ai_chat:myaddinstance'] = 'Add a AI Chat block to my moodle';
+$string['ai_chat:view'] = 'View an AI Chat block floating button';
 $string['addblockinstance'] = 'Add a AI Chat to this course';
 $string['addblockinstance_help'] = 'Adds a block instance of AI Chat to this course. Or is removed when unchecked';
 $string['awaitanswer'] = 'AI generating...';

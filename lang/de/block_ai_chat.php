@@ -26,6 +26,7 @@
 $string['ai_chat'] = 'KI-Chat';
 $string['ai_chat:addinstance'] = 'KI-Chat Block hinzufügen';
 $string['ai_chat:myaddinstance'] = 'KI-Chat Block zu meiner Startseite hinzufügen';
+$string['ai_chat:view'] = 'KI-Chat Anzeige des Floating Buttons';
 $string['addblockinstance'] = 'KI Chat zum Kurs hinzufügen';
 $string['addblockinstance_help'] = 'Fügt den Block KI Chat zum Kurs hinzu. Dieser wird gegebenenfalls entfernt, falls nicht gesetzt.';
 $string['awaitanswer'] = 'KI generiert...';
