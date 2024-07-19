@@ -54,7 +54,7 @@ class hook_callbacks {
         $courseid = $data->id;
         $blockinstance = \block_ai_chat\local\helper::check_block_present($courseid);
 
-        if ($data->addaichat == '1') {
+        if (!empty($data->addaichat) && $data->addaichat == '1') {
             if (!$blockinstance) {
                 // Add block instance.
                 $newinstance = new \stdClass;
