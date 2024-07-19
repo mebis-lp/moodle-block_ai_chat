@@ -54,7 +54,7 @@ $string['showhistory'] = 'Verlauf ansehen';
 $string['maxhistory'] = 'Begrenzung des übermittelten Gesprächsverlaufs';
 $string['maxhistoryreached'] = 'Der Gesprächsverlauf ist begrenzt auf {$a} Nachrichten.
     Aus Effizienzgründen werden ältere Nachrichten nicht berücksichtigt';
-$string['nohistory'] = 'Keine Chat Historie vorhanden';
+$string['nohistory'] = 'Keine Chat-Verlauf vorhanden';
 $string['pluginname'] = 'KI-Chat';
 $string['privacy:metadata'] = 'Diese Plugin speichert keine Daten, Konversationen werden im AI Manager gespeichert.';
 $string['submit'] = 'Absenden';

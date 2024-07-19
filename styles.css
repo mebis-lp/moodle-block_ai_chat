@@ -205,6 +205,7 @@
   flex-direction: row-reverse;
   padding-bottom: 0.4rem;
   margin-top: -0.5rem;
+  z-index: 1;
 }
 .ai_chat_modal .ai_chat_modal_body .infobox .local_ai_manager-infobox.alert.alert-success {
   color: var(--color-text-muted);
@@ -227,6 +228,9 @@
   flex-wrap: nowrap;
   justify-content: space-between;
   gap: 0.2rem;
+}
+.ai_chat_modal .block_ai-history-items.card {
+  flex-direction: column-reverse;
 }
 .ai_chat_modal.onhistorypage .infobox,
 .ai_chat_modal.onhistorypage #block_ai_chat_userquota {

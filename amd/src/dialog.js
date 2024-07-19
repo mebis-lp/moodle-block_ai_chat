@@ -311,6 +311,8 @@ const enterQuestion = async(question) => {
         try {
             let idresult = await externalServices.getNewConversationId(contextid);
             conversation.id = idresult.id;
+            conversation.timecreated = Math.floor(Date.now() / 1000);
+            setModalHeader(question);
         } catch (error) {
             displayException(error);
         }
@@ -467,6 +469,10 @@ const deleteCurrentDialog = () => {
  */
 const showHistory = async() => {
     console.log("showHistory called");
+    // Add current convo local representation, if not already there.
+    if (allConversations.find(x => x.id === conversation.id) === undefined) {
+        allConversations.push(conversation);
+    }
     // Change title and add backlink.
     let title = '<a href="#" id="block_ai_chat_backlink"><i class="icon fa fa-arrow-left"></i>' + strHistory + '</a>';
     clearMessages(true);

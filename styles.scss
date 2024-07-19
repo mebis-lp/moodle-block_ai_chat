@@ -215,6 +215,7 @@
            flex-direction: row-reverse;
            padding-bottom: .4rem;
            margin-top: -.5rem;
+           z-index: 1;
            .local_ai_manager-infobox.alert.alert-success {
                color: var(--color-text-muted);
                background-color: inherit;
@@ -237,6 +238,9 @@
             flex-wrap: nowrap;
             justify-content: space-between;
             gap: .2rem;
+        }
+        &.card {
+            flex-direction: column-reverse;
         }
     }
     &.onhistorypage {
