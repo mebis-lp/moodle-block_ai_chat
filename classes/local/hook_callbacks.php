@@ -32,7 +32,7 @@ class hook_callbacks {
      */
     public static function handle_after_form_definition(\core_course\hook\after_form_definition $hook): void {
         $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
-        if (!$tenant->is_tenant_allowed()) {
+        if ($tenant->is_tenant_allowed()) {
             $mform = $hook->mform;
             $mform->addElement('checkbox', 'addaichat', get_string('addblockinstance', 'block_ai_chat'), 'add_block_ai_chat');
             $mform->addHelpButton('addaichat', 'addblockinstance', 'block_ai_chat');
