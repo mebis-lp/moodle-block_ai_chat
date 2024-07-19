@@ -54,6 +54,7 @@ $string['showhistory'] = 'Show History';
 $string['maxhistory'] = 'Conversation history restriction';
 $string['maxhistoryreached'] = 'Please be aware, that dialog history is restricted to {$a} messages.
     Older messages wont be included';
+$string['nohistory'] = 'Chat History not found';
 $string['pluginname'] = 'AI Chat';
 $string['privacy:metadata'] = 'This plugin doesn\'t store personal data.';
 $string['submit'] = 'Submit';

@@ -93,6 +93,8 @@ export const init = async(params) => {
     strNewDialog = params.new;
     strHistory = params.history;
     badge = params.badge;
+    // Disable bdage.
+    badge = false;
 
     // Get configuration.
     const aiConfig = await getAiConfig();
@@ -129,7 +131,6 @@ export const init = async(params) => {
     let button = document.getElementById('ai_chat_button');
     button.addEventListener('mousedown', async() => {
         showModal(params);
-        await renderInfoBox('block_ai_chat', userid, '.ai_chat_modal_body [data-content="local_ai_manager_infobox"]');
     });
 
     // Get strings.
@@ -209,7 +210,9 @@ async function showModal() {
         });
 
         // Show userquota.
-        renderUserQuota('#block_ai_chat_userquota', ['chat']);
+        await renderUserQuota('#block_ai_chat_userquota', ['chat']);
+        // Show infobox.
+        await renderInfoBox('block_ai_chat', userid, '.ai_chat_modal_body [data-content="local_ai_manager_infobox"]');
 
         firstLoad = false;
     }

@@ -39,6 +39,11 @@
         {{/objects}}
     </div>
 {{/dates}}
+{{^dates}}
+    <div class="">
+        {{#str}} nohistory, block_ai_chat {{/str}}
+    </div>
+{{/dates}}
 
 <button class="btn btn-secondary mt-3 mb-3" id="ai_chat_history_new_dialog">
     <i class="icon fal fa-comment" aria-hidden="true"></i> {{#str}} newdialog, block_ai_chat {{/str}}
