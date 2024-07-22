@@ -86,19 +86,17 @@ class get_all_conversations extends external_api {
             if (empty($result[$value->itemid])) {
                 // Add systemprompt for first prompt.
                 $allmessages = array_merge(json_decode($value->requestoptions, true)['conversationcontext'], $tmpmessages);
-                // Remember time created.
-                $tmptimecreated = $value->timecreated;
                 $result[$value->itemid] = [
                     'id' => $value->itemid,
                     'messages' => $allmessages,
-                    'timecreated' => $tmptimecreated,
+                    'timecreated' => $value->timecreated,
                 ];
             } else {
                 $allmessages = array_merge($result[$value->itemid]['messages'], $tmpmessages);
                 $result[$value->itemid] = [
-                    'id' => $value->itemid,
+                    'id' => $result[$value->itemid]['id'] ,
                     'messages' => $allmessages,
-                    'timecreated' => $tmptimecreated,
+                    'timecreated' => $result[$value->itemid]['timecreated'],
                 ];
             }
         }

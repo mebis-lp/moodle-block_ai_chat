@@ -244,6 +244,10 @@
         }
     }
     &.onhistorypage {
+        .block_ai_chat-output {
+            display: flex;
+            flex-direction: column-reverse;            
+        }
         .infobox,
         #block_ai_chat_userquota {
             display: none;

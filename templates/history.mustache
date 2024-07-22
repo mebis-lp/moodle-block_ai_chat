@@ -15,22 +15,25 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block_ai_chat/dropdownmenuitem
+    @template block_ai_chat/history
 
-    TODO describe template dropdownmenuitem
+    Since dialogues are read ASC, template is build upside down and reversed per flex-direction: column-reverse
 
     Example context (json):
     {
-        "title": "Erste Frage",
-        "conversationid": 9,
-        "conversationid": Datestring,
-        "last": true,
+        "key": "Heute",
+        "objects":     [{
+            "title": "Erste Frage",
+            "conversationid": 9,
+        },]
     }
 }}
+
+<button class="btn btn-secondary mt-3 mb-3" id="ai_chat_history_new_dialog">
+    <i class="icon fal fa-comment" aria-hidden="true"></i> {{#str}} newdialog, block_ai_chat {{/str}}
+</button>
+
 {{#dates}}
-    <div class="block_ai-date mt-3 mb-2">
-        {{key}}
-    </div>
     <div class="block_ai-history-items card">
         {{#objects}}
             <div class="" data-id="{{conversationid}}">
@@ -38,13 +41,12 @@
             </div>
         {{/objects}}
     </div>
+    <div class="block_ai-date mt-3 mb-2">
+        {{key}}
+    </div>
 {{/dates}}
 {{^dates}}
     <div class="">
         {{#str}} nohistory, block_ai_chat {{/str}}
     </div>
 {{/dates}}
-
-<button class="btn btn-secondary mt-3 mb-3" id="ai_chat_history_new_dialog">
-    <i class="icon fal fa-comment" aria-hidden="true"></i> {{#str}} newdialog, block_ai_chat {{/str}}
-</button>

@@ -520,7 +520,7 @@ const showHistory = async() => {
 
             // Create a time string.
             const hours = date.getHours();
-            const minutes = date.getMinutes();
+            const minutes = date.getMinutes().toString().padStart(2, '0');
 
             let convItem = {
                 "title": title,

@@ -232,6 +232,10 @@
 .ai_chat_modal .block_ai-history-items.card {
   flex-direction: column-reverse;
 }
+.ai_chat_modal.onhistorypage .block_ai_chat-output {
+  display: flex;
+  flex-direction: column-reverse;
+}
 .ai_chat_modal.onhistorypage .infobox,
 .ai_chat_modal.onhistorypage #block_ai_chat_userquota {
   display: none;
