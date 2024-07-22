@@ -1,7 +1,7 @@
 import Modal from 'core/modal';
 import * as externalServices from 'block_ai_chat/webservices';
 import Templates from 'core/templates';
-import {alert, exception as displayException, deleteCancelPromise} from 'core/notification';
+import {alert as displayAlert, exception as displayException, deleteCancelPromise} from 'core/notification';
 import ModalEvents from 'core/modal_events';
 import * as helper from 'block_ai_chat/helper';
 import * as manager from 'block_ai_chat/ai_manager';
@@ -280,7 +280,7 @@ const enterQuestion = async(question) => {
         console.log("User not allowed");
         const notice = await getString('notice', 'block_ai_chat');
         const message = await getString('noticenewquestion', 'block_ai_chat');
-        await alert(notice, message);
+        await displayAlert(notice, message);
         aiAtWork = false;
         return;
     }
@@ -421,7 +421,7 @@ const newDialog = async(deleted = false) => {
     if (!userAllowed()) {
         const notice = await getString('notice', 'block_ai_chat');
         const message = await getString('noticenewconversation', 'block_ai_chat');
-        await alert(notice, message);
+        await displayAlert(notice, message);
         aiAtWork = false;
         return;
     }
@@ -705,7 +705,7 @@ const errorHandling = async(requestresult, question, options) => {
 
     // If any other errorcode, alert with errormessage.
     const errorString = await getString('errorwithcode', 'block_ai_chat', requestresult.code);
-    await alert(errorString, requestresult.result);
+    await displayAlert(errorString, requestresult.result);
 
     // Change answer styling to differentiate from ai.
     const answerdivs = document.querySelectorAll('.awaitanswer');
@@ -736,7 +736,7 @@ const checkMessageHistoryLengthLimit = async(messages) => {
         if (!maxHistoryWarnings.has(conversation.id)) {
             const maxHistoryString = await getString('maxhistory', 'block_ai_chat', maxHistory);
             const warningErrorString = await getString('maxhistoryreached', 'block_ai_chat', maxHistory);
-            await alert(maxHistoryString, warningErrorString);
+            await displayAlert(maxHistoryString, warningErrorString);
             // Remember warning.
             maxHistoryWarnings.add(conversation.id);
         }
