@@ -114,7 +114,7 @@ class get_all_conversations extends external_api {
                 'id' => new external_value(PARAM_INT, 'ID of conversation'),
                 'messages' => new external_multiple_structure(
                     new external_single_structure([
-                        'message' => new external_value(PARAM_TEXT, 'Text of conversation'),
+                        'message' => new external_value(PARAM_RAW, 'Text of conversation'),
                         'sender' => new external_value(PARAM_TEXT, 'Sent by user or ai'),
                     ])
                 ),

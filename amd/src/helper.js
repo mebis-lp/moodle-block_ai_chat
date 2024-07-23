@@ -51,3 +51,27 @@ export const scrollToBottom = () => {
     const modalContent = document.querySelector('.ai_chat_modal .modal-body');
     modalContent.scrollTop = modalContent.scrollHeight;
 };
+
+
+/**
+ * Escape html.
+ * @param {*} str
+ */
+export const escapeHTML = (str) => {
+    if (str === null || str === undefined) {
+        return '';
+    }
+    const escapeMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+        '`': '&#x60;',
+        '/': '&#x2F;',
+    };
+
+    return String(str).replace(/[&<>"'`\/]/g, function(match) {
+        return escapeMap[match];
+    });
+};

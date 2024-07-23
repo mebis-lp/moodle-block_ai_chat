@@ -11,6 +11,7 @@ import {renderInfoBox, hash} from 'local_ai_manager/render_infobox';
 import {renderUserQuota} from 'local_ai_manager/userquota';
 import {getAiConfig} from 'local_ai_manager/config';
 import LocalStorage from 'core/localstorage';
+import { escapeHTML } from './helper';
 
 // Declare variables.
 const VIEW_CHATWINDOW = 'block_ai_chat_chatwindow';
@@ -285,6 +286,9 @@ const enterQuestion = async(question) => {
         return;
     }
 
+    // Escape problematic chars.
+    question = escapeHTML(question);
+
     // Add to conversation, answer not yet available.
     showMessage(question, 'self', false);
 
@@ -391,9 +395,11 @@ const showMessage = async(text, sender = '', answer = true) => {
     if (sender === 'ai') {
         sender = '';
     }
+    const content = marked.parse(text);
+
     const templateData = {
         "sender": sender,
-        "content": marked.parse(text),
+        "content": content,
         "answer": answer,
     };
     // Call the function to load and render our template.
