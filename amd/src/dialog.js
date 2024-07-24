@@ -485,7 +485,11 @@ const showHistory = async() => {
     setModalHeader(title);
     const btnBacklink = document.getElementById('block_ai_chat_backlink');
     btnBacklink.addEventListener('click', () => {
-        showConversation(conversation.id);
+        if (conversation.id !== 0) {
+            showConversation(conversation.id);
+        } else {
+            newDialog();
+        }
         clearMessages();
         setModalHeader();
     });
