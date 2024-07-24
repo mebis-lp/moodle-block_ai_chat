@@ -190,7 +190,7 @@
   right: 0;
   height: 2rem;
   background: linear-gradient(to bottom, var(--white) 10%, transparent);
-  z-index: 1;
+  z-index: 33;
 }
 .ai_chat_modal .ai_chat_modal_body {
   width: 100%;

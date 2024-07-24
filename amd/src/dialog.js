@@ -715,7 +715,8 @@ const errorHandling = async(requestresult, question, options) => {
 
     // If any other errorcode, alert with errormessage.
     const errorString = await getString('errorwithcode', 'block_ai_chat', requestresult.code);
-    await displayAlert(errorString, requestresult.result);
+    const result = JSON.parse(requestresult.result);
+    await displayAlert(errorString, result.message);
 
     // Change answer styling to differentiate from ai.
     const answerdivs = document.querySelectorAll('.awaitanswer');
