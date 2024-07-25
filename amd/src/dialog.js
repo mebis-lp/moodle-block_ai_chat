@@ -7,7 +7,7 @@ import * as helper from 'block_ai_chat/helper';
 import * as manager from 'block_ai_chat/ai_manager';
 import {getString} from 'core/str';
 import {marked} from 'block_ai_chat/vendor/marked.esm';
-import {renderInfoBox, hash} from 'local_ai_manager/render_infobox';
+import {renderInfoBox, hash} from 'local_ai_manager/infobox';
 import {renderUserQuota} from 'local_ai_manager/userquota';
 import {getAiConfig} from 'local_ai_manager/config';
 import LocalStorage from 'core/localstorage';
