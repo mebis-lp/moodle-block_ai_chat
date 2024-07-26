@@ -6,12 +6,11 @@ import ModalEvents from 'core/modal_events';
 import * as helper from 'block_ai_chat/helper';
 import * as manager from 'block_ai_chat/ai_manager';
 import {getString} from 'core/str';
-import {marked} from 'block_ai_chat/vendor/marked.esm';
 import {renderInfoBox, hash} from 'local_ai_manager/infobox';
 import {renderUserQuota} from 'local_ai_manager/userquota';
 import {getAiConfig} from 'local_ai_manager/config';
 import LocalStorage from 'core/localstorage';
-import { escapeHTML } from './helper';
+import {escapeHTML} from './helper';
 
 // Declare variables.
 const VIEW_CHATWINDOW = 'block_ai_chat_chatwindow';
@@ -286,9 +285,6 @@ const enterQuestion = async(question) => {
         return;
     }
 
-    // Escape problematic chars.
-    question = escapeHTML(question);
-
     // Add to conversation, answer not yet available.
     showMessage(question, 'self', false);
 
@@ -316,7 +312,7 @@ const enterQuestion = async(question) => {
             let idresult = await externalServices.getNewConversationId(contextid);
             conversation.id = idresult.id;
             conversation.timecreated = Math.floor(Date.now() / 1000);
-            setModalHeader(question);
+            setModalHeader(escapeHTML(question));
         } catch (error) {
             displayException(error);
         }
@@ -363,8 +359,8 @@ const showReply = async (text) => {
     // Get textblock.
     let fields = document.querySelectorAll('.ai_chat_modal .awaitanswer .text');
     const field = fields[fields.length - 1];
-    // Use marked to render the reply.
-    field.innerHTML = marked.parse(text);
+    // Render the reply.
+    field.innerHTML = text;
     field.classList.remove('small');
 
     // Remove awaitanswer class.
@@ -395,11 +391,14 @@ const showMessage = async(text, sender = '', answer = true) => {
     if (sender === 'ai') {
         sender = '';
     }
-    const content = marked.parse(text);
+    // Escape chars for immediate rendering.
+    if (!answer) {
+        text = escapeHTML(text);
+    }
 
     const templateData = {
         "sender": sender,
-        "content": content,
+        "content": text,
         "answer": answer,
     };
     // Call the function to load and render our template.
@@ -442,6 +441,7 @@ const newDialog = async(deleted = false) => {
     };
     clearMessages();
     setModalHeader(strNewDialog);
+    helper.focustextarea();
 };
 
 /**

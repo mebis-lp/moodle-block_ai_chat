@@ -75,11 +75,11 @@ class get_all_conversations extends external_api {
             }
             $tmpmessages = [
                 [
-                    'message' => $value->prompttext,
+                    'message' => format_text($value->prompttext, FORMAT_MARKDOWN),
                     'sender' => 'user',
                 ],
                 [
-                    'message' => $value->promptcompletion,
+                    'message' => format_text($value->promptcompletion, FORMAT_MARKDOWN),
                     'sender' => 'ai',
                 ],
             ];
