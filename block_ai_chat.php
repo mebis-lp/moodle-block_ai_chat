@@ -101,7 +101,7 @@ class block_ai_chat extends block_base {
      * @return array
      */
     public function applicable_formats(): array {
-        return ['my' => true, 'course-view' => true];
+        return ['site-index' => true, 'my' => true, 'course-view' => true];
     }
 
     public function user_can_addto($page) {
@@ -120,13 +120,18 @@ class block_ai_chat extends block_base {
     public function instance_create() {
         global $DB;
 
-        // For dashboard let the standard default.
+        // For standard dashboard keep the standard.
         if (isset($this->page->context) && $this->page->context::instance()->id != SYSCONTEXTID) {
             return true;
         }
-        // For courses set default to all pages.
-        $DB->update_record('block_instances', ['id' => $this->instance->id, 'pagetypepattern' => '*']);
 
+        // When a user changes the dashboard keep the standard.
+        if ($this->page->pagetype == "my-index") {
+            return true;
+        }
+
+        // For courses set default to show on all pages.
+        $DB->update_record('block_instances', ['id' => $this->instance->id, 'pagetypepattern' => '*']);
         return true;
     }
 
