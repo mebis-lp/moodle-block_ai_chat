@@ -87,12 +87,14 @@ class hook_callbacks {
         // Get form data.
         $mform = $hook->mform;
         $formwrapper = $hook->formwrapper;
-        $courseid = $formwrapper->get_course()->id;
+        if (!empty($formwrapper->get_course()->id)) {
+            $courseid = $formwrapper->get_course()->id;
 
-        $blockinstance = \block_ai_chat\local\helper::check_block_present($courseid);
-        if ($blockinstance) {
-            // Block present, so set checkbox accordingly.
-            $mform->setDefault('addaichat', "checked");
+            $blockinstance = \block_ai_chat\local\helper::check_block_present($courseid);
+            if ($blockinstance) {
+                // Block present, so set checkbox accordingly.
+                $mform->setDefault('addaichat', "checked");
+            }
         }
     }
 
