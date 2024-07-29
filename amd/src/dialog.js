@@ -214,6 +214,12 @@ async function showModal() {
         // Show infobox.
         await renderInfoBox('block_ai_chat', userid, '.ai_chat_modal_body [data-content="local_ai_manager_infobox"]', ['chat']);
 
+        // Check if all permissions and settings are correct.
+        const message = userAllowed();
+        if (message !== '') {
+            const notice = await getString('notice', 'block_ai_chat');
+            await displayAlert(notice, message);
+        }
         firstLoad = false;
     }
 
@@ -275,11 +281,10 @@ const enterQuestion = async(question) => {
         aiAtWork = false;
         return;
     }
-
-    if (!userAllowed()) {
+    const message = userAllowed();
+    if (message !== '') {
         console.log("User not allowed");
-        const notice = await getString('notice', 'block_ai_chat');
-        const message = await getString('noticenewquestion', 'block_ai_chat');
+        const notice = await getString('noticenewquestion', 'block_ai_chat');
         await displayAlert(notice, message);
         aiAtWork = false;
         return;
@@ -423,9 +428,9 @@ const newDialog = async(deleted = false) => {
     if (aiAtWork) {
         return;
     }
-    if (!userAllowed()) {
-        const notice = await getString('notice', 'block_ai_chat');
-        const message = await getString('noticenewconversation', 'block_ai_chat');
+    const message = userAllowed();
+    if (message !== '') {
+        const notice = await getString('noticenewconversation', 'block_ai_chat');
         await displayAlert(notice, message);
         aiAtWork = false;
         return;
@@ -796,20 +801,29 @@ const setView = async(mode = '') => {
 
 /**
  * Is user allowed new queries.
- * @returns {bool}
+ * @returns {message}
  */
-const userAllowed = () => {
-    if (tenantConfig.tenantenabled === false || tenantConfig.userlocked === true) {
-        return false;
+const userAllowed = async() => {
+    let message = '';
+    if (tenantConfig.userconfirmed === false) {
+        message += await getString('error_http403notconfirmed', 'local_ai_manager');
     }
-
-    if (chatConfig.isconfigured === false ||
-        chatConfig.lockedforrole === true ||
-        chatConfig.limitreached === true
-    ) {
-        return false;
+    if (tenantConfig.tenantenabled === false) {
+        message += await getString('error_http403disabled', 'local_ai_manager');
     }
-    return true;
+    if (tenantConfig.userlocked === true) {
+        message += await getString('error_http403blocked', 'local_ai_manager');
+    }
+    if (chatConfig.isconfigured === false) {
+        message += await getString('error_purposenotconfigured', 'local_ai_manager');
+    }
+    if (chatConfig.lockedforrole === true) {
+        message += await getString('error_http403blocked', 'local_ai_manager');
+    }
+    if (chatConfig.limitreached === true) {
+        message += await getString('error_limitreached', 'local_ai_manager');
+    }
+    return message;
 };
 
 /**
