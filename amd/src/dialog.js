@@ -807,6 +807,9 @@ const userAllowed = async() => {
     let message = '';
     if (tenantConfig.userconfirmed === false) {
         message += await getString('error_http403notconfirmed', 'local_ai_manager');
+        message += ". ";
+        const link = window.location.origin + '/local/ai_manager/confirm_ai_usage.php';
+        message += await getString('confirm_ai_usage', 'block_ai_chat', link);
     }
     if (tenantConfig.tenantenabled === false) {
         message += await getString('error_http403disabled', 'local_ai_manager');

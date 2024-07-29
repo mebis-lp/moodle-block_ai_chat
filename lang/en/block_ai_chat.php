@@ -34,6 +34,7 @@ $string['badgeprivate'] = 'Your chat is visible only to you.';
 $string['badgepublic'] = 'Your chat is visible to others.';
 $string['chatwindow'] = 'Open as chatwindow';
 $string['copied'] = 'Copied';
+$string['confirm_ai_usage'] = 'To confirm please click <a href="{$a}">here</a>';
 $string['delete'] = 'Delete current Dialog';
 $string['deletewarning'] = 'Are you sure you want to delete this Conversation.';
 $string['dockright'] = 'Dock on the right';
