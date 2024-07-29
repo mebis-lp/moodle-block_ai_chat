@@ -212,7 +212,7 @@ async function showModal() {
         // Show userquota.
         await renderUserQuota('#block_ai_chat_userquota', ['chat']);
         // Show infobox.
-        await renderInfoBox('block_ai_chat', userid, '.ai_chat_modal_body [data-content="local_ai_manager_infobox"]');
+        await renderInfoBox('block_ai_chat', userid, '.ai_chat_modal_body [data-content="local_ai_manager_infobox"]', ['chat']);
 
         firstLoad = false;
     }
