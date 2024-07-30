@@ -39,7 +39,6 @@ $string['delete'] = 'Delete current Dialog';
 $string['deletewarning'] = 'Are you sure you want to delete this Conversation.';
 $string['dockright'] = 'Dock on the right';
 $string['newdialog'] = 'New AI Chat';
-$string['enable'] = 'Activate Chat';
 $string['enableaichat'] = 'Add a AI Chat instance';
 $string['error'] = 'An Error occured, please try again.';
 $string['errorwithcode'] = 'An Error occured with code: {$a}';
