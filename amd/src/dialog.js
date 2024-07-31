@@ -215,7 +215,7 @@ async function showModal() {
         await renderInfoBox('block_ai_chat', userid, '.ai_chat_modal_body [data-content="local_ai_manager_infobox"]', ['chat']);
 
         // Check if all permissions and settings are correct.
-        const message = userAllowed();
+        const message = await userAllowed();
         if (message !== '') {
             const notice = await getString('notice', 'block_ai_chat');
             await displayAlert(notice, message);
@@ -281,7 +281,7 @@ const enterQuestion = async(question) => {
         aiAtWork = false;
         return;
     }
-    const message = userAllowed();
+    const message = await userAllowed();
     if (message !== '') {
         console.log("User not allowed");
         const notice = await getString('noticenewquestion', 'block_ai_chat');
@@ -426,13 +426,6 @@ const showMessage = async(text, sender = '', answer = true) => {
 const newDialog = async(deleted = false) => {
     console.log("newDialog called");
     if (aiAtWork) {
-        return;
-    }
-    const message = userAllowed();
-    if (message !== '') {
-        const notice = await getString('noticenewconversation', 'block_ai_chat');
-        await displayAlert(notice, message);
-        aiAtWork = false;
         return;
     }
     // Add current convo local representation, if not already there.
@@ -809,6 +802,8 @@ const userAllowed = async() => {
         message += await getString('error_http403notconfirmed', 'local_ai_manager');
         message += ". ";
         const link = window.location.origin + '/local/ai_manager/confirm_ai_usage.php';
+        console.log('link');
+        console.log(link);
         message += await getString('confirm_ai_usage', 'block_ai_chat', link);
     }
     if (tenantConfig.tenantenabled === false) {
