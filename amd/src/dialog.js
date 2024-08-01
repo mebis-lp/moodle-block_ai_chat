@@ -6,11 +6,11 @@ import ModalEvents from 'core/modal_events';
 import * as helper from 'block_ai_chat/helper';
 import * as manager from 'block_ai_chat/ai_manager';
 import {getString} from 'core/str';
-import {renderInfoBox, hash} from 'local_ai_manager/infobox';
+import {renderInfoBox} from 'local_ai_manager/infobox';
 import {renderUserQuota} from 'local_ai_manager/userquota';
 import {getAiConfig} from 'local_ai_manager/config';
 import LocalStorage from 'core/localstorage';
-import {escapeHTML} from './helper';
+import {escapeHTML, hash} from './helper';
 
 // Declare variables.
 const VIEW_CHATWINDOW = 'block_ai_chat_chatwindow';
@@ -123,10 +123,6 @@ export const init = async(params) => {
     // Check and set viewmode.
     setView();
 
-    // Get conversationcontext message limit.
-    let conversationcontextLimit = await externalServices.getConversationcontextLimit(contextid);
-    maxHistory = conversationcontextLimit.limit;
-
     // Attach listener to the ai button to call modal.
     let button = document.getElementById('ai_chat_button');
     button.addEventListener('mousedown', async() => {
@@ -180,6 +176,10 @@ async function showModal() {
         // Show conversation.
         // Todo - Evtl. noch firstload verschönern, spinner für header und content z.b.
         showConversation();
+
+        // Get conversationcontext message limit.
+        let conversationcontextLimit = await externalServices.getConversationcontextLimit(contextid);
+        maxHistory = conversationcontextLimit.limit;
 
         // Add listeners for dropdownmenus.
         // Actions.

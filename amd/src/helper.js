@@ -75,3 +75,19 @@ export const escapeHTML = (str) => {
         return escapeMap[match];
     });
 };
+
+/**
+ * Hash function to get a hash of a string.
+ *
+ * @param {string} stringToHash the string to hash
+ * @returns {Promise<string>} the promise containing a hex representation of the string encoded by SHA-256
+ */
+export const hash = async(stringToHash) => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(stringToHash);
+    const hashAsArrayBuffer = await window.crypto.subtle.digest("SHA-256", data);
+    const uint8ViewOfHash = new Uint8Array(hashAsArrayBuffer);
+    return Array.from(uint8ViewOfHash)
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+};
