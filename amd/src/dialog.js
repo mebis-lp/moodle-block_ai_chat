@@ -332,6 +332,7 @@ const enterQuestion = async(question) => {
 
     // Handle errors.
     if (requestresult.code != 200) {
+        console.log("dsflk");
         requestresult = await errorHandling(requestresult, question, options);
     }
 

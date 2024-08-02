@@ -53,7 +53,7 @@
 
    .modal-body {
        display: flex;
-       padding: 0 1rem 0;
+       padding: 0 0 0 1rem;
 
        .block_ai_chat-dialog {
            display: flex;
@@ -128,11 +128,12 @@
         position: sticky;
         bottom: 0;
         background-color: var(--color-content-bg);
+        padding-right: 1rem;
     }
     .block_ai_chat-input {
         display: flex;
         margin-top: .15rem;
-        padding-bottom: .5rem;
+        padding: 0 .1rem 0 .1rem;
         position: relative;
         .ai_chat_icon {
             position: absolute;
@@ -145,7 +146,7 @@
         background-color: var(--color-gray-light);
         padding: 1rem 4.1rem 1rem 2.2rem;
         resize: none;
-        overflow: hidden;
+        overflow: auto;
         line-height: 1.5rem;
         min-height: calc(1.5rem + 2rem);;
         max-height: calc((1.5rem * 4) + 2rem);
@@ -159,8 +160,8 @@
     .block_ai_chat-input button {
         position: absolute;
         display: flex;
-        bottom: 1rem;
-        right: .5rem;
+        bottom: .5rem;
+        right: .7rem;
     }
     .headeroptions {
         display: flex;
@@ -184,6 +185,7 @@
 
     #block_ai_chat_userquota {
         text-align: right;
+        min-height: 1rem;
         .local_ai_manager_userquota_infobox {
             color: var(--color-text-muted);
             background-color: inherit;
@@ -205,6 +207,7 @@
     }
     .ai_chat_modal_body {
         width: 100%;
+        overflow: hidden;
         .infobox {
            display: flex;
            align-items: center;
@@ -212,6 +215,7 @@
            padding-bottom: .4rem;
            margin-top: -.5rem;
            z-index: 1;
+           min-height: 2rem;
            .local_ai_manager-infobox.alert.alert-success {
                color: var(--color-text-muted);
                background-color: inherit;
@@ -221,13 +225,22 @@
            }
        }
     }
+    .block_ai_chat-output-wrapper {
+        overflow-y: auto;
+        height: 100%;
+        padding-right: 1rem;
+    }
     .block_ai-history-items {
         padding: .5rem;
         a {
-            display: block;
+            display: flex;
+            align-items: baseline;
             text-overflow: ellipsis;
             white-space: nowrap;
-            overflow: hidden;        
+            overflow: hidden;
+            p {
+                margin: 0;
+            }
         }
         & > div {
             display: flex;

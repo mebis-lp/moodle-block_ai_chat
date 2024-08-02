@@ -47,7 +47,7 @@
 }
 .ai_chat_modal .modal-body {
   display: flex;
-  padding: 0 1rem 0;
+  padding: 0 0 0 1rem;
 }
 .ai_chat_modal .modal-body .block_ai_chat-dialog {
   display: flex;
@@ -118,11 +118,12 @@
   position: sticky;
   bottom: 0;
   background-color: var(--color-content-bg);
+  padding-right: 1rem;
 }
 .ai_chat_modal .block_ai_chat-input {
   display: flex;
   margin-top: 0.15rem;
-  padding-bottom: 0.5rem;
+  padding: 0 0.1rem 0 0.1rem;
   position: relative;
 }
 .ai_chat_modal .block_ai_chat-input .ai_chat_icon {
@@ -135,7 +136,7 @@
   background-color: var(--color-gray-light);
   padding: 1rem 4.1rem 1rem 2.2rem;
   resize: none;
-  overflow: hidden;
+  overflow: auto;
   line-height: 1.5rem;
   min-height: 3.5rem;
   max-height: 8rem;
@@ -149,8 +150,8 @@
 .ai_chat_modal .block_ai_chat-input button {
   position: absolute;
   display: flex;
-  bottom: 1rem;
-  right: 0.5rem;
+  bottom: 0.5rem;
+  right: 0.7rem;
 }
 .ai_chat_modal .headeroptions {
   display: flex;
@@ -173,6 +174,7 @@
 }
 .ai_chat_modal #block_ai_chat_userquota {
   text-align: right;
+  min-height: 1rem;
 }
 .ai_chat_modal #block_ai_chat_userquota .local_ai_manager_userquota_infobox {
   color: var(--color-text-muted);
@@ -194,6 +196,7 @@
 }
 .ai_chat_modal .ai_chat_modal_body {
   width: 100%;
+  overflow: hidden;
 }
 .ai_chat_modal .ai_chat_modal_body .infobox {
   display: flex;
@@ -202,6 +205,7 @@
   padding-bottom: 0.4rem;
   margin-top: -0.5rem;
   z-index: 1;
+  min-height: 2rem;
 }
 .ai_chat_modal .ai_chat_modal_body .infobox .local_ai_manager-infobox.alert.alert-success {
   color: var(--color-text-muted);
@@ -210,14 +214,23 @@
   padding: 0;
   margin: 0;
 }
+.ai_chat_modal .block_ai_chat-output-wrapper {
+  overflow-y: auto;
+  height: 100%;
+  padding-right: 1rem;
+}
 .ai_chat_modal .block_ai-history-items {
   padding: 0.5rem;
 }
 .ai_chat_modal .block_ai-history-items a {
-  display: block;
+  display: flex;
+  align-items: baseline;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+}
+.ai_chat_modal .block_ai-history-items a p {
+  margin: 0;
 }
 .ai_chat_modal .block_ai-history-items > div {
   display: flex;
