@@ -115,7 +115,8 @@ class block_ai_chat extends block_base {
 
     public function user_can_addto($page) {
         $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
-        if (!$tenant->is_tenant_allowed()) {
+        // Add exception for site admin, otherwise we cannot add the block to the dashboard in the website administration.
+        if (!$tenant->is_tenant_allowed() && !is_siteadmin()) {
             return false;
         }
         return parent::user_can_addto($page);
