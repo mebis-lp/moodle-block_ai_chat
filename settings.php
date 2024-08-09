@@ -15,18 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for block_ai_chat
+ * Settings for the local_ai_manager plugin.
  *
- * @package    block_ai_chat
+ * @package    local_ai_manager
  * @copyright  2024 ISB Bayern
- * @author     Tobias Garske
+ * @author     Philipp Memmel
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die;
 
-$plugin->release = '0.1';
-$plugin->version = 2024080800;
-$plugin->requires = 2023010101;
-$plugin->component = 'block_ai_chat';
-$plugin->maturity = MATURITY_ALPHA;
+if ($hassiteconfig) {
+
+    $ADMIN->add('blocksettings', new admin_category('block_ai_chat_settings',
+            new lang_string('pluginname', 'block_ai_chat')));
+
+    if ($ADMIN->fulltree) {
+
+        $settings->add(new admin_setting_configtextarea('block_ai_chat/showonpagetypes',
+                new lang_string('showonpagetypes', 'block_ai_chat'),
+                new lang_string('showonpagetypesdesc', 'block_ai_chat'),
+                '',
+        ));
+    }
+}

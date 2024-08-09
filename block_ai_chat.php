@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+use block_ai_chat\local\helper;
 
 /**
  * Block class for block_ai_chat
@@ -89,8 +90,9 @@ class block_ai_chat extends block_base {
 
         $this->content = new stdClass;
 
+        /** @var block_ai_chat\output\renderer $aioutput */
         $aioutput = $this->page->get_renderer('block_ai_chat');
-        $this->content->text = $aioutput->render_ai_chat_content();
+        $this->content->text = $aioutput->render_ai_chat_content($this);
 
         return $this->content;
     }
@@ -110,23 +112,24 @@ class block_ai_chat extends block_base {
      * @return array
      */
     public function applicable_formats(): array {
-        return ['site-index' => true, 'my' => true, 'course-view' => true];
+        return ['course-view' => true];
     }
 
+    #[\Override]
     public function user_can_addto($page) {
         $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
         // Add exception for site admin, otherwise we cannot add the block to the dashboard in the website administration.
         if (!$tenant->is_tenant_allowed() && !is_siteadmin()) {
             return false;
         }
+        if (helper::show_global_block($page)) {
+            // If a global block is being shown on a page, we do not allow the user to add an own block.
+            return false;
+        }
         return parent::user_can_addto($page);
     }
 
-    /**
-     * Set instance default, to show block on all pages.
-     *
-     * @return array
-     */
+    #[\Override]
     public function instance_create() {
         global $DB;
 
@@ -135,13 +138,10 @@ class block_ai_chat extends block_base {
             return true;
         }
 
-        // When a user changes the dashboard keep the standard.
-        if ($this->page->pagetype == "my-index") {
-            return true;
-        }
-
         // For courses set default to show on all pages.
-        $DB->update_record('block_instances', ['id' => $this->instance->id, 'pagetypepattern' => '*']);
+        if ($this->context->get_parent_context()->contextlevel === CONTEXT_COURSE) {
+            $DB->update_record('block_instances', ['id' => $this->instance->id, 'pagetypepattern' => '*']);
+        }
         return true;
     }
 

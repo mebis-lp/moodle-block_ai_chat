@@ -57,5 +57,7 @@ $string['maxhistoryreached'] = 'Please be aware, that dialog history is restrict
 $string['nohistory'] = 'Chat History not found';
 $string['pluginname'] = 'AI Chat';
 $string['privacy:metadata'] = 'This plugin doesn\'t store personal data.';
+$string['showonpagetypes'] = 'Pagetypes on which the chat bot floating button should be shown';
+$string['showonpagetypesdesc'] = 'Insert a list of page types (one string per line) on which the floating button should be shown. Insert "*" to always show the block.';
 $string['submit'] = 'Submit';
 $string['yesterday'] = 'Yesterday';

@@ -16,6 +16,10 @@
 
 namespace block_ai_chat\local;
 
+use context_block;
+use context_system;
+use stdClass;
+
 /**
  * Hook listener callbacks.
  *
@@ -96,6 +100,48 @@ class hook_callbacks {
                 $mform->setDefault('addaichat', "checked");
             }
         }
+    }
+
+    /**
+     * Insert a chatbot floating button on pagetypes which are defined in the related admin setting.
+     *
+     * @param \core\hook\output\before_footer_html_generation $hook the before footer html generation hook object
+     */
+    public static function handle_before_footer_html_generation(\core\hook\output\before_footer_html_generation $hook): void {
+        global $DB, $PAGE;
+        if (!helper::show_global_block($PAGE)) {
+            return;
+        }
+        $systemcontext = context_system::instance();
+        $blockinstancerecord = $DB->get_record('block_instances',
+                ['blockname' => 'ai_chat', 'parentcontextid' => $systemcontext->id, 'pagetypepattern' => '']);
+
+        if (!$blockinstancerecord) {
+
+            $defaultregion = $PAGE->blocks->get_default_region();
+            // Add a special system-wide block instance.
+            $blockinstancerecord = new stdClass;
+            $blockinstancerecord->blockname = 'ai_chat';
+            $blockinstancerecord->parentcontextid = $systemcontext->id;
+            $blockinstancerecord->showinsubcontexts = false;
+            $blockinstancerecord->requiredbytheme = false;
+            $blockinstancerecord->pagetypepattern = '';
+            $blockinstancerecord->subpagepattern = null;
+            $blockinstancerecord->defaultregion = $defaultregion;
+            $blockinstancerecord->defaultweight = 0;
+            $blockinstancerecord->configdata = '';
+            $blockinstancerecord->timecreated = time();
+            $blockinstancerecord->timemodified = $blockinstancerecord->timecreated;
+            $blockinstancerecord->id = $DB->insert_record('block_instances', $blockinstancerecord);
+
+            // Ensure the block context is created.
+            context_block::instance($blockinstancerecord->id);
+        }
+        // If the new instance was created, allow it to do additional setup.
+        if ($block = block_instance('ai_chat', $blockinstancerecord)) {
+            $block->instance_create();
+        }
+        echo $block->get_content()->text;
     }
 
 }

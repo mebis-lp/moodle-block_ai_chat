@@ -56,6 +56,8 @@ $string['maxhistoryreached'] = 'Der Gesprächsverlauf ist begrenzt auf {$a} Nach
     Aus Effizienzgründen werden ältere Nachrichten nicht berücksichtigt';
 $string['nohistory'] = 'Keine Chat-Verlauf vorhanden';
 $string['pluginname'] = 'KI-Chat';
-$string['privacy:metadata'] = 'Diese Plugin speichert keine Daten, Konversationen werden im AI Manager gespeichert.';
+$string['privacy:metadata'] = 'Dieses Plugin speichert keine Daten, Konversationen werden im AI Manager gespeichert.';
+$string['showonpagetypes'] = 'Pagetypes, auf denen der Chat-Bot-Floating-Button angezeigt werden soll';
+$string['showonpagetypesdesc'] = 'Hinterlegen Sie hier eine Liste (ein String pro Zeile) von pagetypes, auf denen der Chat-Bot-Floating-Button angezeigt werden soll. Geben Sie "*" ein, um den Block immer anzuzeigen.';
 $string['submit'] = 'Absenden';
 $string['yesterday'] = 'Gestern';

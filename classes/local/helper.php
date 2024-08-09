@@ -16,6 +16,8 @@
 
 namespace block_ai_chat\local;
 
+use moodle_page;
+
 /**
  * Class helper
  *
@@ -41,5 +43,41 @@ class helper {
         ];
 
         return $DB->get_record_sql($sql, $params);
+    }
+
+    /**
+     * Helper function to determine if the global instance floating button should be shown.
+     *
+     * @param moodle_page $page The page needed to determine if the global instance should be rendered
+     * @return bool true if the global instance floating button should be rendered or not
+     */
+    public static function show_global_block(moodle_page $page): bool {
+        if (!isloggedin()) {
+            return false;
+        }
+
+        if ($page->blocks->is_block_present('ai_chat')) {
+            // If current page already has a block instance, we do not add a global one.
+            return false;
+        }
+
+        $showonpagetypes = get_config('block_ai_chat', 'showonpagetypes');
+        if (trim($showonpagetypes) === '*') {
+            return true;
+        }
+
+        if (empty(trim($showonpagetypes))) {
+            return false;
+        }
+
+        $pagetypes = [];
+        foreach (explode(PHP_EOL, $showonpagetypes) as $pagetype) {
+            $pagetype = trim($pagetype);
+            if (!empty($pagetype)) {
+                $pagetypes[] = $pagetype;
+            }
+        }
+
+        return in_array($page->pagetype, $pagetypes);
     }
 }

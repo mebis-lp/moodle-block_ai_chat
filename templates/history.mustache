@@ -30,14 +30,14 @@
 }}
 
 <button class="btn btn-secondary mt-3 mb-3" id="ai_chat_history_new_dialog">
-    <i class="icon fal fa-comment" aria-hidden="true"></i> {{#str}} newdialog, block_ai_chat {{/str}}
+    <i class="icon fa fa-comment" aria-hidden="true"></i> {{#str}} newdialog, block_ai_chat {{/str}}
 </button>
 
 {{#dates}}
     <div class="block_ai-history-items card">
         {{#objects}}
             <div class="" data-id="{{conversationid}}">
-                <a class="" onclick="document.showConversation({{conversationid}})" href="#"><i class="fal fa-comment mr-2"></i><span>{{{title}}}</span></a> {{time}}
+                <a class="" onclick="document.showConversation({{conversationid}})" href="#"><i class="fa fa-comment mr-2"></i><span>{{{title}}}</span></a> {{time}}
             </div>
         {{/objects}}
     </div>
