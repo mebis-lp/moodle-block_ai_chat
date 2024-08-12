@@ -34,7 +34,7 @@ $string['badgeprivate'] = 'Dein Chatverlauf ist nur für dich sichtbar.';
 $string['badgepublic'] = 'Dein Chatverlauf ist für andere sichtbar.';
 $string['chatwindow'] = 'Als Chatfenster öffnen';
 $string['copied'] = 'Kopiert';
-$string['confirm_ai_usage'] = 'Zum Bestätigen klicke <a target="_blank" href="{$a}">hier</a>';
+$string['confirm_ai_usage'] = 'Zum Bestätigen klicke <a target="_self" href="{$a}">hier</a>';
 $string['delete'] = 'Chat löschen';
 $string['deletewarning'] = 'Sind Sie sich sicher, dass Sie den Chatverlauf löschen möchten?';
 $string['dockright'] = 'Rechts andocken';

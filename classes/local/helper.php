@@ -77,7 +77,13 @@ class helper {
                 $pagetypes[] = $pagetype;
             }
         }
-
-        return in_array($page->pagetype, $pagetypes);
+        $pagetypecheck = false;
+        foreach ($pagetypes as $value) {
+            if (str_starts_with($page->pagetype, $value)) {
+                $pagetypecheck = true;
+                break;
+            }
+        }
+        return $pagetypecheck;
     }
 }
