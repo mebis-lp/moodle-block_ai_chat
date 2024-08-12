@@ -34,7 +34,7 @@ $string['badgeprivate'] = 'Your chat is visible only to you.';
 $string['badgepublic'] = 'Your chat is visible to others.';
 $string['chatwindow'] = 'Open as chatwindow';
 $string['copied'] = 'Copied';
-$string['confirm_ai_usage'] = 'To confirm please click <a href="{$a}">here</a>';
+$string['confirm_ai_usage'] = 'To confirm please click <a target="_self" href="{$a}">here</a>';
 $string['delete'] = 'Delete current Dialog';
 $string['deletewarning'] = 'Are you sure you want to delete this Conversation.';
 $string['dockright'] = 'Dock on the right';
@@ -57,5 +57,7 @@ $string['maxhistoryreached'] = 'Please be aware, that dialog history is restrict
 $string['nohistory'] = 'Chat History not found';
 $string['pluginname'] = 'AI Chat';
 $string['privacy:metadata'] = 'This plugin doesn\'t store personal data.';
+$string['showonpagetypes'] = 'Pagetypes on which the chat bot floating button should be shown';
+$string['showonpagetypesdesc'] = 'Insert a list of page types (one string per line) on which the floating button should be shown. Insert "*" to always show the block.';
 $string['submit'] = 'Submit';
 $string['yesterday'] = 'Yesterday';

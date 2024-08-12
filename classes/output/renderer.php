@@ -25,31 +25,31 @@
 namespace block_ai_chat\output;
 
 use plugin_renderer_base;
-use block_ai_chat\permissions;
 
 class renderer extends plugin_renderer_base {
     /**
      * Defer to template.
+     *
      * @return string html for the page
      */
-    public function render_ai_chat_content() {
-        global $USER, $COURSE;
+    public function render_ai_chat_content(\block_ai_chat $block): string {
+        global $USER;
 
         $params = new \stdClass;
         $params->new = get_string('newdialog', 'block_ai_chat');
         $params->history = get_string('history', 'block_ai_chat');
         $params->userid = $USER->id;
-        $params->contextid = \context_course::instance($COURSE->id)->id;
+        $params->contextid = $block->context->id;
         $params->badge = [
-            'text' => get_string('private', 'block_ai_chat'),
-            'title' => get_string('badgeprivate', 'block_ai_chat'),
+                'text' => get_string('private', 'block_ai_chat'),
+                'title' => get_string('badgeprivate', 'block_ai_chat'),
         ];
         $this->page->requires->js_call_amd(
-            'block_ai_chat/dialog',
-            'init',
-            [$params]
+                'block_ai_chat/dialog',
+                'init',
+                [$params]
         );
 
-        return  parent::render_from_template('block_ai_chat/floatingbutton', $params);
+        return parent::render_from_template('block_ai_chat/floatingbutton', $params);
     }
 }
