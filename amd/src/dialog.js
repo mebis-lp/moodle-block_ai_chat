@@ -798,31 +798,34 @@ const setView = async(mode = '') => {
  * @returns {message}
  */
 const userAllowed = async() => {
-    let message = '';
+    if (tenantConfig.tenantenabled === false) {
+        message = await getString('error_http403disabled', 'local_ai_manager');
+        return message;
+    }
     if (tenantConfig.userconfirmed === false) {
-        message += await getString('error_http403notconfirmed', 'local_ai_manager');
+        message = await getString('error_http403notconfirmed', 'local_ai_manager');
         message += ". ";
         const link = window.location.origin + '/local/ai_manager/confirm_ai_usage.php';
-        console.log('link');
-        console.log(link);
         message += await getString('confirm_ai_usage', 'block_ai_chat', link);
-    }
-    if (tenantConfig.tenantenabled === false) {
-        message += await getString('error_http403disabled', 'local_ai_manager');
+        return message;
     }
     if (tenantConfig.userlocked === true) {
-        message += await getString('error_http403blocked', 'local_ai_manager');
+        message = await getString('error_http403blocked', 'local_ai_manager');
+        return message;
     }
     if (chatConfig.isconfigured === false) {
-        message += await getString('error_purposenotconfigured', 'local_ai_manager');
+        message = await getString('error_purposenotconfigured', 'local_ai_manager');
+        return message;
     }
     if (chatConfig.lockedforrole === true) {
-        message += await getString('error_http403blocked', 'local_ai_manager');
+        message = await getString('error_http403blocked', 'local_ai_manager');
+        return message;
     }
     if (chatConfig.limitreached === true) {
-        message += await getString('error_limitreached', 'local_ai_manager');
+        message = await getString('error_limitreached', 'local_ai_manager');
+        return message;
     }
-    return message;
+    return '';
 };
 
 /**
