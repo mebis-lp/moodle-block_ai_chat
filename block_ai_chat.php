@@ -62,6 +62,10 @@ class block_ai_chat extends block_base {
         $this->content->text = '';
         $this->content->footer = '';
 
+        $context = \context_block::instance($this->instance->id);
+        if (!has_capability('block/ai_chat:view', $context)) {
+            return $this->content;
+        }
         $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
         $configmanager = \core\di::get(\local_ai_manager\local\config_manager::class);
         $aiconfig = \local_ai_manager\ai_manager_utils::get_ai_config($USER);
@@ -70,22 +74,14 @@ class block_ai_chat extends block_base {
             return $this->content;
         }
         if ($tenant->is_tenant_allowed() && !$configmanager->is_tenant_enabled()) {
-            if ($aiconfig['role'] === \local_ai_manager\local\userinfo::ROLE_EXTENDED) {
-                // Notice for Role_extended users.
-                $this->content->text = get_string('error_tenantdisabled', 'local_ai_manager');
+            if ($aiconfig['role'] === \local_ai_manager\local\userinfo::get_role_as_string(\local_ai_manager\local\userinfo::ROLE_BASIC)) {
+                return $this->content;
             }
-            return $this->content;
         }
         if (!$chatconfig['isconfigured']) {
-            if ($aiconfig['role'] === \local_ai_manager\local\userinfo::ROLE_EXTENDED) {
-                // Notice for Role_extended users.
-                $this->content->text = get_string('error_purposenotconfigured', 'local_ai_manager');
+            if ($aiconfig['role'] === \local_ai_manager\local\userinfo::get_role_as_string(\local_ai_manager\local\userinfo::ROLE_BASIC)) {
+                return $this->content;
             }
-            return $this->content;
-        }
-        $context = \context_block::instance($this->instance->id);
-        if (!has_capability('block/ai_chat:view', $context)) {
-            return $this->content;
         }
 
         $this->content = new stdClass;
