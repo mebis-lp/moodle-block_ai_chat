@@ -11,6 +11,7 @@ import {renderUserQuota} from 'local_ai_manager/userquota';
 import {getAiConfig} from 'local_ai_manager/config';
 import LocalStorage from 'core/localstorage';
 import {escapeHTML, hash} from './helper';
+import Config from 'core/config';
 
 // Declare variables.
 const VIEW_CHATWINDOW = 'block_ai_chat_chatwindow';
@@ -295,8 +296,9 @@ const enterQuestion = async(question) => {
 
     // For first message, add a system message.
     if (conversation.messages.length === 0) {
+        const LangNames = new Intl.DisplayNames('en', {type: 'language'});
         conversation.messages.push({
-            'message': 'Answer in german',
+            'message': 'Answer in ' + LangNames.of(Config.language),
             'sender': 'system',
         });
     }
@@ -414,6 +416,27 @@ const showMessage = async(text, sender = '', answer = true) => {
     // Add copy listener for replys.
     if (sender === '') {
         helper.attachCopyListenerLast();
+    }
+
+    // Render formulas with mathjax 2.7.9.
+    if (typeof window.MathJax !== "undefined") {
+        // Change delimiters so they work with chatgpt.
+        window.MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [['(', ')']],
+                displayMath: [['[', ']']]
+            }
+        });
+        try {
+            const content = document.querySelector('.block_ai_chat-dialog');
+            if (content) {
+                window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, content]);
+            }
+        } catch (err) {
+            require(["core/log"], function(log) {
+                log.debug(err);
+            });
+        }
     }
 
     // Scroll the modal content to the bottom.
