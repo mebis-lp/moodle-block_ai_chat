@@ -91,3 +91,32 @@ export const hash = async(stringToHash) => {
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
 };
+
+/**
+ * Render mathjax formulas.
+ *  @returns {void}
+ */
+export const renderMathjax = async() => {
+    // Render formulas with mathjax 2.7.9.
+    console.log("Render Mathjax called");
+    if (typeof window.MathJax !== "undefined") {
+        // Change delimiters so they work with chatgpt.
+        window.MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [['(', ')']],
+                displayMath: [['[', ']']]
+            }
+        });
+        try {
+            const content = document.querySelector('.block_ai_chat-output');
+            if (content) {
+                console.log(content);
+                window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, content]);
+            }
+        } catch (err) {
+            require(["core/log"], function(log) {
+                log.debug(err);
+            });
+        }
+    }
+};

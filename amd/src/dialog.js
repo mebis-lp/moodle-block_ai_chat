@@ -176,7 +176,7 @@ async function showModal() {
 
         // Show conversation.
         // Todo - Evtl. noch firstload verschönern, spinner für header und content z.b.
-        showConversation();
+        await showConversation();
 
         // Get conversationcontext message limit.
         let conversationcontextLimit = await externalServices.getConversationcontextLimit(contextid);
@@ -246,7 +246,7 @@ const getConversations = async() => {
  * Function to set conversation.
  * @param {*} id
  */
-const showConversation = (id = 0) => {
+const showConversation = async(id = 0) => {
     console.log("showConversation called");
     // Dissallow changing conversations when question running.
     if (aiAtWork) {
@@ -265,7 +265,8 @@ const showConversation = (id = 0) => {
     }
     clearMessages();
     setModalHeader();
-    showMessages();
+    await showMessages();
+    helper.renderMathjax();
 };
 // Make globally accessible since it is used to show history in dropdownmenuitem.mustache.
 document.showConversation = showConversation;
@@ -345,7 +346,10 @@ const enterQuestion = async(question) => {
     });
 
     // Write back answer.
-    showReply(requestresult.result);
+    await showReply(requestresult.result);
+
+    // Render mathjax.
+    helper.renderMathjax();
 
     // Ai is done.
     aiAtWork = false;
@@ -377,11 +381,11 @@ const showReply = async (text) => {
     awaitdiv.classList.remove('awaitanswer');
 };
 
-const showMessages = () => {
+const showMessages = async() => {
     console.log("showMessages called");
-    conversation.messages.forEach((val) => {
-        showMessage(val.message, val.sender);
-    });
+    for (const item of conversation.messages) {
+        await showMessage(item.message, item.sender);
+    }
 };
 
 /**
@@ -416,27 +420,6 @@ const showMessage = async(text, sender = '', answer = true) => {
     // Add copy listener for replys.
     if (sender === '') {
         helper.attachCopyListenerLast();
-    }
-
-    // Render formulas with mathjax 2.7.9.
-    if (typeof window.MathJax !== "undefined") {
-        // Change delimiters so they work with chatgpt.
-        window.MathJax.Hub.Config({
-            tex2jax: {
-                inlineMath: [['(', ')']],
-                displayMath: [['[', ']']]
-            }
-        });
-        try {
-            const content = document.querySelector('.block_ai_chat-dialog');
-            if (content) {
-                window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, content]);
-            }
-        } catch (err) {
-            require(["core/log"], function(log) {
-                log.debug(err);
-            });
-        }
     }
 
     // Scroll the modal content to the bottom.
@@ -480,7 +463,7 @@ const deleteCurrentDialog = () => {
                 const deleted = await externalServices.deleteConversation(contextid, userid, conversation.id);
                 if (deleted) {
                     removeFromHistory();
-                    showConversation();
+                    await showConversation();
                 }
             } catch (error) {
                 displayException(error);
@@ -506,9 +489,9 @@ const showHistory = async() => {
     clearMessages(true);
     setModalHeader(title);
     const btnBacklink = document.getElementById('block_ai_chat_backlink');
-    btnBacklink.addEventListener('click', () => {
+    btnBacklink.addEventListener('click', async() => {
         if (conversation.id !== 0) {
-            showConversation(conversation.id);
+            await showConversation(conversation.id);
         } else {
             newDialog();
         }
