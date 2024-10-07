@@ -48,7 +48,7 @@ export const focustextarea = () => {
  */
 export const scrollToBottom = () => {
     console.log("scroll to bottom called");
-    const modalContent = document.querySelector('.ai_chat_modal .modal-body');
+    const modalContent = document.querySelector('.ai_chat_modal .modal-body .block_ai_chat-output-wrapper');
     modalContent.scrollTop = modalContent.scrollHeight;
 };
 
@@ -90,4 +90,26 @@ export const hash = async(stringToHash) => {
     return Array.from(uint8ViewOfHash)
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
+};
+
+/**
+ * Render mathjax formulas.
+ *  @returns {void}
+ */
+export const renderMathjax = () => {
+    // Render formulas with mathjax 2.7.9.
+    console.log("Render Mathjax called");
+    if (typeof window.MathJax !== "undefined") {
+        // Change delimiters so they work with chatgpt.
+        window.MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [['$', '$'], ['\\(', '\\)'], ['(', ')']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]'], ['[', ']']],
+            },
+        });
+        const content = document.querySelector('.block_ai_chat-output');
+        if (content) {
+            window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, content]);
+        }
+    }
 };
