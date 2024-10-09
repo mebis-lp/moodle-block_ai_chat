@@ -48,7 +48,7 @@ export const focustextarea = () => {
  */
 export const scrollToBottom = () => {
     console.log("scroll to bottom called");
-    const modalContent = document.querySelector('.ai_chat_modal .modal-body');
+    const modalContent = document.querySelector('.ai_chat_modal .modal-body .block_ai_chat-output-wrapper');
     modalContent.scrollTop = modalContent.scrollHeight;
 };
 
