@@ -175,7 +175,7 @@ async function showModal() {
 
         // Show conversation.
         // Todo - Evtl. noch firstload verschönern, spinner für header und content z.b.
-        showConversation();
+        await showConversation();
 
         // Get conversationcontext message limit.
         let conversationcontextLimit = await externalServices.getConversationcontextLimit(contextid);
@@ -245,7 +245,7 @@ const getConversations = async() => {
  * Function to set conversation.
  * @param {*} id
  */
-const showConversation = (id = 0) => {
+const showConversation = async(id = 0) => {
     console.log("showConversation called");
     // Dissallow changing conversations when question running.
     if (aiAtWork) {
@@ -264,7 +264,8 @@ const showConversation = (id = 0) => {
     }
     clearMessages();
     setModalHeader();
-    showMessages();
+    await showMessages();
+    helper.renderMathjax();
 };
 // Make globally accessible since it is used to show history in dropdownmenuitem.mustache.
 document.showConversation = showConversation;
@@ -343,7 +344,10 @@ const enterQuestion = async(question) => {
     });
 
     // Write back answer.
-    showReply(requestresult.result);
+    await showReply(requestresult.result);
+
+    // Render mathjax.
+    helper.renderMathjax();
 
     // Ai is done.
     aiAtWork = false;
@@ -375,11 +379,11 @@ const showReply = async (text) => {
     awaitdiv.classList.remove('awaitanswer');
 };
 
-const showMessages = () => {
+const showMessages = async() => {
     console.log("showMessages called");
-    conversation.messages.forEach((val) => {
-        showMessage(val.message, val.sender);
-    });
+    for (const item of conversation.messages) {
+        await showMessage(item.message, item.sender);
+    }
 };
 
 /**
@@ -457,7 +461,7 @@ const deleteCurrentDialog = () => {
                 const deleted = await externalServices.deleteConversation(contextid, userid, conversation.id);
                 if (deleted) {
                     removeFromHistory();
-                    showConversation();
+                    await showConversation();
                 }
             } catch (error) {
                 displayException(error);
@@ -483,9 +487,9 @@ const showHistory = async() => {
     clearMessages(true);
     setModalHeader(title);
     const btnBacklink = document.getElementById('block_ai_chat_backlink');
-    btnBacklink.addEventListener('click', () => {
+    btnBacklink.addEventListener('click', async() => {
         if (conversation.id !== 0) {
-            showConversation(conversation.id);
+            await showConversation(conversation.id);
         } else {
             newDialog();
         }
