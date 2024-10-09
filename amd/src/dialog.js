@@ -11,6 +11,7 @@ import {renderUserQuota} from 'local_ai_manager/userquota';
 import {getAiConfig} from 'local_ai_manager/config';
 import LocalStorage from 'core/localstorage';
 import {escapeHTML, hash} from './helper';
+import Config from 'core/config';
 
 // Declare variables.
 const VIEW_CHATWINDOW = 'block_ai_chat_chatwindow';
@@ -295,8 +296,10 @@ const enterQuestion = async(question) => {
 
     // For first message, add a system message.
     if (conversation.messages.length === 0) {
+        const currentUserLanguage = Config.language.substring(0, 2);
+        const LangNames = new Intl.DisplayNames('en', {type: 'language'});
         conversation.messages.push({
-            'message': 'Answer in german',
+            'message': 'Answer in ' + LangNames.of(currentUserLanguage),
             'sender': 'system',
         });
     }
@@ -332,7 +335,6 @@ const enterQuestion = async(question) => {
 
     // Handle errors.
     if (requestresult.code != 200) {
-        console.log("dsflk");
         requestresult = await errorHandling(requestresult, question, options);
     }
 
