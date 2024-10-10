@@ -63,7 +63,7 @@ class block_ai_chat extends block_base {
         $this->content->footer = '';
 
         $context = \context_block::instance($this->instance->id);
-        if (!has_capability('block/ai_chat:view', $context)) {
+        if (!has_capability('block/ai_chat:view', $context) || !has_capability('local/ai_manager:use', $context)) {
             return $this->content;
         }
         $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
