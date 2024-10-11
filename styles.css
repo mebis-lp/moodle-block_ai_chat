@@ -128,7 +128,7 @@
 }
 .ai_chat_modal .block_ai_chat-input .ai_chat_icon {
   position: absolute;
-  bottom: 1.6rem;
+  top: 1.2rem;
   left: 0.5rem;
 }
 .ai_chat_modal .block_ai_chat-input textarea {
