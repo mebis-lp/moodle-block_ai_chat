@@ -55,6 +55,7 @@ class get_conversationcontext_limit extends external_api {
             'contextid' => $contextid,
         ]);
         self::validate_context(\core\context_helper::instance_by_id($contextid));
+        require_capability('local/ai_manager:use', \context::instance_by_id($contextid));
 
         // return ['id' => \local_ai_manager\ai_manager_utils::get_next_free_itemid('block_ai_chat', $contextid)];
         return ['limit' => 5];

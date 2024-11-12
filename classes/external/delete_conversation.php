@@ -53,12 +53,14 @@ class delete_conversation extends external_api {
      */
     public static function execute(int $contextid, int $userid, int $conversationid): array {
         global $USER;
+
         self::validate_parameters(self::execute_parameters(), [
             'contextid' => $contextid,
             'userid' => $userid,
             'conversationid' => $conversationid,
         ]);
         self::validate_context(\core\context_helper::instance_by_id($contextid));
+        require_capability('local/ai_manager:use', \context::instance_by_id($contextid));
 
         // Check userid and USER-id ?
         // Delete conversation.
