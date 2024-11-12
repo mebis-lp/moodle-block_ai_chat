@@ -17,9 +17,9 @@
 /**
  * Settings for the local_ai_manager plugin.
  *
- * @package    local_ai_manager
+ * @package    block_ai_chat
  * @copyright  2024 ISB Bayern
- * @author     Philipp Memmel
+ * @author     Tobias Garske
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

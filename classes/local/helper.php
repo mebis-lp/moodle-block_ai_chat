@@ -26,6 +26,13 @@ use moodle_page;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class helper {
+
+    /**
+     * Check if a block is present.
+     *
+     * @param int $courseid
+     * @return mixed
+     */
     public static function check_block_present($courseid) {
         global $DB;
 

@@ -34,7 +34,7 @@ $functions = [
         'description'   => 'Get all conversations.',
         'type'          => 'read',
         'ajax'          => true,
-        'capabilities'  => '', // TODO add cap
+        'capabilities'  => 'local/ai_manager:use',
     ],
     'block_ai_chat_get_new_conversation_id' => [
         'classname'     => 'block_ai_chat\external\get_new_conversation_id',
@@ -42,7 +42,7 @@ $functions = [
         'description'   => 'Save question and reply, get back the conversationid.',
         'type'          => 'write',
         'ajax'          => true,
-        'capabilities'  => '', // TODO add cap
+        'capabilities'  => 'local/ai_manager:use',
     ],
     'block_ai_chat_delete_conversation' => [
         'classname'     => 'block_ai_chat\external\delete_conversation',
@@ -50,7 +50,7 @@ $functions = [
         'description'   => 'Delete/Hide conversation from history.',
         'type'          => 'write',
         'ajax'          => true,
-        'capabilities'  => '', // TODO add cap
+        'capabilities'  => 'local/ai_manager:use',
     ],
     'block_ai_chat_get_conversationcontext_limit' => [
         'classname'     => 'block_ai_chat\external\get_conversationcontext_limit',
@@ -58,6 +58,6 @@ $functions = [
         'description'   => 'Get limit for messages to pass to query.',
         'type'          => 'read',
         'ajax'          => true,
-        'capabilities'  => '', // TODO add cap
+        'capabilities'  => 'local/ai_manager:use',
     ],
 ];

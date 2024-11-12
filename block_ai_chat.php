@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 use block_ai_chat\local\helper;
 
 /**
@@ -74,12 +75,16 @@ class block_ai_chat extends block_base {
             return $this->content;
         }
         if ($tenant->is_tenant_allowed() && !$configmanager->is_tenant_enabled()) {
-            if ($aiconfig['role'] === \local_ai_manager\local\userinfo::get_role_as_string(\local_ai_manager\local\userinfo::ROLE_BASIC)) {
+            if ($aiconfig['role'] ===
+                \local_ai_manager\local\userinfo::get_role_as_string(\local_ai_manager\local\userinfo::ROLE_BASIC
+            )) {
                 return $this->content;
             }
         }
         if (!$chatconfig['isconfigured']) {
-            if ($aiconfig['role'] === \local_ai_manager\local\userinfo::get_role_as_string(\local_ai_manager\local\userinfo::ROLE_BASIC)) {
+            if ($aiconfig['role'] ===
+                \local_ai_manager\local\userinfo::get_role_as_string(\local_ai_manager\local\userinfo::ROLE_BASIC
+            )) {
                 return $this->content;
             }
         }

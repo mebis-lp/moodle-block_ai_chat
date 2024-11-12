@@ -26,6 +26,9 @@ namespace block_ai_chat\output;
 
 use plugin_renderer_base;
 
+/**
+ * Rendering for block_ai_chat
+ */
 class renderer extends plugin_renderer_base {
     /**
      * Defer to template.
