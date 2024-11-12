@@ -42,4 +42,8 @@ $callbacks = [
                 'hook' => \core\hook\output\before_footer_html_generation::class,
                 'callback' => \block_ai_chat\local\hook_callbacks::class . '::handle_before_footer_html_generation',
         ],
+        [
+                'hook' => \core\hook\output\before_http_headers::class,
+                'callback' => \block_ai_chat\local\hook_callbacks::class . '::handle_before_http_headers',
+        ],
 ];

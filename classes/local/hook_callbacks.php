@@ -144,4 +144,16 @@ class hook_callbacks {
         echo $block->get_content()->text;
     }
 
+    /**
+     * Add a bodyclass depending on the replacehelp setting.
+     *
+     * @param \core\hook\output\before_http_headers $hook the before html attributes generation hook object
+     */
+    public static function handle_before_http_headers(\core\hook\output\before_http_headers $hook): void {
+        global $PAGE;
+
+        if (get_config('block_ai_chat', 'replacehelp')) {
+            $PAGE->add_body_class('block_ai_chat_replacehelp');
+        }
+    }
 }

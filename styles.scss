@@ -1,7 +1,7 @@
 #ai_chat_button {
     visibility: visible;
     position: fixed;
-    bottom: 1.9rem;
+    bottom: 4.5rem;
     right: 2rem;
     transition: 0.2s;
     z-index: 1000;
@@ -277,10 +277,6 @@
     margin: 0;
 }
 
-#page-footer [data-region="footer-container-popover"] .btn-footer-popover[data-action="footer-popover"] {
-    display: none;
-}
-
 body.block_ai_chat_chatwindow {
     .ai_chat_modal .modal-dialog {
         position: fixed;
@@ -358,5 +354,15 @@ body.block_ai_chat_openfull {
         .modal-body {
             min-width: 497px;
         }
+    }
+}
+
+body.block_ai_chat_replacehelp {
+    // Replace question mark popover on the bottom right corner with ai_chat.
+    #page-footer [data-region="footer-container-popover"] .btn-footer-popover[data-action="footer-popover"] {
+        display: none;
+    }
+    #ai_chat_button {
+        bottom: 1.9rem;
     }
 }

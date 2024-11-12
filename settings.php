@@ -37,5 +37,10 @@ if ($hassiteconfig) {
                 new lang_string('showonpagetypesdesc', 'block_ai_chat'),
                 '',
         ));
+        $settings->add(new admin_setting_configcheckbox('block_ai_chat/replacehelp',
+                new lang_string('replacehelp', 'block_ai_chat'),
+                '',
+                0,
+        ));
     }
 }
