@@ -294,7 +294,7 @@ class mock_course_edit_form extends \course_edit_form {
      *
      * @return MoodleQuickForm the form used.
      */
-    public function get_mform() {
+    public function get_mform(): \MoodleQuickForm {
         return $this->_form;
     }
 }

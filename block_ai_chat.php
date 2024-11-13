@@ -113,8 +113,8 @@ class block_ai_chat extends block_base {
      * because the block::_self_test fails.
      *
      * There are only two ways to create block instances:
-     * - Check "add ai block" in the settingsform of a course
-     * - Admin has configurated an automatic create of a block instance using the plugin settings.
+     * - Check "add ai block" in the settings form of a course
+     * - Admin has set up an automatic create of a block instance using the plugin settings.
      *
      * @return array
      */

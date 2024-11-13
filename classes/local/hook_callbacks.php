@@ -76,6 +76,8 @@ class hook_callbacks {
                 $newinstance->id = $DB->insert_record('block_instances', $newinstance);
             }
         } else {
+            // If tenant is not allowed, $data->addaichat will be empty,
+            // so an existing instance will be deleted by following lines.
             if ($blockinstance) {
                 // Remove block instance.
                 blocks_delete_instance($blockinstance);
