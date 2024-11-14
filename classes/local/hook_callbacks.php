@@ -35,8 +35,8 @@ class hook_callbacks {
      * @param after_form_definition $hook
      */
     public static function handle_after_form_definition(\core_course\hook\after_form_definition $hook): void {
-        $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
-        if ($tenant->is_tenant_allowed()) {
+        $configmanager = \core\di::get(\local_ai_manager\local\config_manager::class);
+        if (!$configmanager->is_tenant_enabled()) {
             $mform = $hook->mform;
             $mform->addElement('checkbox', 'addaichat', get_string('addblockinstance', 'block_ai_chat'), 'add_block_ai_chat');
             $mform->addHelpButton('addaichat', 'addblockinstance', 'block_ai_chat');
