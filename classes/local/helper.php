@@ -26,22 +26,21 @@ use moodle_page;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class helper {
-
     /**
-     * Check if a block is present.
-     *
+     * Check, if a block is existing in course context.
      * @param int $courseid
-     * @return mixed
+     * @return object|bool
+     * @throws \dml_exception
      */
-    public static function check_block_present($courseid) {
+    public static function has_block_in_course_context(int $courseid): object|bool {
         global $DB;
 
         // Check if tenant is enabled for the school.
-        $sql = "SELECT bi.id
-                FROM {block_instances} bi
-                JOIN {context} ctx ON bi.parentcontextid = ctx.id
-                WHERE bi.blockname = :blockname AND ctx.contextlevel = :contextlevel
-                AND ctx.instanceid = :courseid";
+        $sql = "SELECT bi.*
+                  FROM {block_instances} bi
+                  JOIN {context} ctx ON bi.parentcontextid = ctx.id
+                 WHERE bi.blockname = :blockname AND ctx.contextlevel = :contextlevel
+                   AND ctx.instanceid = :courseid";
 
         $params = [
             'blockname' => 'ai_chat',

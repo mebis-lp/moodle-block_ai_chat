@@ -45,7 +45,7 @@ class hook_callbacks {
     }
 
     /**
-     * Check for addaichat form setting and add/remove ai-chat blockk.
+     * Check for addaichat form setting and add/remove ai-chat block.
      *
      * @param after_form_submission $hook
      */
@@ -56,7 +56,7 @@ class hook_callbacks {
 
         // Check if block_ai_chat instance is present.
         $courseid = $data->id;
-        $blockinstance = \block_ai_chat\local\helper::check_block_present($courseid);
+        $blockinstance = helper::has_block_in_course_context($courseid);
 
         if (!empty($data->addaichat) && $data->addaichat == '1') {
             if (!$blockinstance) {
@@ -64,7 +64,8 @@ class hook_callbacks {
                 $newinstance = new \stdClass;
                 $newinstance->blockname = 'ai_chat';
                 $newinstance->parentcontextid = \context_course::instance($courseid)->id;
-                $newinstance->showinsubcontexts = 0;
+                // We want to make the block usable for single activity courses as well, so display in subcontexts.
+                $newinstance->showinsubcontexts = 1;
                 $newinstance->pagetypepattern = '*';
                 $newinstance->subpagepattern = null;
                 $newinstance->defaultregion = 'side-pre';
@@ -75,6 +76,8 @@ class hook_callbacks {
                 $newinstance->id = $DB->insert_record('block_instances', $newinstance);
             }
         } else {
+            // If tenant is not allowed, $data->addaichat will be empty,
+            // so an existing instance will be deleted by following lines.
             if ($blockinstance) {
                 // Remove block instance.
                 blocks_delete_instance($blockinstance);
@@ -85,7 +88,9 @@ class hook_callbacks {
     /**
      * Check if block instance is present and set addaichat form setting.
      *
-     * @param after_form_submission $hook
+     * @param \core_course\hook\after_form_definition_after_data $hook
+     * @return void
+     * @throws \dml_exception
      */
     public static function handle_after_form_definition_after_data(\core_course\hook\after_form_definition_after_data $hook): void {
         // Get form data.
@@ -94,7 +99,7 @@ class hook_callbacks {
         if (!empty($formwrapper->get_course()->id)) {
             $courseid = $formwrapper->get_course()->id;
 
-            $blockinstance = \block_ai_chat\local\helper::check_block_present($courseid);
+            $blockinstance = helper::has_block_in_course_context($courseid);
             if ($blockinstance) {
                 // Block present, so set checkbox accordingly.
                 $mform->setDefault('addaichat', "checked");

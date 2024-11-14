@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-use block_ai_chat\local\helper;
+use local_ai_manager\local\userinfo;
 
 /**
  * Block class for block_ai_chat
@@ -41,6 +41,7 @@ class block_ai_chat extends block_base {
      *
      * @return bool
      */
+    #[\Override]
     public function has_config(): bool {
         return true;
     }
@@ -52,6 +53,7 @@ class block_ai_chat extends block_base {
      * @throws coding_exception
      * @throws moodle_exception
      */
+    #[\Override]
     public function get_content(): stdClass {
         global $USER;
 
@@ -64,7 +66,8 @@ class block_ai_chat extends block_base {
         $this->content->footer = '';
 
         $context = \context_block::instance($this->instance->id);
-        if (!has_capability('block/ai_chat:view', $context) || !has_capability('local/ai_manager:use', $context)) {
+        if (!has_capability('block/ai_chat:view', $context) ||
+                !has_capability('local/ai_manager:use', $context)) {
             return $this->content;
         }
         $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
@@ -75,16 +78,12 @@ class block_ai_chat extends block_base {
             return $this->content;
         }
         if ($tenant->is_tenant_allowed() && !$configmanager->is_tenant_enabled()) {
-            if ($aiconfig['role'] ===
-                \local_ai_manager\local\userinfo::get_role_as_string(\local_ai_manager\local\userinfo::ROLE_BASIC
-            )) {
+            if ($aiconfig['role'] === userinfo::get_role_as_string(userinfo::ROLE_BASIC)) {
                 return $this->content;
             }
         }
         if (!$chatconfig['isconfigured']) {
-            if ($aiconfig['role'] ===
-                \local_ai_manager\local\userinfo::get_role_as_string(\local_ai_manager\local\userinfo::ROLE_BASIC
-            )) {
+            if ($aiconfig['role'] === userinfo::get_role_as_string(userinfo::ROLE_BASIC)) {
                 return $this->content;
             }
         }
@@ -103,33 +102,48 @@ class block_ai_chat extends block_base {
      *
      * @return bool
      */
+    #[\Override]
     public function instance_allow_multiple(): bool {
         return false;
     }
 
     /**
-     * Returns on which page formats this block can be used.
+     * Returns on which page formats this block can be added.
+     *
+     * We do not want any user to create the block manually.
+     * But me must add at least one applicable format here otherwise it will lead to an installation error,
+     * because the block::_self_test fails.
+     *
+     * There are only two ways to create block instances:
+     * - Check "add ai block" in the settings form of a course
+     * - Admin has set up an automatic create of a block instance using the plugin settings.
      *
      * @return array
      */
+    #[\Override]
     public function applicable_formats(): array {
         return ['course-view' => true];
     }
 
+    /**
+     * We don't want any user to manually create an instance of this block.
+     *
+     * @param $page
+     * @return false
+     */
     #[\Override]
     public function user_can_addto($page) {
-        $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
-        // Add exception for site admin, otherwise we cannot add the block to the dashboard in the website administration.
-        if (!$tenant->is_tenant_allowed() && !is_siteadmin()) {
-            return false;
-        }
-        if (helper::show_global_block($page)) {
-            // If a global block is being shown on a page, we do not allow the user to add an own block.
-            return false;
-        }
-        return parent::user_can_addto($page);
+        return false;
     }
 
+    /**
+     *  Do any additional initialization you may need at the time a new block instance is created
+     *
+     * @return boolean
+     * /
+     * @return true
+     * @throws dml_exception
+     */
     #[\Override]
     public function instance_create() {
         global $DB;
