@@ -31,7 +31,7 @@
 }
 
 
-.ai_chat_modal{
+.block_ai_chat_modal{
     .modal-dialog {
         min-height: 500px;
     }
@@ -44,7 +44,7 @@
            align-items: center;
            width: calc(100% - 2rem);
            font-size: 1rem;
-           .ai_chat_title {
+           .block_ai_chat_title {
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 overflow: hidden;
@@ -209,7 +209,7 @@
         background: linear-gradient(to bottom, #fff 10%, transparent);
         z-index: 33;
     }
-    .ai_chat_modal_body {
+    .block_ai_chat_modal_body {
         width: 100%;
         overflow: hidden;
         .infobox {
@@ -271,21 +271,15 @@
     }
 }
 @media (min-width: 497px) {
-    .ai_chat_modal.onhistorypage {
+    .block_ai_chat_modal.onhistorypage {
         .modal-body {
             min-width: 497px;
         }
     }
 }
 
-.ai_fake_block {
-    visibility: hidden;
-    height: 0;
-    margin: 0;
-}
-
 body.block_ai_chat_chatwindow {
-    .ai_chat_modal .modal-dialog {
+    .block_ai_chat_modal .modal-dialog {
         position: fixed;
         max-height: calc(100vh - 6rem);
         right: 2rem;
@@ -300,19 +294,19 @@ body.block_ai_chat_chatwindow,
 body.block_ai_chat_dockright {
     overflow: initial;
     .modal-backdrop.show,
-    .ai_chat_modal {
+    .block_ai_chat_modal {
         width: 0;
         height: 0;
     }
 }
 
 body.block_ai_chat_openfull {
-    .ai_chat_modal {
+    .block_ai_chat_modal {
         .modal-dialog {
             max-width: 95%;
             min-height: calc(100vh - 3.5rem);
         }
-        .ai_chat_modal_body {
+        .block_ai_chat_modal_body {
             max-width: 1080px;
             margin: 0 auto;
         }
@@ -325,7 +319,7 @@ body.block_ai_chat_dockright {
     &.block_ai_chat_open #page-wrapper #page {
         margin-right: 50%;
     }
-    .ai_chat_modal .modal-dialog {
+    .block_ai_chat_modal .modal-dialog {
         position: fixed;
         width: 50%;
         max-width: 50%;

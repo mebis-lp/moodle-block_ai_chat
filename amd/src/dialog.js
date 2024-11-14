@@ -111,7 +111,7 @@ export const init = async(params) => {
 
     // Add class for styling when modal is displayed.
     modal.getRoot().on('modal:shown', function(e) {
-        e.target.classList.add("ai_chat_modal");
+        e.target.classList.add("block_ai_chat_modal");
     });
 
     // Conditionally prevent outside click event.
@@ -211,7 +211,9 @@ async function showModal() {
         // Show userquota.
         await renderUserQuota('#block_ai_chat_userquota', ['chat']);
         // Show infobox.
-        await renderInfoBox('block_ai_chat', userid, '.ai_chat_modal_body [data-content="local_ai_manager_infobox"]', ['chat']);
+        await renderInfoBox(
+            'block_ai_chat', userid, '.block_ai_chat_modal_body [data-content="local_ai_manager_infobox"]', ['chat']
+        );
 
         // Check if all permissions and settings are correct.
         const message = await userAllowed();
@@ -332,7 +334,7 @@ const enterQuestion = async(question) => {
     }
 
     // Attach copy listener.
-    let copy = document.querySelector('.ai_chat_modal .awaitanswer .copy');
+    let copy = document.querySelector('.block_ai_chat_modal .awaitanswer .copy');
     copy.addEventListener('mousedown', () => {
         helper.copyToClipboard(copy);
     });
@@ -358,14 +360,14 @@ const enterQuestion = async(question) => {
  */
 const showReply = async(text) => {
     // Get textblock.
-    let fields = document.querySelectorAll('.ai_chat_modal .awaitanswer .text');
+    let fields = document.querySelectorAll('.block_ai_chat_modal .awaitanswer .text');
     const field = fields[fields.length - 1];
     // Render the reply.
     field.innerHTML = text;
     field.classList.remove('small');
 
     // Remove awaitanswer class.
-    let awaitdivs = document.querySelectorAll('.ai_chat_modal .awaitanswer');
+    let awaitdivs = document.querySelectorAll('.block_ai_chat_modal .awaitanswer');
     const awaitdiv = awaitdivs[awaitdivs.length - 1];
     awaitdiv.classList.remove('awaitanswer');
 };
@@ -485,7 +487,7 @@ const showHistory = async() => {
     });
 
     // Set modal class to hide info about ratelimits and infobox.
-    let modal = document.querySelector('.ai_chat_modal');
+    let modal = document.querySelector('.block_ai_chat_modal');
     modal.classList.add('onhistorypage');
 
     // Iterate over conversations and group by date.
@@ -549,7 +551,7 @@ const showHistory = async() => {
         "dates": convert.groups,
     };
     const {html, js} = await Templates.renderForPromise('block_ai_chat/history', templateData);
-    Templates.appendNodeContents('.ai_chat_modal .block_ai_chat-output', html, js);
+    Templates.appendNodeContents('.block_ai_chat_modal .block_ai_chat-output', html, js);
 
     // Add a listener for the new dialog button.
     const btnNewDialog = document.getElementById('ai_chat_history_new_dialog');
@@ -603,7 +605,7 @@ const clearMessages = (hideinput = false) => {
  * @param {*} setTitle
  */
 const setModalHeader = (setTitle = '') => {
-    let modalheader = document.querySelector('.ai_chat_modal .modal-title div');
+    let modalheader = document.querySelector('.block_ai_chat_modal .modal-title div');
     let title = '';
     if (modalheader !== null && (conversation.messages.length > 0 || setTitle.length)) {
         if (!setTitle.length) {
@@ -614,7 +616,7 @@ const setModalHeader = (setTitle = '') => {
         modalheader.innerHTML = title;
     }
     // Remove onhistorypage, since history page is setting it.
-    let modal = document.querySelector('.ai_chat_modal');
+    let modal = document.querySelector('.block_ai_chat_modal');
     modal.classList.remove('onhistorypage');
 };
 
