@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-use block_ai_chat\local\helper;
 use local_ai_manager\local\userinfo;
 
 /**
@@ -42,6 +41,7 @@ class block_ai_chat extends block_base {
      *
      * @return bool
      */
+    #[\Override]
     public function has_config(): bool {
         return true;
     }
@@ -53,6 +53,7 @@ class block_ai_chat extends block_base {
      * @throws coding_exception
      * @throws moodle_exception
      */
+    #[\Override]
     public function get_content(): stdClass {
         global $USER;
 
@@ -101,6 +102,7 @@ class block_ai_chat extends block_base {
      *
      * @return bool
      */
+    #[\Override]
     public function instance_allow_multiple(): bool {
         return false;
     }
@@ -118,6 +120,7 @@ class block_ai_chat extends block_base {
      *
      * @return array
      */
+    #[\Override]
     public function applicable_formats(): array {
         return ['course-view' => true];
     }
@@ -141,6 +144,7 @@ class block_ai_chat extends block_base {
      * @return true
      * @throws dml_exception
      */
+    #[\Override]
     public function instance_create() {
         global $DB;
 
