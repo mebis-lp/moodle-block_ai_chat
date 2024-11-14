@@ -64,7 +64,6 @@ class DialogModal extends Modal {
         modalConfig.removeOnClose = false;
 
         modalConfig.isVerticallyCentered = false;
-        // returnFocus: target,
 
         super.configure(modalConfig);
 
@@ -107,7 +106,6 @@ export const init = async(params) => {
         templateContext: {
             title: strNewDialog,
             badge: badge,
-            // history: history, // history dynamically added.
         },
     });
 
@@ -232,12 +230,9 @@ async function showModal() {
  * Webservice Get all conversations.
  */
 const getConversations = async() => {
-    console.log("allConversations called");
     try {
         allConversations = await externalServices.getAllConversations(userid, contextid);
-        console.log(allConversations);
     } catch (error) {
-        console.log(allConversations);
         displayException(error);
     }
 };
@@ -247,7 +242,6 @@ const getConversations = async() => {
  * @param {*} id
  */
 const showConversation = (id = 0) => {
-    console.log("showConversation called");
     // Dissallow changing conversations when question running.
     if (aiAtWork) {
         return;
@@ -284,7 +278,6 @@ const enterQuestion = async(question) => {
     }
     const message = await userAllowed();
     if (message !== '') {
-        console.log("User not allowed");
         const notice = await getString('noticenewquestion', 'block_ai_chat');
         await displayAlert(notice, message);
         aiAtWork = false;
@@ -363,7 +356,7 @@ const enterQuestion = async(question) => {
  * Render reply.
  * @param {string} text
  */
-const showReply = async (text) => {
+const showReply = async(text) => {
     // Get textblock.
     let fields = document.querySelectorAll('.ai_chat_modal .awaitanswer .text');
     const field = fields[fields.length - 1];
@@ -378,7 +371,6 @@ const showReply = async (text) => {
 };
 
 const showMessages = () => {
-    console.log("showMessages called");
     conversation.messages.forEach((val) => {
         showMessage(val.message, val.sender);
     });
@@ -427,7 +419,6 @@ const showMessage = async(text, sender = '', answer = true) => {
  * @param {bool} deleted
  */
 const newDialog = async(deleted = false) => {
-    console.log("newDialog called");
     if (aiAtWork) {
         return;
     }
@@ -449,7 +440,6 @@ const newDialog = async(deleted = false) => {
  * Delete /hide current dialog.
  */
 const deleteCurrentDialog = () => {
-    console.log("deleteCurrentDialog called");
     deleteCancelPromise(
         getString('delete', 'block_ai_chat'),
         getString('deletewarning', 'block_ai_chat'),
@@ -475,7 +465,6 @@ const deleteCurrentDialog = () => {
  * Show conversation history.
  */
 const showHistory = async() => {
-    console.log("showHistory called");
     // Add current convo local representation, if not already there.
     if (allConversations.find(x => x.id === conversation.id) === undefined) {
         allConversations.push(conversation);
@@ -598,7 +587,6 @@ const saveConversationLocally = (question, reply) => {
  * @param {*} hideinput
  */
 const clearMessages = (hideinput = false) => {
-    console.log("clearMessages called");
     const output = document.querySelector('.block_ai_chat-output');
     output.innerHTML = '';
     // For showing history.
@@ -727,7 +715,6 @@ const errorHandling = async(requestresult, question, options) => {
 
     // And write generic error message in chatbot.
     requestresult.result = await getString('error', 'block_ai_chat');
-    console.log(requestresult);
     return requestresult;
 };
 
@@ -738,11 +725,9 @@ const errorHandling = async(requestresult, question, options) => {
  */
 const checkMessageHistoryLengthLimit = async(messages) => {
     const length = messages.length;
-    console.log("checkHistoryLengthLimit called");
     if (length > maxHistory) {
         // Cut history.
         let shortenedMessages = [messages[0], ...messages.slice(-maxHistory)];
-        console.log(shortenedMessages);
 
         // Show warning once per session.
         if (!maxHistoryWarnings.has(conversation.id)) {
@@ -800,6 +785,7 @@ const setView = async(mode = '') => {
  * @returns {message}
  */
 const userAllowed = async() => {
+    let message;
     if (tenantConfig.tenantenabled === false) {
         message = await getString('error_http403disabled', 'local_ai_manager');
         return message;

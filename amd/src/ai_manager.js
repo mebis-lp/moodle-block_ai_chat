@@ -1,5 +1,4 @@
 import {makeRequest} from 'local_ai_manager/make_request';
-import {exception as displayException} from 'core/notification';
 
 /**
  * Get the async answer from the local_ai_manager.
@@ -14,7 +13,6 @@ export const askLocalAiManager = async(purpose, prompt, options = []) => {
     try {
         result = await makeRequest(purpose, prompt, options);
     } catch (error) {
-        console.log(error);
         result.code = 'aiconnector';
         result.result = error.error + " " + error.message;
         // For devs.

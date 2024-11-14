@@ -47,6 +47,8 @@ class delete_conversation extends external_api {
      * Execute the service.
      *
      * @param int $contextid
+     * @param int $userid
+     * @param int $conversationid
      * @return array
      * @throws invalid_parameter_exception
      * @throws dml_exception

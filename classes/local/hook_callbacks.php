@@ -88,7 +88,7 @@ class hook_callbacks {
     /**
      * Check if block instance is present and set addaichat form setting.
      *
-     * @param \core_course\hook\after_form_definition_after_data $hook
+     * @param after_form_definition_after_data $hook
      * @return void
      * @throws \dml_exception
      */
