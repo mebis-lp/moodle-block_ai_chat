@@ -47,7 +47,6 @@ export const focustextarea = () => {
  * Scroll to bottom of modal body.
  */
 export const scrollToBottom = () => {
-    console.log("scroll to bottom called");
     const modalContent = document.querySelector('.ai_chat_modal .modal-body .block_ai_chat-output-wrapper');
     modalContent.scrollTop = modalContent.scrollHeight;
 };
@@ -71,7 +70,7 @@ export const escapeHTML = (str) => {
         '/': '&#x2F;',
     };
 
-    return String(str).replace(/[&<>"'`\/]/g, function(match) {
+    return String(str).replace(/[&<>"'`/]/g, function(match) {
         return escapeMap[match];
     });
 };

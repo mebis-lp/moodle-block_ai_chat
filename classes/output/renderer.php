@@ -33,6 +33,7 @@ class renderer extends plugin_renderer_base {
     /**
      * Defer to template.
      *
+     * @param block_ai_chat $block
      * @return string html for the page
      */
     public function render_ai_chat_content(\block_ai_chat $block): string {
