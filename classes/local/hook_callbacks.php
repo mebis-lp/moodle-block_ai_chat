@@ -32,7 +32,7 @@ class hook_callbacks {
     /**
      * Add a checkbox to add a ai-chat block.
      *
-     * @param after_form_definition $hook
+     * @param \core_course\hook\after_form_definition $hook
      */
     public static function handle_after_form_definition(\core_course\hook\after_form_definition $hook): void {
         $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
@@ -47,7 +47,7 @@ class hook_callbacks {
     /**
      * Check for addaichat form setting and add/remove ai-chat block.
      *
-     * @param after_form_submission $hook
+     * @param \core_course\hook\after_form_submission $hook
      */
     public static function handle_after_form_submission(\core_course\hook\after_form_submission $hook): void {
         global $DB;
@@ -88,7 +88,7 @@ class hook_callbacks {
     /**
      * Check if block instance is present and set addaichat form setting.
      *
-     * @param after_form_definition_after_data $hook
+     * @param \core_course\hook\after_form_definition_after_data $hook
      * @return void
      * @throws \dml_exception
      */
