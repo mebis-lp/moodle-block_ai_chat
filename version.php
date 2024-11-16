@@ -31,5 +31,5 @@ $plugin->requires = 2024042200;
 $plugin->component = 'block_ai_chat';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [
-    'local_mbsteachshare' => ANY_VERSION,
+    'local_ai_manager' => 2024092700,
 ];
