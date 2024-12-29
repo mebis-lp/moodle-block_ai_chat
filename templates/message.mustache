@@ -33,7 +33,7 @@
 <div class="message ai">
 {{/sender}}
     <div class="content">
-        <img src="{{{ config.wwwroot }}}/blocks/ai_chat/pix/ai-icon.svg" alt="" class="ai_chat_icon mr-2">
+        <img src="{{globals.config.wwwroot}}/blocks/ai_chat/pix/ai-icon.svg" alt="" class="ai_chat_icon mr-2">
         <div class="copiedtoast">{{#str}} copied, block_ai_chat {{/str}}</div>
         <a class="copy"><i class="fa fa-copy"></i></a>
         <div class="text">
@@ -45,7 +45,7 @@
 {{^answer}}
 <div class="message ai">
     <div class="content awaitanswer">
-    <img src="{{{ config.wwwroot }}}/blocks/ai_chat/pix/ai-icon.svg" alt="" class="ai_chat_icon mr-2">
+    <img src="{{globals.config.wwwroot}}/blocks/ai_chat/pix/ai-icon.svg" alt="" class="ai_chat_icon mr-2">
         <div class="copiedtoast">{{#str}} copied, block_ai_chat {{/str}}</div>
         <a class="copy"><i class="fa fa-copy"></i></a>
         <div class="text small">
