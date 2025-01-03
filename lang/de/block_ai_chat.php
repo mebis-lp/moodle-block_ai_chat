@@ -23,8 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['addblockinstance'] = 'KI Chat zum Kurs hinzufügen';
-$string['addblockinstance_help'] = 'Fügt den Block KI Chat zum Kurs hinzu. Dieser wird gegebenenfalls entfernt, falls nicht gesetzt.';
+$string['addblockinstance'] = 'KI-Chat zum Kurs hinzufügen';
+$string['addblockinstance_help'] = 'Durch Setzen des Hakens wird dem Kurs ein KI-Chat hinzugefügt. Wird der Haken entfernt, wird der KI-Chat aus dem Kurs entfernt.';
 $string['ai_chat'] = 'KI-Chat';
 $string['ai_chat:addinstance'] = 'KI-Chat Block hinzufügen';
 $string['ai_chat:myaddinstance'] = 'KI-Chat Block zu meiner Startseite hinzufügen';

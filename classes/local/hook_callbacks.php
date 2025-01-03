@@ -18,6 +18,7 @@ namespace block_ai_chat\local;
 
 use context_block;
 use context_system;
+use local_ai_manager\ai_manager_utils;
 use stdClass;
 
 /**
@@ -30,7 +31,7 @@ use stdClass;
  */
 class hook_callbacks {
     /**
-     * Add a checkbox to add a ai-chat block.
+     * Add a checkbox to add an AI chat block.
      *
      * @param \core_course\hook\after_form_definition $hook
      */
@@ -38,9 +39,11 @@ class hook_callbacks {
         $tenant = \core\di::get(\local_ai_manager\local\tenant::class);
         if ($tenant->is_tenant_allowed()) {
             $mform = $hook->mform;
-            $mform->addElement('checkbox', 'addaichat', get_string('addblockinstance', 'block_ai_chat'), 'add_block_ai_chat');
+            ai_manager_utils::add_ai_tools_category_to_mform($mform);
+            $mform->addElement('checkbox', 'addaichat', get_string('pluginname', 'block_ai_chat'),
+                    get_string('addblockinstance', 'block_ai_chat'));
             $mform->addHelpButton('addaichat', 'addblockinstance', 'block_ai_chat');
-            $mform->setDefaults('addaichat', 1);
+            $mform->setDefault('addaichat', 0);
         }
     }
 
