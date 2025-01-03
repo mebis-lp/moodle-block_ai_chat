@@ -23,8 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['addblockinstance'] = 'Add a AI Chat to this course';
-$string['addblockinstance_help'] = 'Adds a block instance of AI Chat to this course. Or is removed when unchecked';
+$string['addblockinstance'] = 'Add an AI Chat to this course';
+$string['addblockinstance_help'] = 'Adds an AI Chat to this course. The AI chat will be removed if the checkbox is unchecked.';
 $string['ai_chat'] = 'AI Chat';
 $string['ai_chat:addinstance'] = 'Add a AI Chat block';
 $string['ai_chat:myaddinstance'] = 'Add a AI Chat block to my moodle';
