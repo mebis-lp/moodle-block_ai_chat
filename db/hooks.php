@@ -29,6 +29,7 @@ $callbacks = [
         [
                 'hook' => \core_course\hook\after_form_definition::class,
                 'callback' => \block_ai_chat\local\hook_callbacks::class . '::handle_after_form_definition',
+                'priority' => 500,
         ],
         [
                 'hook' => \core_course\hook\after_form_submission::class,
