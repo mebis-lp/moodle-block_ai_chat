@@ -299,14 +299,13 @@ const enterQuestion = async(question) => {
         });
     }
 
-    // Ceck history for length limit.
+    // Check history for length limit.
     const convHistory = await checkMessageHistoryLengthLimit(conversation.messages);
 
     // Options, with conversation history.
     const options = {
         'component': 'block_ai_chat',
-        'contextid': contextid,
-        'conversationcontext': convHistory,
+        'conversationcontext': convHistory
     };
 
     // For a new conversation, get an id.
@@ -326,11 +325,11 @@ const enterQuestion = async(question) => {
     options.itemid = conversation.id;
 
     // Send to local_ai_manager.
-    let requestresult = await manager.askLocalAiManager('chat', question, options);
+    let requestresult = await manager.askLocalAiManager('chat', question, contextid, options);
 
     // Handle errors.
     if (requestresult.code != 200) {
-        requestresult = await errorHandling(requestresult, question, options);
+        requestresult = await errorHandling(requestresult, question, contextid, options);
     }
 
     // Attach copy listener.
@@ -683,10 +682,11 @@ const clickSubmitButton = () => {
  * Handle error from local_ai_manager.
  * @param {*} requestresult
  * @param {*} question
+ * @param {*} contextid
  * @param {*} options
  * @returns {object}
  */
-const errorHandling = async(requestresult, question, options) => {
+const errorHandling = async(requestresult, question, contextid, options) => {
 
     // If code 409, conversationid is already taken, try get new a one.
     if (requestresult.code == 409) {
@@ -699,7 +699,7 @@ const errorHandling = async(requestresult, question, options) => {
                 displayException(error);
             }
             // Retry with new id.
-            requestresult = await manager.askLocalAiManager('chat', question, options);
+            requestresult = await manager.askLocalAiManager('chat', question, contextid, options);
             return requestresult;
         }
     }
