@@ -70,7 +70,7 @@
   right: 0;
   padding: 0.5rem 0.75rem 2.5rem 2.75rem;
 }
-.block_ai_chat_modal .message.ai:hover .copy {
+.block_ai_chat_modal .message:hover .copy {
   visibility: visible;
   cursor: pointer;
 }
