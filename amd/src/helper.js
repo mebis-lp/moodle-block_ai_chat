@@ -27,9 +27,13 @@ export const copyToClipboard = (element) => {
  */
 export const attachCopyListenerLast = () => {
     const elements = document.querySelectorAll(".block_ai_chat_modal .copy");
-    const last = elements[elements.length - 1];
-    last.addEventListener('click', function() {
-        copyToClipboard(last);
+    const lastquestion = elements[elements.length - 2];
+    lastquestion.addEventListener('click', function() {
+        copyToClipboard(lastquestion);
+    });
+    const lastanswer = elements[elements.length - 1];
+    lastanswer.addEventListener('click', function() {
+        copyToClipboard(lastanswer);
     });
 };
 

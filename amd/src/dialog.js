@@ -406,10 +406,8 @@ const showMessage = async(text, sender = '', answer = true) => {
     const {html, js} = await Templates.renderForPromise('block_ai_chat/message', templateData);
     Templates.appendNodeContents('.block_ai_chat-output', html, js);
 
-    // Add copy listener for replys.
-    if (sender === '') {
-        helper.attachCopyListenerLast();
-    }
+    // Add copy listener for question and reply.
+    helper.attachCopyListenerLast();
 
     // Scroll the modal content to the bottom.
     helper.scrollToBottom();
