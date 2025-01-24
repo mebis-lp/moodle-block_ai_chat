@@ -42,6 +42,7 @@ class renderer extends plugin_renderer_base {
         $params = new \stdClass;
         $params->new = get_string('newdialog', 'block_ai_chat');
         $params->history = get_string('history', 'block_ai_chat');
+        $params->persona = get_string('definepersona', 'block_ai_chat');
         $params->userid = $USER->id;
         $params->contextid = $block->context->id;
         $params->badge = [

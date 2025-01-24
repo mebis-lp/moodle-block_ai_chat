@@ -3,6 +3,7 @@ import * as externalServices from 'block_ai_chat/webservices';
 import Templates from 'core/templates';
 import {alert as displayAlert, exception as displayException, deleteCancelPromise} from 'core/notification';
 import ModalEvents from 'core/modal_events';
+import ModalForm from 'core_form/modalform';
 import * as helper from 'block_ai_chat/helper';
 import * as manager from 'block_ai_chat/ai_manager';
 import {getString} from 'core/str';
@@ -25,6 +26,8 @@ let strHistory;
 let strNewDialog;
 let strToday;
 let strYesterday;
+let strDefinePersona;
+let personaForm = {};
 let badge;
 let viewmode;
 let modalopen = false;
@@ -38,7 +41,7 @@ let conversation = {
 let allConversations = [];
 // Userid.
 let userid = 0;
-// Course context id.
+// Block context id.
 let contextid = 0;
 // First load.
 let firstLoad = true;
@@ -92,6 +95,7 @@ export const init = async(params) => {
     contextid = params.contextid;
     strNewDialog = params.new;
     strHistory = params.history;
+    strDefinePersona = params.persona;
     badge = params.badge;
     // Disable bdage.
     badge = false;
@@ -101,7 +105,7 @@ export const init = async(params) => {
     tenantConfig = aiConfig;
     chatConfig = aiConfig.purposes.find(p => p.purpose === "chat");
 
-    // Build modal.
+    // Build chat dialog modal.
     modal = await DialogModal.create({
         templateContext: {
             title: strNewDialog,
@@ -142,6 +146,42 @@ export const init = async(params) => {
     if (window.innerWidth <= 576) {
         setView(VIEW_OPENFULL);
     }
+
+    // Add a dynamic form to add a systemprompt/persona to a block instance.
+    personaForm = new ModalForm({
+        // Set formclass, depending on component.
+        formClass: "block_ai_chat\\form\\persona_form",
+        args: {
+            contextid: contextid,
+        },
+        modalConfig: {title: strDefinePersona},
+    });
+
+    // In addition to menu, attach listener to the block prompt button to call the persona modal.
+    let promptbutton = document.getElementById('ai_chat_prompt');
+    if (promptbutton) {
+        promptbutton.addEventListener('mousedown', async(e) => {
+            e.preventDefault();
+            personaForm.show();
+                setTimeout(
+                    () => {
+                        const inputprompts = document.querySelector('input[name="prompts"]');
+                        const prompts = JSON.parse(inputprompts.value);
+                        const select = document.querySelector('select[name="name"]');
+                        const textarea = document.querySelector('textarea[name="prompt"]');
+                        select.addEventListener('change', (event) => {
+                            let selectedValue = event.target.value;
+                            if (typeof prompts[selectedValue] !== 'undefined') {
+                                textarea.value = prompts[selectedValue];
+                            } else {
+                                textarea.value = '';
+                            }
+                        });
+                    }, 1200
+                );
+        });
+    }
+
 };
 
 /**
@@ -173,7 +213,6 @@ async function showModal() {
         await getConversations();
 
         // Show conversation.
-        // Todo - Evtl. noch firstload verschönern, spinner für header und content z.b.
         showConversation();
 
         // Get conversationcontext message limit.
@@ -193,6 +232,10 @@ async function showModal() {
         const btnShowHistory = document.getElementById('block_ai_chat_show_history');
         btnShowHistory.addEventListener('click', () => {
             showHistory();
+        });
+        const btnDefinePersona = document.getElementById('block_ai_chat_define_persona');
+        btnDefinePersona.addEventListener('click', () => {
+            personaForm.show();
         });
         // Views.
         const btnChatwindow = document.getElementById(VIEW_CHATWINDOW);
@@ -657,7 +700,6 @@ const addTextareaListener = (textarea) => {
  * @param {*} event
  */
 const textareaOnKeydown = (event) => {
-    // TODO check for mobile devices.
     if (event.key === 'Enter' && !aiAtWork && !event.shiftKey) {
         aiAtWork = true;
         enterQuestion(event.target.value);
