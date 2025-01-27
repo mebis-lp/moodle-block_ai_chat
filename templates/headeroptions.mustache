@@ -35,6 +35,9 @@
         <div class="dropdown-menu dropdown-menu-right">
             <a class="dropdown-item" href="#" id="block_ai_chat_new_dialog">{{#pix}} t/messages, core, {{#str}} newdialog, block_ai_chat {{/str}} {{/pix}}{{#str}} newdialog, block_ai_chat {{/str}}</a>
             <a class="dropdown-item" href="#" id="block_ai_chat_show_history">{{#pix}} t/reload, core, {{#str}} showhistory, block_ai_chat {{/str}} {{/pix}}{{#str}} history, block_ai_chat {{/str}}</a>
+            {{#showPersona}}
+                <a class="dropdown-item" href="#" id="block_ai_chat_define_persona">{{#pix}} t/user, core, {{#str}} definepersona, block_ai_chat {{/str}} {{/pix}}{{#str}} definepersona, block_ai_chat {{/str}}</a>
+            {{/showPersona}}
             <a class="dropdown-item" href="#" id="block_ai_chat_delete_dialog">{{#pix}} t/delete, core, {{#str}} delete, block_ai_chat {{/str}} {{/pix}}{{#str}} delete, block_ai_chat {{/str}}</a>
         </div>
     </div>

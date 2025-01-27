@@ -218,6 +218,9 @@
   padding: 0;
   margin: 0;
 }
+.block_ai_chat_modal .block_ai_chat_modal_body .infobox .local_ai_manager-infobox {
+  margin-top: 0.5rem;
+}
 .block_ai_chat_modal .block_ai_chat-output-wrapper {
   overflow-y: auto;
   height: 100%;
@@ -336,4 +339,18 @@ body.block_ai_chat_replacehelp #page-footer [data-region=footer-container-popove
 }
 body.block_ai_chat_replacehelp #ai_chat_button {
   bottom: 1.9rem;
+}
+
+#add_persona,
+#copy_persona {
+  font-size: 1.25rem;
+}
+#add_persona:hover,
+#copy_persona:hover {
+  cursor: pointer;
+  filter: invert(30%);
+}
+
+.select-spacer {
+  font-size: 0.25rem;
 }

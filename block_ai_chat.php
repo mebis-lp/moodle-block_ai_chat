@@ -94,6 +94,11 @@ class block_ai_chat extends block_base {
         $aioutput = $this->page->get_renderer('block_ai_chat');
         $this->content->text = $aioutput->render_ai_chat_content($this);
 
+        if ($this->page->user_is_editing()) {
+            $this->content->text .= get_string('editsystemprompt', 'block_ai_chat');
+            return $this->content;
+        }
+
         return $this->content;
     }
 
@@ -133,7 +138,7 @@ class block_ai_chat extends block_base {
      */
     #[\Override]
     public function user_can_addto($page) {
-        return false;
+        return true;
     }
 
     /**

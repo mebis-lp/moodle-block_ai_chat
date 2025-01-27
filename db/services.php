@@ -60,4 +60,12 @@ $functions = [
         'ajax'          => true,
         'capabilities'  => 'local/ai_manager:use',
     ],
+    'block_ai_chat_reload_persona' => [
+        'classname'     => 'block_ai_chat\external\reload_persona',
+        'methodname'    => 'execute',
+        'description'   => 'Reload persona.',
+        'type'          => 'read',
+        'ajax'          => true,
+        'capabilities'  => 'local/ai_manager:use',
+    ],
 ];

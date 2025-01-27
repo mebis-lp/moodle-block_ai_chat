@@ -74,4 +74,20 @@ export const getConversationcontextLimit = (
     methodname: 'block_ai_chat_get_conversationcontext_limit',
     args: {
         contextid
-}}])[0];
+    }
+}])[0];
+
+
+/**
+ * Get current persona.
+ * @param {int} contextid
+ * @returns {mixed}
+ */
+export const reloadPersona = (
+    contextid,
+) => fetchMany([{
+    methodname: 'block_ai_chat_reload_persona',
+    args: {
+        contextid
+    }
+}])[0];

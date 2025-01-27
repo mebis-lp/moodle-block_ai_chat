@@ -18,6 +18,7 @@ import * as externalServices from 'block_ai_chat/webservices';
 import Templates from 'core/templates';
 import {alert as displayAlert, exception as displayException, deleteCancelPromise} from 'core/notification';
 import ModalEvents from 'core/modal_events';
+import ModalForm from 'core_form/modalform';
 import * as helper from 'block_ai_chat/helper';
 import * as manager from 'block_ai_chat/ai_manager';
 import {getString} from 'core/str';
@@ -26,7 +27,6 @@ import {renderUserQuota} from 'local_ai_manager/userquota';
 import {getAiConfig} from 'local_ai_manager/config';
 import LocalStorage from 'core/localstorage';
 import {escapeHTML, hash} from './helper';
-import Config from 'core/config';
 
 // Declare variables.
 const VIEW_CHATWINDOW = 'block_ai_chat_chatwindow';
@@ -40,6 +40,19 @@ let strHistory;
 let strNewDialog;
 let strToday;
 let strYesterday;
+let strDefinePersona;
+let strNewPersona;
+let strUserTemplates;
+let strSystemTemplates;
+let personaForm = {};
+let personaPrompt = '';
+let personaInfo = '';
+let personaLink = '';
+let personaNewname = {};
+let personaButtondelete = {};
+let personaUserinfo = {};
+let personaInputprompt = {};
+let showPersona = false;
 let badge;
 let viewmode;
 let modalopen = false;
@@ -53,7 +66,7 @@ let conversation = {
 let allConversations = [];
 // Userid.
 let userid = 0;
-// Course context id.
+// Block context id.
 let contextid = 0;
 // First load.
 let firstLoad = true;
@@ -107,8 +120,16 @@ export const init = async(params) => {
     contextid = params.contextid;
     strNewDialog = params.new;
     strHistory = params.history;
+    strDefinePersona = params.persona;
+    strNewPersona = params.newpersona;
+    strUserTemplates = params.usertemplates;
+    strSystemTemplates = params.systemtemplates;
+    personaPrompt = params.personaprompt;
+    personaInfo = params.personainfo;
+    showPersona = params.showpersona;
+    personaLink = params.personalink;
     badge = params.badge;
-    // Disable bdage.
+    // Disable badge.
     badge = false;
 
     // Get configuration.
@@ -116,11 +137,12 @@ export const init = async(params) => {
     tenantConfig = aiConfig;
     chatConfig = aiConfig.purposes.find(p => p.purpose === "chat");
 
-    // Build modal.
+    // Build chat dialog modal.
     modal = await DialogModal.create({
         templateContext: {
             title: strNewDialog,
             badge: badge,
+            showPersona: showPersona,
         },
     });
 
@@ -208,6 +230,10 @@ async function showModal() {
         btnShowHistory.addEventListener('click', () => {
             showHistory();
         });
+        const btnDefinePersona = document.getElementById('block_ai_chat_define_persona');
+        btnDefinePersona.addEventListener('click', () => {
+           showPersonasModal();
+        });
         // Views.
         const btnChatwindow = document.getElementById(VIEW_CHATWINDOW);
         btnChatwindow.addEventListener('click', () => {
@@ -228,6 +254,16 @@ async function showModal() {
         await renderInfoBox(
             'block_ai_chat', userid, '.block_ai_chat_modal_body [data-content="local_ai_manager_infobox"]', ['chat']
         );
+        // Show persona info.
+        if (personaPrompt !== '') {
+            const targetElement = document.querySelector('.block_ai_chat_modal_body [data-content="local_ai_manager_infobox"]');
+            const templateContext = {
+                'persona': personaInfo,
+                'personainfourl': personaLink,
+            };
+            const {html, js} = await Templates.renderForPromise('block_ai_chat/persona_infobox', templateContext);
+            Templates.appendNodeContents(targetElement, html, js);
+        }
 
         // Check if all permissions and settings are correct.
         const message = await userAllowed();
@@ -303,15 +339,12 @@ const enterQuestion = async(question) => {
     // Add to conversation, answer not yet available.
     showMessage(question, 'self', false);
 
-    // For first message, add a system message.
-    if (conversation.messages.length === 0) {
-        const currentUserLanguage = Config.language.substring(0, 2);
-        const LangNames = new Intl.DisplayNames('en', {type: 'language'});
-        conversation.messages.push({
-            'message': 'Answer in ' + LangNames.of(currentUserLanguage),
-            'sender': 'system',
-        });
-    }
+    // For first message, add the personaprompt, even if empty.
+    // Since we dont know if the personaPrompt was changed, always replace it.
+    conversation.messages[0] = {
+        'message': personaPrompt,
+        'sender': 'system'
+    };
 
     // Check history for length limit.
     const convHistory = await checkMessageHistoryLengthLimit(conversation.messages);
@@ -744,6 +777,7 @@ const checkMessageHistoryLengthLimit = async(messages) => {
         // Cut history.
         let shortenedMessages = [messages[0], ...messages.slice(-maxHistory)];
 
+
         // Show warning once per session.
         if (!maxHistoryWarnings.has(conversation.id)) {
             const maxHistoryString = await getString('maxhistory', 'block_ai_chat', maxHistory);
@@ -844,5 +878,205 @@ const handleScreenWidthChange = (e) => {
     } else {
         body.classList.remove(VIEW_CHATWINDOW, VIEW_OPENFULL, VIEW_DOCKRIGHT);
         body.classList.add(viewmode);
+    }
+};
+
+/**
+ * Show personas modal.
+ */
+const showPersonasModal = () => {
+    // Add a dynamic form to add a systemprompt/persona to a block instance.
+    // Always create the dynamic form modal, since it is being destroyed.
+    personaForm = new ModalForm({
+        formClass: "block_ai_chat\\form\\persona_form",
+        moduleName: "block_ai_chat/modal_save_delete_cancel",
+        args: {
+            contextid: contextid,
+        },
+        modalConfig: {
+            title: strDefinePersona,
+        },
+    });
+
+    // Show modal.
+    personaForm.show();
+
+    // If select[template] is changed, change textarea[prompt].
+    // For this, we want to get the value of the hidden input with name="prompts".
+    // So we wait for the modalForm() to be LOADED to get the modal object.
+    // On the modal object we wait for the bodyRendered event to read the input.
+    personaForm.addEventListener(personaForm.events.LOADED, () => {
+        personaForm.modal.getRoot().on(ModalEvents.bodyRendered, () => {
+            const inputprompts = document.querySelector('input[name="prompts"]');
+            const prompts = JSON.parse(inputprompts.value);
+            const select = document.querySelector('select[name="template"]');
+            const addpersona = document.querySelector('#add_persona');
+            const copypersona = document.querySelector('#copy_persona');
+            personaNewname = document.querySelector('input[name="name"]');
+            personaInputprompt = document.querySelector('textarea[name="prompt"]');
+            personaUserinfo = document.querySelector('textarea[name="userinfo"]');
+            const inputtemplateids = document.querySelector('input[name="templateids"]');
+            const templateids = JSON.parse(inputtemplateids.value);
+            const inputuserinfos = document.querySelector('input[name="userinfos"]');
+            const userinfos = JSON.parse(inputuserinfos.value);
+            personaButtondelete = document.querySelector('[data-custom="delete"]');
+
+            // Disable delete/name on system templates.
+            manageInputs(false, templateids, select.value);
+
+            // Now we can add a listener to reflect select[template] to textarea[prompt].
+            select.addEventListener('change', (event) => {
+                let selectValue = event.target.value;
+                let selectText = event.target.options[select.selectedIndex].text;
+
+                // Enable all.
+                manageInputs(true);
+
+                // Reflect prompt, name and userinfos.
+                if (typeof prompts[selectValue] !== 'undefined') {
+                    personaInputprompt.value = prompts[selectValue];
+                    // For personaNewname, get_formdata needs setAttribute,
+                    // but .value is used to repopulate after placeholder is used.
+                    personaNewname.value = selectText;
+                    personaNewname.setAttribute('placeholder', '');
+                    personaNewname.setAttribute('value', selectText);
+                    personaUserinfo.value = userinfos[selectValue];
+                    personaUserinfo.disabled = false;
+                    personaInputprompt.disabled = false;
+                } else {
+                    // Should be selection "No Persona"
+                    personaNewname.setAttribute('value', '');
+                    personaInputprompt.value = '';
+                    personaInputprompt.disabled = true;
+                    personaUserinfo.value = '';
+                    personaUserinfo.disabled = true;
+                }
+                // Disable delete/name on system templates.
+                manageInputs(false, templateids, selectValue);
+            });
+
+            // Remove newpersona signifier option on click.
+            select.addEventListener('click', () => {
+                let option = document.querySelector('.new-persona-placeholder');
+                if (option) {
+                    select.removeChild(option);
+                }
+            });
+
+            // Add headlines and spacing to the template select element.
+            // But before adding options make a comparison to check for usertemplates.
+            const useroptions = select.options.length > templateids.length;
+            // Add spacing after "No persona".
+            const spacer = new Option('', '', false, false);
+            spacer.disabled = true;
+            spacer.classList.add('select-spacer');
+            select.insertBefore(spacer, select.options[1]);
+            // Systemtemplates.
+            const systemtemplates = new Option(strSystemTemplates, '', false, false);
+            systemtemplates.disabled = true;
+            select.insertBefore(systemtemplates, select.options[2]);
+            // // Add usertemplate heading.
+            if (useroptions) {
+                const maxValue = Math.max(...templateids.map(Number));
+                const lastSystemOption = Array.from(select.options).find(opt => Number(opt.value) === maxValue);
+                const usertemplates = new Option(strUserTemplates, '', false, false);
+                usertemplates.disabled = true;
+                select.insertBefore(usertemplates, lastSystemOption.nextSibling);
+            }
+
+            // Add listener to addPersona icon.
+            addpersona.addEventListener('click', () => {
+                addPersona(false, select);
+            });
+
+            // Add listener to copyPersona icon.
+            copypersona.addEventListener('click', () => {
+                addPersona(true, select);
+            });
+
+            // To use process_dynamic_submission() for deletion, we use a save button but add a delete hidden input.
+            // Make sure it is set 1 on deletion and to 0 on actual saving process.
+            const actionbuttons = document.querySelectorAll('[data-action="save"]');
+            actionbuttons.forEach((button) => {
+                button.addEventListener('click', (e) => {
+                    const deleteinput = document.querySelector('input[name="delete"]');
+                    if (e.target.dataset.custom == 'delete') {
+                        deleteinput.value = '1';
+                    } else {
+                        deleteinput.value = '0';
+                    }
+                });
+            });
+        });
+    });
+
+    // Enable admintemplate name input on save.
+    personaForm.addEventListener(personaForm.events.SUBMIT_BUTTON_PRESSED, () => {
+        manageInputs(true);
+    });
+
+
+    // Also enable admintemplate name input on error.
+    personaForm.addEventListener(personaForm.events.SERVER_VALIDATION_ERROR, () => {
+        manageInputs(true);
+    });
+
+    // Reload persona on submission.
+    personaForm.addEventListener(personaForm.events.FORM_SUBMITTED, async() => {
+        let reply = await externalServices.reloadPersona(contextid);
+        personaPrompt = reply.prompt;
+        personaInfo = reply.info;
+    });
+};
+
+/**
+ * Click on add new persona, make input writable and reset if no copy.
+ * @param {bool} copy
+ * @param {HTMLElement} select
+ */
+const addPersona = (copy, select) => {
+    // Enable inputs and set a placeholder.
+    personaNewname.disabled = false;
+    personaNewname.placeholder = strNewPersona;
+    personaNewname.value = '';
+    personaInputprompt.disabled = false;
+    personaUserinfo.disabled = false;
+    if (!copy) {
+        personaInputprompt.value = '';
+        personaUserinfo.value = '';
+    }
+    // Add option to signify new persona.
+    let option = document.querySelector('.new-persona-placeholder');
+    if (!option) {
+        let signifierOption = new Option(strNewPersona, '', true, true);
+        signifierOption.classList.add('new-persona-placeholder');
+        select.add(signifierOption);
+    }
+};
+
+const manageInputs = (switchon, templateids = [], selectValue = 42) => {
+    // Switch all inputs on.
+    if (switchon) {
+        personaNewname.disabled = false;
+        personaButtondelete.disabled = false;
+        personaInputprompt.disabled = false;
+        personaUserinfo.disabled = false;
+        return;
+    }
+    // Abort on reload if validation failed.
+    if (document.querySelector('.is-invalid') !== null) {
+        return;
+    }
+    // Switch input between admin and user templates.
+    if (templateids.includes(selectValue) || selectValue == 0) {
+        personaNewname.disabled = true;
+        personaButtondelete.disabled = true;
+        personaInputprompt.disabled = true;
+        personaUserinfo.disabled = true;
+    } else {
+        personaNewname.disabled = false;
+        personaButtondelete.disabled = false;
+        personaInputprompt.disabled = false;
+        personaUserinfo.disabled = false;
     }
 };

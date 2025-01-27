@@ -42,5 +42,11 @@ if ($hassiteconfig) {
                 '',
                 0,
         ));
+        $settings->add(new admin_setting_configtext('block_ai_chat/personalink',
+            new lang_string('personalink', 'block_ai_chat'),
+            '',
+            '',
+            PARAM_TEXT
+        ));
     }
 }
