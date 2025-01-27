@@ -50,7 +50,6 @@ class get_new_conversation_id extends external_api {
      * @throws dml_exception
      */
     public static function execute(int $contextid): array {
-        global $DB;
         self::validate_parameters(self::execute_parameters(), [
             'contextid' => $contextid,
         ]);

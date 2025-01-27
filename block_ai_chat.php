@@ -138,7 +138,7 @@ class block_ai_chat extends block_base {
      */
     #[\Override]
     public function user_can_addto($page) {
-        return true;
+        return false;
     }
 
     /**
