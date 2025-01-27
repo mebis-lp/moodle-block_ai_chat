@@ -49,4 +49,51 @@ class persona {
 
         $DB->insert_records('block_ai_chat_personas', $records);
     }
+
+    /**
+     * Get current persona for blockinstance.
+     * @params int $blockinstanceid
+     * @return string
+     */
+    public static function get_current_persona($blockinstanceid): string {
+        global $DB;
+
+        $sql = "SELECT per.prompt FROM {block_ai_chat_personas} per
+                JOIN {block_ai_chat_personas_selected} sel ON sel.personasid = per.id
+                WHERE sel.contextid = :contextid";
+        $record = $DB->get_record_sql($sql, ['contextid' => $blockinstanceid]);
+        if ($record) {
+            return  $record->prompt;
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * Get all relevant personas for this instance.
+     * @return array
+     */
+    public static function get_all_personas(): array {
+        global $DB, $USER;
+
+        $names = [];
+        $prompts = [];
+        $currentprompt = '';
+        $sql = "SELECT per.id, per.userid, per.name, per.prompt  FROM {block_ai_chat_personas} per
+                        LEFT JOIN {block_ai_chat_personas_selected} sel ON sel.personasid = per.id
+                        WHERE per.userid = 0 OR per.userid = :userid";
+        $personas = $DB->get_records_sql($sql, ['userid' => $USER->id]);
+        foreach ($personas as $key => $persona) {
+            $names[$persona->id] = $persona->name;
+            $prompts[$persona->id] = $persona->prompt;
+                // Get current persona.
+            if ($persona->userid != 0) {
+            $currentprompt = $persona->prompt;
+            }
+        }
+        // Add option "none".
+        $names[0] = get_string('nopersona', 'block_ai_chat');
+
+        return [$currentprompt, $personas, $names, $prompts];
+        }
 }

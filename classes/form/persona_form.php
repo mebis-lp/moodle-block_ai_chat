@@ -42,23 +42,8 @@ class persona_form extends dynamic_form {
         global $USER, $DB;
 
         // Load default and user personas here since select options need to be inserted.
-        $names = [];
-        $prompts = [];
-        $currentprompt = '';
-        $sql = "SELECT per.id, per.userid, per.name, per.prompt  FROM {block_ai_chat_personas} per
-                LEFT JOIN {block_ai_chat_personas_selected} sel ON sel.personasid = per.id
-                WHERE per.userid = 0 OR per.userid = :userid";
-        $this->personas = $DB->get_records_sql($sql, ['userid' => $USER->id]);
-        foreach ($this->personas as $key => $persona) {
-            $names[$persona->id] = $persona->name;
-            $prompts[$persona->id] = $persona->prompt;
-            // Get current persona.
-            if ($persona->userid != 0) {
-                $currentprompt = $persona->prompt;
-            }
-        }
-        // Add option "none".
-        $names[0] = get_string('nopersona', 'block_ai_chat');
+        [$currentprompt, $this->personas, $names, $prompts] = \block_ai_chat\local\persona::get_all_personas();
+
         // Stringify.
         $prompts = json_encode($prompts);
 
@@ -174,9 +159,6 @@ class persona_form extends dynamic_form {
             $record->contextid = $formdata->contextid;
             $result2 = $DB->insert_record('block_ai_chat_personas_selected', $record);
         }
-
-        // If no persona selected delete entry.
-        // TODO
 
         return [
             'update' => true,

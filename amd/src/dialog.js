@@ -28,6 +28,7 @@ let strToday;
 let strYesterday;
 let strDefinePersona;
 let personaForm = {};
+let personaPrompt = '';
 let badge;
 let viewmode;
 let modalopen = false;
@@ -96,8 +97,9 @@ export const init = async(params) => {
     strNewDialog = params.new;
     strHistory = params.history;
     strDefinePersona = params.persona;
+    personaPrompt = params.personaprompt;
     badge = params.badge;
-    // Disable bdage.
+    // Disable badge.
     badge = false;
 
     // Get configuration.
@@ -149,7 +151,6 @@ export const init = async(params) => {
 
     // Add a dynamic form to add a systemprompt/persona to a block instance.
     personaForm = new ModalForm({
-        // Set formclass, depending on component.
         formClass: "block_ai_chat\\form\\persona_form",
         args: {
             contextid: contextid,
@@ -163,22 +164,22 @@ export const init = async(params) => {
         promptbutton.addEventListener('mousedown', async(e) => {
             e.preventDefault();
             personaForm.show();
-                setTimeout(
-                    () => {
-                        const inputprompts = document.querySelector('input[name="prompts"]');
-                        const prompts = JSON.parse(inputprompts.value);
-                        const select = document.querySelector('select[name="name"]');
-                        const textarea = document.querySelector('textarea[name="prompt"]');
-                        select.addEventListener('change', (event) => {
-                            let selectedValue = event.target.value;
-                            if (typeof prompts[selectedValue] !== 'undefined') {
-                                textarea.value = prompts[selectedValue];
-                            } else {
-                                textarea.value = '';
-                            }
-                        });
-                    }, 1200
-                );
+            setTimeout(
+                () => {
+                    const inputprompts = document.querySelector('input[name="prompts"]');
+                    const prompts = JSON.parse(inputprompts.value);
+                    const select = document.querySelector('select[name="name"]');
+                    const textarea = document.querySelector('textarea[name="prompt"]');
+                    select.addEventListener('change', (event) => {
+                        let selectedValue = event.target.value;
+                        if (typeof prompts[selectedValue] !== 'undefined') {
+                            textarea.value = prompts[selectedValue];
+                        } else {
+                            textarea.value = '';
+                        }
+                    });
+                }, 1200
+            );
         });
     }
 
@@ -332,17 +333,15 @@ const enterQuestion = async(question) => {
     // Add to conversation, answer not yet available.
     showMessage(question, 'self', false);
 
-    // For first message, add a system message.
-    if (conversation.messages.length === 0) {
-        const currentUserLanguage = Config.language.substring(0, 2);
-        const LangNames = new Intl.DisplayNames('en', {type: 'language'});
+    // For first message, add the personaprompt if there is onw.
+    if (conversation.messages.length === 0 && personaPrompt != '') {
         conversation.messages.push({
-            'message': 'Answer in ' + LangNames.of(currentUserLanguage),
+            'message': personaPrompt,
             'sender': 'system',
         });
     }
 
-    // Ceck history for length limit.
+    // Check history for length limit.
     const convHistory = await checkMessageHistoryLengthLimit(conversation.messages);
 
     // Options, with conversation history.
