@@ -59,7 +59,9 @@ jobs:
           echo "NVM_DIR=$HOME/.nvm" >> $GITHUB_ENV
 
       - name: Install moodle-plugin-ci
-        run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
+        run: |
+          moodle-plugin-ci add-plugin mebis-lp/moodle-local_ai_manager
+          moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
@@ -95,10 +97,9 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci grunt --max-lint-warnings 0
 
-      # Unittest need local_ai_manager to run successfully.
-      # - name: PHPUnit tests
-      #   if: ${{ !cancelled() }}
-      #   run: moodle-plugin-ci phpunit --fail-on-warning
+      - name: PHPUnit tests
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci phpunit --fail-on-warning
 
       - name: Behat features
         id: behat

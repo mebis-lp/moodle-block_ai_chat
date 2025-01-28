@@ -20,13 +20,14 @@ import {makeRequest} from 'local_ai_manager/make_request';
  *
  * @param {string} purpose
  * @param {string} prompt
+ * @param {number} contextid
  * @param {array} options
  * @returns {string}
  */
-export const askLocalAiManager = async(purpose, prompt, options = []) => {
+export const askLocalAiManager = async(purpose, prompt, contextid, options = []) => {
     let result = {};
     try {
-        result = await makeRequest(purpose, prompt, options);
+        result = await makeRequest(purpose, prompt, 'block_ai_chat', contextid, options);
     } catch (error) {
         result.code = 'aiconnector';
         result.result = error.error + " " + error.message;
