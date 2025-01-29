@@ -68,4 +68,5 @@ $string['showhistory'] = 'Show History';
 $string['showonpagetypes'] = 'Pagetypes on which the chat bot floating button should be shown';
 $string['showonpagetypesdesc'] = 'Insert a list of page types (one string per line) on which the floating button should be shown. Insert "*" to always show the block.';
 $string['submit'] = 'Submit';
+$string['template'] = 'Template';
 $string['yesterday'] = 'Yesterday';

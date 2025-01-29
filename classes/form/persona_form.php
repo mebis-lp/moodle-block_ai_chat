@@ -57,12 +57,28 @@ class persona_form extends dynamic_form {
         $mform->setType('prompts', PARAM_TEXT);
         $mform->setDefault('prompts', $prompts);
 
-        $mform->addElement('select', 'name', get_string('name', 'block_ai_chat'), $names);
+        $mform->addElement('select', 'template', get_string('template', 'block_ai_chat'), $names);
+        $mform->setType('template', PARAM_ALPHANUM);
+
+        $mform->addElement('text', 'name', get_string('name', 'block_ai_chat'), $names);
         $mform->setType('name', PARAM_ALPHANUM);
+        $mform->hideIf('name', 'select', 'noteq', 0);
+
 
         $mform->addElement('textarea', 'prompt', get_string('prompt', 'block_ai_chat'));
         $mform->setType('prompt', PARAM_TEXT);
         $mform->setDefault('prompt', $currentprompt);
+
+        // Since we want a delete button, we create action buttons here and hide the other.
+        $buttonarray = [];
+        $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('submit'));
+        $buttonarray[] = $mform->createElement('submit', 'deletebutton', get_string('delete'));
+        $buttonarray[] = $mform->createElement('submit', 'cancelbutton', get_string('cancel'));
+        $mform->addGroup($buttonarray, 'buttonarraysticky', '', [''], false);
+
+        // We'll add a second submit button to the form that will be used to reset current report conditions.
+
+//        $this->add_action_buttons(false);
     }
 
     /**
@@ -97,10 +113,10 @@ class persona_form extends dynamic_form {
     public function validation($data, $files) {
         $errors = [];
         // $data['name'] = "0" is the option to delete the current persona.
-        if (empty($data['name']) && $data['name'] !== "0") {
+        if (empty($data['name']) && $data['name'] == "0") {
             $errors['name'] = get_string('errorname', 'block_ai_chat');
         }
-        if (empty($data['prompt']) && $data['name'] !== "0") {
+        if (empty($data['prompt'])) {
             $errors['prompt'] = get_string('errorprompt', 'block_ai_chat');
         }
         return $errors;

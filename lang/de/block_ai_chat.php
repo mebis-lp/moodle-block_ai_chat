@@ -67,4 +67,5 @@ $string['showhistory'] = 'Verlauf ansehen';
 $string['showonpagetypes'] = 'Pagetypes, auf denen der Chat-Bot-Floating-Button angezeigt werden soll';
 $string['showonpagetypesdesc'] = 'Hinterlegen Sie hier eine Liste (ein String pro Zeile) von pagetypes, auf denen der Chat-Bot-Floating-Button angezeigt werden soll. Geben Sie "*" ein, um den Block immer anzuzeigen.';
 $string['submit'] = 'Absenden';
+$string['template'] = 'Vorlage';
 $string['yesterday'] = 'Gestern';
