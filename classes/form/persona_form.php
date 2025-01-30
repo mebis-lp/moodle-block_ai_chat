@@ -42,16 +42,25 @@ class persona_form extends dynamic_form {
         global $USER, $DB;
 
         // Load default and user personas here since select options need to be inserted.
-        [$currentprompt, $this->personas, $names, $prompts] = \block_ai_chat\local\persona::get_all_personas();
+        [$currentprompt, $currentname, $this->personas, $names, $prompts, $templateids] = \block_ai_chat\local\persona::get_all_personas();
 
         // Stringify.
         $prompts = json_encode($prompts);
+        $templateids = json_encode($templateids);
 
         $mform =& $this->_form;
 
         $mform->addElement('hidden', 'contextid');
         $mform->setType('contextid', PARAM_INT);
         $mform->setDefault('contextid', $this->optional_param('contextid', null, PARAM_INT));
+
+        $mform->addElement('hidden', 'newpersona');
+        $mform->setType('newpersona', PARAM_INT);
+        $mform->setDefault('newpersona', 0);
+
+        $mform->addElement('hidden', 'templateids');
+        $mform->setType('templateids', PARAM_TEXT);
+        $mform->setDefault('templateids', $templateids);
 
         $mform->addElement('hidden', 'prompts');
         $mform->setType('prompts', PARAM_TEXT);
@@ -60,25 +69,12 @@ class persona_form extends dynamic_form {
         $mform->addElement('select', 'template', get_string('template', 'block_ai_chat'), $names);
         $mform->setType('template', PARAM_ALPHANUM);
 
-        $mform->addElement('text', 'name', get_string('name', 'block_ai_chat'), $names);
+        $mform->addElement('text', 'name', get_string('name', 'block_ai_chat'), ['class' => 'addname']);
         $mform->setType('name', PARAM_ALPHANUM);
-        $mform->hideIf('name', 'select', 'noteq', 0);
-
 
         $mform->addElement('textarea', 'prompt', get_string('prompt', 'block_ai_chat'));
         $mform->setType('prompt', PARAM_TEXT);
         $mform->setDefault('prompt', $currentprompt);
-
-        // Since we want a delete button, we create action buttons here and hide the other.
-        $buttonarray = [];
-        $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('submit'));
-        $buttonarray[] = $mform->createElement('submit', 'deletebutton', get_string('delete'));
-        $buttonarray[] = $mform->createElement('submit', 'cancelbutton', get_string('cancel'));
-        $mform->addGroup($buttonarray, 'buttonarraysticky', '', [''], false);
-
-        // We'll add a second submit button to the form that will be used to reset current report conditions.
-
-//        $this->add_action_buttons(false);
     }
 
     /**
@@ -194,7 +190,8 @@ class persona_form extends dynamic_form {
         $this->personaselected = $DB->get_record_select('block_ai_chat_personas_selected', 'contextid = ?', $param);
         if ($this->personaselected) {
             $data = [
-                'name' => $this->personaselected->personasid,
+                'template' => $this->personaselected->personasid,
+                'name' => $this->personas[$this->personaselected->personasid]->name,
                 'prompt' => $this->personas[$this->personaselected->personasid]->prompt,
             ];
         } else {

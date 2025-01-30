@@ -79,21 +79,28 @@ class persona {
         $names = [];
         $prompts = [];
         $currentprompt = '';
-        $sql = "SELECT per.id, per.userid, per.name, per.prompt  FROM {block_ai_chat_personas} per
+        $sql = "SELECT per.id, per.userid, per.name, per.prompt, sel.personasid FROM {block_ai_chat_personas} per
                         LEFT JOIN {block_ai_chat_personas_selected} sel ON sel.personasid = per.id
                         WHERE per.userid = 0 OR per.userid = :userid";
         $personas = $DB->get_records_sql($sql, ['userid' => $USER->id]);
+        $personaidmax = 0;
+        $templateids = [];
         foreach ($personas as $key => $persona) {
             $names[$persona->id] = $persona->name;
             $prompts[$persona->id] = $persona->prompt;
-                // Get current persona.
-            if ($persona->userid != 0) {
-            $currentprompt = $persona->prompt;
+            // Get current persona.
+            if ($persona->personasid != 0) {
+                $currentprompt = $persona->prompt;
+                $currentname = $persona->name;
+            }
+            // Get templates with userid 0.
+            if ($persona->userid == 0) {
+                $templateids[] = $persona->id;
             }
         }
         // Add option "none".
         $names[0] = get_string('nopersona', 'block_ai_chat');
 
-        return [$currentprompt, $personas, $names, $prompts];
+        return [$currentprompt, $currentname, $personas, $names, $prompts, $templateids];
         }
 }

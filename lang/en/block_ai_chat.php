@@ -53,6 +53,7 @@ $string['maxhistory'] = 'Conversation history restriction';
 $string['maxhistoryreached'] = 'Please be aware, that dialog history is restricted to {$a} messages.
     Older messages wont be included';
 $string['newdialog'] = 'New AI Chat';
+$string['newpersona'] = 'Create new Persona';
 $string['nohistory'] = 'Chat History not found';
 $string['nopersona'] = 'No Persona';
 $string['notice'] = 'Notice';

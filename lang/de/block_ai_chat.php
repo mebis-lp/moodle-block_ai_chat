@@ -52,6 +52,7 @@ $string['maxhistory'] = 'Begrenzung des übermittelten Gesprächsverlaufs';
 $string['maxhistoryreached'] = 'Der Gesprächsverlauf ist begrenzt auf {$a} Nachrichten.
     Aus Effizienzgründen werden ältere Nachrichten nicht berücksichtigt';
 $string['newdialog'] = 'Neuer Chat';
+$string['newpersona'] = 'Neue Persona anlegen';
 $string['nopersona'] = 'Keine Persona';
 $string['nohistory'] = 'Keine Chat-Verlauf vorhanden';
 $string['notice'] = 'Hinweis';

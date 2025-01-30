@@ -42,6 +42,7 @@ let strNewDialog;
 let strToday;
 let strYesterday;
 let strDefinePersona;
+let strNewPersona;
 let personaForm = {};
 let personaPrompt = '';
 let badge;
@@ -112,6 +113,7 @@ export const init = async(params) => {
     strNewDialog = params.new;
     strHistory = params.history;
     strDefinePersona = params.persona;
+    strNewPersona = params.newpersona;
     personaPrompt = params.personaprompt;
     badge = params.badge;
     // Disable badge.
@@ -164,40 +166,14 @@ export const init = async(params) => {
         setView(VIEW_OPENFULL);
     }
 
-    // Add a dynamic form to add a systemprompt/persona to a block instance.
-    personaForm = new ModalForm({
-        formClass: "block_ai_chat\\form\\persona_form",
-        args: {
-            contextid: contextid,
-        },
-        modalConfig: {title: strDefinePersona},
-    });
-
-    // In addition to menu, attach listener to the block prompt button to call the persona modal.
+    // In addition to the dialog_modal menu, attach listener to the block prompt button to call the persona modal.
     let promptbutton = document.getElementById('ai_chat_prompt');
     if (promptbutton) {
         promptbutton.addEventListener('mousedown', async(e) => {
             e.preventDefault();
-            personaForm.show();
-            setTimeout(
-                () => {
-                    const inputprompts = document.querySelector('input[name="prompts"]');
-                    const prompts = JSON.parse(inputprompts.value);
-                    const select = document.querySelector('select[name="name"]');
-                    const textarea = document.querySelector('textarea[name="prompt"]');
-                    select.addEventListener('change', (event) => {
-                        let selectedValue = event.target.value;
-                        if (typeof prompts[selectedValue] !== 'undefined') {
-                            textarea.value = prompts[selectedValue];
-                        } else {
-                            textarea.value = '';
-                        }
-                    });
-                }, 1200
-            );
+            showPersonasModal();
         });
     }
-
 };
 
 /**
@@ -251,7 +227,7 @@ async function showModal() {
         });
         const btnDefinePersona = document.getElementById('block_ai_chat_define_persona');
         btnDefinePersona.addEventListener('click', () => {
-            personaForm.show();
+           showPersonasModal();
         });
         // Views.
         const btnChatwindow = document.getElementById(VIEW_CHATWINDOW);
@@ -889,3 +865,89 @@ const handleScreenWidthChange = (e) => {
         body.classList.add(viewmode);
     }
 };
+
+/**
+ * Show personas modal.
+ */
+function showPersonasModal() {
+    // Always create the dynamic form modal, since it is being destroyed.
+    // By being removeOnClose overriden in ModalForm.
+    // Add a dynamic form to add a systemprompt/persona to a block instance.
+    personaForm = new ModalForm({
+        formClass: "block_ai_chat\\form\\persona_form",
+        moduleName: "block_ai_chat/modal_save_delete_cancel",
+        args: {
+            contextid: contextid,
+        },
+        modalConfig: {
+            title: strDefinePersona,
+            removeOnClose: false,
+        },
+    });
+
+    // Show modal.
+    personaForm.show();
+
+    // If select[template] is changed, change textarea[prompt].
+    // For this, we want to get the value of the hidden input with name="prompts".
+    // So we wait for the modalForm() to be LOADED to get the modal object.
+    // On the modal object we wait for the bodyRendered event to read the input.
+    // Otherwise the document.querySelector would return null.
+    personaForm.addEventListener(personaForm.events.LOADED, () => {
+        personaForm.modal.getRoot().on(ModalEvents.bodyRendered, () => {
+            const inputprompts = document.querySelector('input[name="prompts"]');
+            const prompts = JSON.parse(inputprompts.value);
+            const select = document.querySelector('select[name="template"]');
+            const newname = document.querySelector('input[name="name"]');
+            const textarea = document.querySelector('textarea[name="prompt"]');
+            const newpersona = document.querySelector('input[name="newpersona"]');
+            const inputtemplateids = document.querySelector('input[name="templateids"]');
+            const templateids = JSON.parse(inputtemplateids.value);
+            const buttondelete = document.querySelector('[data-action="delete"]');
+
+            console.log(prompts);
+            // Now we can add a listener to reflect select[template] to textarea[prompt].
+            select.addEventListener('change', (event) => {
+                let selectValue = event.target.value;
+                console.log(selectValue);
+                let selectText = event.target.options[select.selectedIndex].text;
+
+                // Reflect prompt and name.
+                if (typeof prompts[selectValue] !== 'undefined') {
+                    textarea.value = prompts[selectValue];
+                    newname.value = select.options[select.selectedIndex].text;
+                } else {
+                    newname.value = '';
+                    textarea.value = '';
+                }
+                // Disable delete/name on system templates.
+                if (templateids.includes(selectValue) || selectValue == 0) {
+                    newname.disabled = true;
+                    buttondelete.disabled = true;
+                    // Also disable textarea if no persona is chosen.
+                    if (selectValue == 0) {
+                        textarea.disabled = true;
+                    } else {
+                        textarea.disabled = false;
+                    }
+                } else {
+                    newname.disabled = false;
+                    buttondelete.disabled = false;
+                    textarea.disabled = false;
+                }
+            });
+            // Set newpersona to 0 per default.
+            newpersona.value = 0;
+
+            // Change name to "Create new Persona" if systemtemplate is changed.
+            textarea.addEventListener('input', (event) => {
+                if (templateids.includes(select.value)) {
+                    newname.disabled = false;
+                    textarea.disabled = false;
+                    newname.value = strNewPersona;
+                    newpersona.value = 1;
+                }
+            });
+        });
+    });
+}
