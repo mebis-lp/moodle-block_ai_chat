@@ -18,6 +18,7 @@ import * as externalServices from 'block_ai_chat/webservices';
 import Templates from 'core/templates';
 import {alert as displayAlert, exception as displayException, deleteCancelPromise} from 'core/notification';
 import ModalEvents from 'core/modal_events';
+import ModalForm from 'core_form/modalform';
 import * as helper from 'block_ai_chat/helper';
 import * as manager from 'block_ai_chat/ai_manager';
 import {getString} from 'core/str';
@@ -40,6 +41,10 @@ let strHistory;
 let strNewDialog;
 let strToday;
 let strYesterday;
+let strDefinePersona;
+let strNewPersona;
+let personaForm = {};
+let personaPrompt = '';
 let badge;
 let viewmode;
 let modalopen = false;
@@ -53,7 +58,7 @@ let conversation = {
 let allConversations = [];
 // Userid.
 let userid = 0;
-// Course context id.
+// Block context id.
 let contextid = 0;
 // First load.
 let firstLoad = true;
@@ -107,8 +112,11 @@ export const init = async(params) => {
     contextid = params.contextid;
     strNewDialog = params.new;
     strHistory = params.history;
+    strDefinePersona = params.persona;
+    strNewPersona = params.newpersona;
+    personaPrompt = params.personaprompt;
     badge = params.badge;
-    // Disable bdage.
+    // Disable badge.
     badge = false;
 
     // Get configuration.
@@ -116,7 +124,7 @@ export const init = async(params) => {
     tenantConfig = aiConfig;
     chatConfig = aiConfig.purposes.find(p => p.purpose === "chat");
 
-    // Build modal.
+    // Build chat dialog modal.
     modal = await DialogModal.create({
         templateContext: {
             title: strNewDialog,
@@ -156,6 +164,15 @@ export const init = async(params) => {
     // Initial check for screenwidth.
     if (window.innerWidth <= 576) {
         setView(VIEW_OPENFULL);
+    }
+
+    // In addition to the dialog_modal menu, attach listener to the block prompt button to call the persona modal.
+    let promptbutton = document.getElementById('ai_chat_prompt');
+    if (promptbutton) {
+        promptbutton.addEventListener('mousedown', async(e) => {
+            e.preventDefault();
+            showPersonasModal();
+        });
     }
 };
 
@@ -207,6 +224,10 @@ async function showModal() {
         const btnShowHistory = document.getElementById('block_ai_chat_show_history');
         btnShowHistory.addEventListener('click', () => {
             showHistory();
+        });
+        const btnDefinePersona = document.getElementById('block_ai_chat_define_persona');
+        btnDefinePersona.addEventListener('click', () => {
+           showPersonasModal();
         });
         // Views.
         const btnChatwindow = document.getElementById(VIEW_CHATWINDOW);
@@ -303,12 +324,10 @@ const enterQuestion = async(question) => {
     // Add to conversation, answer not yet available.
     showMessage(question, 'self', false);
 
-    // For first message, add a system message.
-    if (conversation.messages.length === 0) {
-        const currentUserLanguage = Config.language.substring(0, 2);
-        const LangNames = new Intl.DisplayNames('en', {type: 'language'});
+    // For first message, add the personaprompt if there is onw.
+    if (conversation.messages.length === 0 && personaPrompt != '') {
         conversation.messages.push({
-            'message': 'Answer in ' + LangNames.of(currentUserLanguage),
+            'message': personaPrompt,
             'sender': 'system',
         });
     }
@@ -846,3 +865,89 @@ const handleScreenWidthChange = (e) => {
         body.classList.add(viewmode);
     }
 };
+
+/**
+ * Show personas modal.
+ */
+function showPersonasModal() {
+    // Always create the dynamic form modal, since it is being destroyed.
+    // By being removeOnClose overriden in ModalForm.
+    // Add a dynamic form to add a systemprompt/persona to a block instance.
+    personaForm = new ModalForm({
+        formClass: "block_ai_chat\\form\\persona_form",
+        moduleName: "block_ai_chat/modal_save_delete_cancel",
+        args: {
+            contextid: contextid,
+        },
+        modalConfig: {
+            title: strDefinePersona,
+            removeOnClose: false,
+        },
+    });
+
+    // Show modal.
+    personaForm.show();
+
+    // If select[template] is changed, change textarea[prompt].
+    // For this, we want to get the value of the hidden input with name="prompts".
+    // So we wait for the modalForm() to be LOADED to get the modal object.
+    // On the modal object we wait for the bodyRendered event to read the input.
+    // Otherwise the document.querySelector would return null.
+    personaForm.addEventListener(personaForm.events.LOADED, () => {
+        personaForm.modal.getRoot().on(ModalEvents.bodyRendered, () => {
+            const inputprompts = document.querySelector('input[name="prompts"]');
+            const prompts = JSON.parse(inputprompts.value);
+            const select = document.querySelector('select[name="template"]');
+            const newname = document.querySelector('input[name="name"]');
+            const textarea = document.querySelector('textarea[name="prompt"]');
+            const newpersona = document.querySelector('input[name="newpersona"]');
+            const inputtemplateids = document.querySelector('input[name="templateids"]');
+            const templateids = JSON.parse(inputtemplateids.value);
+            const buttondelete = document.querySelector('[data-action="delete"]');
+
+            console.log(prompts);
+            // Now we can add a listener to reflect select[template] to textarea[prompt].
+            select.addEventListener('change', (event) => {
+                let selectValue = event.target.value;
+                console.log(selectValue);
+                let selectText = event.target.options[select.selectedIndex].text;
+
+                // Reflect prompt and name.
+                if (typeof prompts[selectValue] !== 'undefined') {
+                    textarea.value = prompts[selectValue];
+                    newname.value = select.options[select.selectedIndex].text;
+                } else {
+                    newname.value = '';
+                    textarea.value = '';
+                }
+                // Disable delete/name on system templates.
+                if (templateids.includes(selectValue) || selectValue == 0) {
+                    newname.disabled = true;
+                    buttondelete.disabled = true;
+                    // Also disable textarea if no persona is chosen.
+                    if (selectValue == 0) {
+                        textarea.disabled = true;
+                    } else {
+                        textarea.disabled = false;
+                    }
+                } else {
+                    newname.disabled = false;
+                    buttondelete.disabled = false;
+                    textarea.disabled = false;
+                }
+            });
+            // Set newpersona to 0 per default.
+            newpersona.value = 0;
+
+            // Change name to "Create new Persona" if systemtemplate is changed.
+            textarea.addEventListener('input', (event) => {
+                if (templateids.includes(select.value)) {
+                    newname.disabled = false;
+                    textarea.disabled = false;
+                    newname.value = strNewPersona;
+                    newpersona.value = 1;
+                }
+            });
+        });
+    });
+}

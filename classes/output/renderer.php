@@ -37,11 +37,17 @@ class renderer extends plugin_renderer_base {
      * @return string html for the page
      */
     public function render_ai_chat_content(\block_ai_chat $block): string {
-        global $USER;
+        global $DB, $USER;
+
+        // Get current personaprompt.
+        $personaprompt = \block_ai_chat\local\persona::get_current_persona($block->context->id);
 
         $params = new \stdClass;
         $params->new = get_string('newdialog', 'block_ai_chat');
         $params->history = get_string('history', 'block_ai_chat');
+        $params->persona = get_string('definepersona', 'block_ai_chat');
+        $params->newpersona = get_string('newpersona', 'block_ai_chat');
+        $params->personaprompt = $personaprompt;
         $params->userid = $USER->id;
         $params->contextid = $block->context->id;
         $params->badge = [
