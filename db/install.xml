@@ -35,5 +35,20 @@
                 <INDEX NAME="idx-contextid" UNIQUE="true" FIELDS="contextid"/>
             </INDEXES>
         </TABLE>
+
+        <TABLE NAME="block_ai_chat_options" COMMENT="Save options per block instance">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Name of option"/>
+                <FIELD NAME="value" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Value of option"/>
+                <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Block contextid"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+            <INDEXES>
+                <INDEX NAME="idx-contextid" UNIQUE="true" FIELDS="contextid"/>
+            </INDEXES>
+        </TABLE>
     </TABLES>
 </XMLDB>

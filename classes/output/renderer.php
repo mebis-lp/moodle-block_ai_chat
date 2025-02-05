@@ -51,6 +51,8 @@ class renderer extends plugin_renderer_base {
         $params->systemtemplates = get_string('systemtemplates', 'block_ai_chat');
         $params->personaprompt = $personaprompt;
         $params->personainfo = $personainfo;
+        $params->showpersona = has_capability('block/ai_chat:addinstance', $block->context, $USER->id);
+        $params->showoptions = has_capability('block/ai_chat:addinstance', $block->context, $USER->id);
         $params->personalink = get_config('block_ai_chat', 'personalink');
         $params->showpersona = is_siteadmin() || (has_capability('block/ai_chat:addinstance', $block->context, $USER->id)
             && $block->instance->parentcontextid != 1);

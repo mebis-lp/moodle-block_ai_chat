@@ -53,6 +53,8 @@ let personaButtondelete = {};
 let personaUserinfo = {};
 let personaInputprompt = {};
 let showPersona = false;
+let optionsForm = {};
+let showOptions = false;
 let badge;
 let viewmode;
 let modalopen = false;
@@ -72,7 +74,7 @@ let contextid = 0;
 let firstLoad = true;
 // AI in process of answering.
 let aiAtWork = false;
-// Maximum history included in query.
+// Maximum history included in query, should be reset via webservice.
 let maxHistory = 5;
 // Remember warnings for maximum history in this session.
 let maxHistoryWarnings = new Set();
@@ -127,6 +129,7 @@ export const init = async(params) => {
     personaPrompt = params.personaprompt;
     personaInfo = params.personainfo;
     showPersona = params.showpersona;
+    showOptions = params.showoptions;
     personaLink = params.personalink;
     badge = params.badge;
     // Disable badge.
@@ -143,6 +146,7 @@ export const init = async(params) => {
             title: strNewDialog,
             badge: badge,
             showPersona: showPersona,
+            showOptions: showOptions,
         },
     });
 
@@ -213,8 +217,9 @@ async function showModal() {
         showConversation();
 
         // Get conversationcontext message limit.
-        let conversationcontextLimit = await externalServices.getConversationcontextLimit(contextid);
-        maxHistory = conversationcontextLimit.limit;
+        let reply = await externalServices.getConversationcontextLimit(contextid);
+        maxHistory = reply.limit;
+
 
         // Add listeners for dropdownmenus.
         // Actions.
@@ -231,9 +236,17 @@ async function showModal() {
             showHistory();
         });
         const btnDefinePersona = document.getElementById('block_ai_chat_define_persona');
-        btnDefinePersona.addEventListener('click', () => {
-           showPersonasModal();
-        });
+        if (btnDefinePersona) {
+            btnDefinePersona.addEventListener('click', () => {
+                showPersonasModal();
+            });
+        }
+        const btnOptions = document.getElementById('block_ai_chat_options');
+        if (btnOptions) {
+            btnOptions.addEventListener('click', () => {
+                showOptionsModal();
+            });
+        }
         // Views.
         const btnChatwindow = document.getElementById(VIEW_CHATWINDOW);
         btnChatwindow.addEventListener('click', () => {
@@ -777,7 +790,6 @@ const checkMessageHistoryLengthLimit = async(messages) => {
         // Cut history.
         let shortenedMessages = [messages[0], ...messages.slice(-maxHistory)];
 
-
         // Show warning once per session.
         if (!maxHistoryWarnings.has(conversation.id)) {
             const maxHistoryString = await getString('maxhistory', 'block_ai_chat', maxHistory);
@@ -971,14 +983,16 @@ const showPersonasModal = () => {
             spacer.disabled = true;
             spacer.classList.add('select-spacer');
             select.insertBefore(spacer, select.options[1]);
-            // Systemtemplates.
+            // Add systemtemplates heading.
             const systemtemplates = new Option(strSystemTemplates, '', false, false);
             systemtemplates.disabled = true;
             select.insertBefore(systemtemplates, select.options[2]);
-            // // Add usertemplate heading.
+            // // Add usertemplates heading.
             if (useroptions) {
+                // Get last systemtemplate position
                 const maxValue = Math.max(...templateids.map(Number));
                 const lastSystemOption = Array.from(select.options).find(opt => Number(opt.value) === maxValue);
+                // Add heading.
                 const usertemplates = new Option(strUserTemplates, '', false, false);
                 usertemplates.disabled = true;
                 select.insertBefore(usertemplates, lastSystemOption.nextSibling);
@@ -1027,6 +1041,28 @@ const showPersonasModal = () => {
         personaPrompt = reply.prompt;
         personaInfo = reply.info;
     });
+};
+
+
+/**
+ * Show options modal.
+ */
+const showOptionsModal = () => {
+    // Add a dynamic form to add options.
+    // Always create the dynamic form modal, since it is being destroyed.
+    optionsForm = new ModalForm({
+        formClass: "block_ai_chat\\form\\options_form",
+        moduleName: "core/modal_save_cancel",
+        args: {
+            contextid: contextid,
+        },
+        modalConfig: {
+            title: getString('options'),
+        },
+    });
+
+    // Show modal.
+    optionsForm.show();
 };
 
 /**
