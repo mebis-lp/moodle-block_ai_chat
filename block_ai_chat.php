@@ -94,6 +94,10 @@ class block_ai_chat extends block_base {
         $aioutput = $this->page->get_renderer('block_ai_chat');
         $this->content->text = $aioutput->render_ai_chat_content($this);
 
+        if ($this->page->user_is_editing()) {
+            return $this->content;
+        }
+
         return $this->content;
     }
 

@@ -14,22 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace block_ai_chat\local;
+
+
 /**
- * Version information for block_ai_chat
+ * Class helper
  *
  * @package    block_ai_chat
- * @copyright  2024 ISB Bayern
- * @author     Tobias Garske
+ * @copyright  2025 Tobias Garske, ISB Bayern
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+class options {
 
-defined('MOODLE_INTERNAL') || die();
+    /**
+     * Get current chat options for blockinstance.
+     * @param int $blockinstanceid
+     * @return array
+     */
+    public static function get_options($blockinstanceid): array {
+        global $DB;
 
-$plugin->release = '0.1.2';
-$plugin->version = 2025021000;
-$plugin->requires = 2024042200;
-$plugin->component = 'block_ai_chat';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = [
-    'local_ai_manager' => 2025010701,
-];
+        return $DB->get_records_select('block_ai_chat_options', 'contextid = ?', [$blockinstanceid]);
+    }
+
+}
