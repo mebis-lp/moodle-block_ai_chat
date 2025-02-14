@@ -73,6 +73,9 @@ class get_all_conversations extends external_api {
             if (empty($value->itemid)) {
                 continue;
             }
+            if ($value->purpose !== 'chat') {
+                continue;
+            }
             $tmpmessages = [
                 [
                     'message' => format_text($value->prompttext, FORMAT_MARKDOWN),

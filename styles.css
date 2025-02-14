@@ -127,10 +127,9 @@
   padding: 0 0.1rem 0 0.1rem;
   position: relative;
 }
-.block_ai_chat_modal .block_ai_chat-input .ai_chat_icon {
+.block_ai_chat_modal .block_ai_chat-input .ai_chat_icon_button {
   position: absolute;
-  top: 1.2rem;
-  left: 0.5rem;
+  top: 0.6rem;
 }
 .block_ai_chat_modal .block_ai_chat-input textarea {
   height: inherit;
@@ -148,13 +147,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.block_ai_chat_modal .block_ai_chat-input button {
+.block_ai_chat_modal .block_ai_chat-input button[type=submit] {
   position: absolute;
   display: flex;
   bottom: 0.5rem;
   right: 0.7rem;
 }
-.block_ai_chat_modal .block_ai_chat-input button i {
+.block_ai_chat_modal .block_ai_chat-input button[type=submit] i {
   padding: 6.5px 0;
 }
 .block_ai_chat_modal .headeroptions {

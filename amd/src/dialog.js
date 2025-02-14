@@ -27,6 +27,9 @@ import {renderUserQuota} from 'local_ai_manager/userquota';
 import {getAiConfig} from 'local_ai_manager/config';
 import LocalStorage from 'core/localstorage';
 import {escapeHTML, hash} from './helper';
+import * as TinyAiUtils from 'tiny_ai/utils';
+import TinyAiEditorUtils from 'tiny_ai/editor_utils';
+import {constants as TinyAiConstants} from 'tiny_ai/constants';
 
 // Declare variables.
 const VIEW_CHATWINDOW = 'block_ai_chat_chatwindow';
@@ -284,6 +287,37 @@ async function showModal() {
             const notice = await getString('notice', 'block_ai_chat');
             await displayAlert(notice, message);
         }
+
+        const aiUtilsButton = document.querySelector('[data-action="openaiutils"]');
+        const uniqid = Math.random().toString(16).slice(2);
+
+        await TinyAiUtils.init(uniqid, TinyAiConstants.modalModes.standalone);
+        aiUtilsButton.addEventListener('click', async() => {
+            // We try to find selected text or images and inject it into the AI tools.
+            const selectionObject = window.getSelection();
+            const range = selectionObject.getRangeAt(0);
+            const container = document.createElement('div');
+            container.appendChild(range.cloneContents());
+            const images = container.querySelectorAll('img');
+            if (images.length > 0 && images[0].src) {
+                // If there are more than one we just use the first one.
+                const image = images[0];
+                // This should work for both external and data urls.
+                const fetchResult = await fetch(image.src);
+                const data = await fetchResult.blob();
+                TinyAiUtils.getDatamanager(uniqid).setSelectionImg(data);
+            }
+
+            // If currently there is text selected we inject it.
+            if (selectionObject.toString() && selectionObject.toString().length > 0) {
+                TinyAiUtils.getDatamanager(uniqid).setSelection(selectionObject.toString());
+            }
+
+            const editorUtils = new TinyAiEditorUtils(uniqid, 'block_ai_chat', contextid, userid, null);
+            TinyAiUtils.setEditorUtils(uniqid, editorUtils);
+            await editorUtils.displayDialogue();
+        });
+
         firstLoad = false;
     }
 
