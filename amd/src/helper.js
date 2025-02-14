@@ -43,13 +43,17 @@ export const copyToClipboard = (element) => {
 export const attachCopyListenerLast = () => {
     const elements = document.querySelectorAll(".block_ai_chat_modal .copy");
     const lastquestion = elements[elements.length - 2];
-    lastquestion.addEventListener('click', function() {
-        copyToClipboard(lastquestion);
-    });
+    if (lastquestion) {
+        lastquestion.addEventListener('click', function() {
+            copyToClipboard(lastquestion);
+        });
+    }
     const lastanswer = elements[elements.length - 1];
-    lastanswer.addEventListener('click', function() {
-        copyToClipboard(lastanswer);
-    });
+    if (lastanswer) {
+        lastanswer.addEventListener('click', function () {
+            copyToClipboard(lastanswer);
+        });
+    }
 };
 
 
