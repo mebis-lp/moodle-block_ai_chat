@@ -50,7 +50,7 @@ export const attachCopyListenerLast = () => {
     }
     const lastanswer = elements[elements.length - 1];
     if (lastanswer) {
-        lastanswer.addEventListener('click', function () {
+        lastanswer.addEventListener('click', function() {
             copyToClipboard(lastanswer);
         });
     }
