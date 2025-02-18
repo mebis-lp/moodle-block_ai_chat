@@ -87,6 +87,12 @@ class block_ai_chat extends block_base {
                 return $this->content;
             }
         }
+        $coursecontext = \local_ai_manager\ai_manager_utils::find_closest_parent_course_context($context);
+        if (is_null($coursecontext) && intval($aiconfig['scope']) === userinfo::SCOPE_COURSES_ONLY) {
+            if ($aiconfig['role'] === userinfo::get_role_as_string(userinfo::ROLE_BASIC)) {
+                return $this->content;
+            }
+        }
 
         $this->content = new stdClass;
 
