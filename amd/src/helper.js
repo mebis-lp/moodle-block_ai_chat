@@ -126,9 +126,8 @@ export const renderMathjax = () => {
         // Change delimiters so they work with chatgpt.
         window.MathJax.Hub.Config({
             tex2jax: {
-                inlineMath: [['$', '$'], ['\\(', '\\)'], ['(', ')']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]'], ['[', ']']],
-                processEscapes: true,
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
             },
         });
         const content = document.querySelector('.block_ai_chat-output');
@@ -143,4 +142,3 @@ export const renderMathjax = () => {
         }
     }
 };
-
