@@ -109,7 +109,11 @@ class get_all_conversations extends external_api {
         return $result;
     }
 
-    #[\Override]
+    /**
+     * Describes the return structure of the service.
+     *
+     * @return external_multiple_structure
+     */
     public static function execute_returns(): external_multiple_structure {
         return new external_multiple_structure(
             new external_single_structure([

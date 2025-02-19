@@ -224,7 +224,6 @@ async function showModal() {
         let reply = await externalServices.getConversationcontextLimit(contextid);
         maxHistory = reply.limit;
 
-
         // Add listeners for dropdownmenus.
         // Actions.
         const btnNewDialog = document.getElementById('block_ai_chat_new_dialog');
@@ -395,7 +394,12 @@ const enterQuestion = async(question) => {
     };
 
     // Check history for length limit.
-    const convHistory = await checkMessageHistoryLengthLimit(conversation.messages);
+    let convHistory = await checkMessageHistoryLengthLimit(conversation.messages);
+
+    // Since some models cant handle an empty system message, remove from convHistory.
+    if (personaPrompt.trim() === '') {
+        convHistory.shift();
+    }
 
     // Options, with conversation history.
     const options = {
@@ -1157,6 +1161,7 @@ const manageInputs = (switchon, templateids = [], selectValue = 42) => {
 };
 
 const showUserinfo = async(first) => {
+    // If persona is updated, delete current infobox.
     if (!first) {
         const toDelete = document.querySelector('.local_ai_manager-infobox.alert.alert-info');
         if (toDelete) {
@@ -1164,11 +1169,13 @@ const showUserinfo = async(first) => {
         }
     }
 
-    const targetElement = document.querySelector('.block_ai_chat_modal_body .infobox');
-    const templateContext = {
-        'persona': personaInfo,
-        'personainfourl': personaLink,
-    };
-    const {html, js} = await Templates.renderForPromise('block_ai_chat/persona_infobox', templateContext);
-    Templates.appendNodeContents(targetElement, html, js);
+    if (personaInfo.trim() != '') {
+        const targetElement = document.querySelector('.block_ai_chat_modal_body .infobox');
+        const templateContext = {
+            'persona': personaInfo,
+            'personainfourl': personaLink,
+        };
+        const {html, js} = await Templates.renderForPromise('block_ai_chat/persona_infobox', templateContext);
+        Templates.appendNodeContents(targetElement, html, js);
+    }
 };
