@@ -24,6 +24,7 @@ import * as manager from 'block_ai_chat/ai_manager';
 import {getString} from 'core/str';
 import {renderInfoBox} from 'local_ai_manager/infobox';
 import {renderUserQuota} from 'local_ai_manager/userquota';
+import {renderWarningBox} from 'local_ai_manager/warningbox';
 import {getAiConfig} from 'local_ai_manager/config';
 import LocalStorage from 'core/localstorage';
 import {escapeHTML, hash} from './helper';
@@ -270,15 +271,14 @@ async function showModal() {
         await renderInfoBox(
             'block_ai_chat', userid, '.block_ai_chat_modal_body [data-content="local_ai_manager_infobox"]', ['chat']
         );
+        // Show ai info warning.
+        const warningBoxSelector = '.local_ai_manager-ai-warning';
+        if (document.querySelector(warningBoxSelector)) {
+            await renderWarningBox(warningBoxSelector);
+        }
         // Show persona info.
         if (personaPrompt !== '') {
-            const targetElement = document.querySelector('.block_ai_chat_modal_body [data-content="local_ai_manager_infobox"]');
-            const templateContext = {
-                'persona': personaInfo,
-                'personainfourl': personaLink,
-            };
-            const {html, js} = await Templates.renderForPromise('block_ai_chat/persona_infobox', templateContext);
-            Templates.appendNodeContents(targetElement, html, js);
+            showUserinfo(true);
         }
 
         // Check if all permissions and settings are correct.
@@ -1073,11 +1073,12 @@ const showPersonasModal = () => {
         manageInputs(true);
     });
 
-    // Reload persona on submission.
+    // Reload persona and rewrite info on submission.
     personaForm.addEventListener(personaForm.events.FORM_SUBMITTED, async() => {
         let reply = await externalServices.reloadPersona(contextid);
         personaPrompt = reply.prompt;
         personaInfo = reply.info;
+        showUserinfo(false);
     });
 };
 
@@ -1153,4 +1154,21 @@ const manageInputs = (switchon, templateids = [], selectValue = 42) => {
         personaInputprompt.disabled = false;
         personaUserinfo.disabled = false;
     }
+};
+
+const showUserinfo = async(first) => {
+    if (!first) {
+        const toDelete = document.querySelector('.local_ai_manager-infobox.alert.alert-info');
+        if (toDelete) {
+            toDelete.remove();
+        }
+    }
+
+    const targetElement = document.querySelector('.block_ai_chat_modal_body .infobox');
+    const templateContext = {
+        'persona': personaInfo,
+        'personainfourl': personaLink,
+    };
+    const {html, js} = await Templates.renderForPromise('block_ai_chat/persona_infobox', templateContext);
+    Templates.appendNodeContents(targetElement, html, js);
 };

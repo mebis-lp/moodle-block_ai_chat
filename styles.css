@@ -204,13 +204,14 @@
 .block_ai_chat_modal .block_ai_chat_modal_body .infobox {
   display: flex;
   align-items: center;
-  flex-direction: row-reverse;
+  flex-direction: column;
   padding-bottom: 0.4rem;
   margin-top: -0.5rem;
   z-index: 1;
   min-height: 2rem;
 }
-.block_ai_chat_modal .block_ai_chat_modal_body .infobox .local_ai_manager-infobox.alert.alert-success {
+.block_ai_chat_modal .block_ai_chat_modal_body .infobox .local_ai_manager-infobox.alert.alert-success,
+.block_ai_chat_modal .block_ai_chat_modal_body .infobox .local_ai_manager-ai-warning {
   color: #6c757d;
   background-color: inherit;
   font-size: 0.6rem;

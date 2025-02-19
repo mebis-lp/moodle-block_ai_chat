@@ -214,12 +214,13 @@
         .infobox {
            display: flex;
            align-items: center;
-           flex-direction: row-reverse;
+           flex-direction: column;
            padding-bottom: .4rem;
            margin-top: -.5rem;
            z-index: 1;
            min-height: 2rem;
-           .local_ai_manager-infobox.alert.alert-success {
+           .local_ai_manager-infobox.alert.alert-success,
+           .local_ai_manager-ai-warning {
                color: #6c757d;
                background-color: inherit;
                font-size: .6rem;
@@ -377,3 +378,4 @@ body.block_ai_chat_replacehelp {
 .select-spacer {
     font-size: .25rem;
 }
+
