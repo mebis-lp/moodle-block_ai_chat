@@ -27,7 +27,7 @@ import {renderUserQuota} from 'local_ai_manager/userquota';
 import {renderWarningBox} from 'local_ai_manager/warningbox';
 import {getAiConfig} from 'local_ai_manager/config';
 import LocalStorage from 'core/localstorage';
-import {escapeHTML, hash} from './helper';
+import {escapeHTML, hash, scrollToBottom} from './helper';
 import * as TinyAiUtils from 'tiny_ai/utils';
 import TinyAiEditorUtils from 'tiny_ai/editor_utils';
 import {constants as TinyAiConstants} from 'tiny_ai/constants';
@@ -473,6 +473,12 @@ const showReply = async(text) => {
     let awaitdivs = document.querySelectorAll('.block_ai_chat_modal .awaitanswer');
     const awaitdiv = awaitdivs[awaitdivs.length - 1];
     awaitdiv.classList.remove('awaitanswer');
+
+    // Check if answer is smaller than the viewport, if so scroll to bottom.
+    const container = document.querySelector('.block_ai_chat-output-wrapper');
+    if (field.scrollHeight < container.clientHeight) {
+        scrollToBottom();
+    }
 };
 
 const showMessages = async() => {
