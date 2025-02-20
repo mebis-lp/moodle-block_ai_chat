@@ -16,10 +16,8 @@
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
             </KEYS>
-            <INDEXES>
-                <INDEX NAME="idx-userid" UNIQUE="false" FIELDS="userid"/>
-            </INDEXES>
         </TABLE>
 
         <TABLE NAME="block_ai_chat_personas_selected" COMMENT="Save blockcontextid and selected persona">
@@ -30,10 +28,8 @@
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="contextid" TYPE="foreign" FIELDS="contextid" REFTABLE="context" REFFIELDS="id"/>
             </KEYS>
-            <INDEXES>
-                <INDEX NAME="idx-contextid" UNIQUE="true" FIELDS="contextid"/>
-            </INDEXES>
         </TABLE>
 
         <TABLE NAME="block_ai_chat_options" COMMENT="Save options per block instance">
@@ -45,10 +41,8 @@
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="contextid" TYPE="foreign" FIELDS="contextid" REFTABLE="context" REFFIELDS="id"/>
             </KEYS>
-            <INDEXES>
-                <INDEX NAME="idx-contextid" UNIQUE="true" FIELDS="contextid"/>
-            </INDEXES>
         </TABLE>
     </TABLES>
 </XMLDB>
