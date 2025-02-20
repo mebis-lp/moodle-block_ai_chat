@@ -78,7 +78,7 @@
        right: 0;
        padding: .5rem .75rem 2.5rem 2.75rem;
    }
-   .message:hover .copy {
+    .message:hover .copy {
        visibility: visible;
        cursor: pointer;
     }
@@ -300,6 +300,14 @@ body.block_ai_chat_dockright {
     .block_ai_chat_modal {
         width: 0;
         height: 0;
+    }
+    [data-content="local_ai_manager_infobox"],
+    .local_ai_manager-ai-warning {
+        width: 100%;
+        div {
+            justify-content: space-between;
+            align-items: flex-start;
+        }
     }
 }
 

@@ -287,6 +287,18 @@ body.block_ai_chat_dockright .block_ai_chat_modal {
   width: 0;
   height: 0;
 }
+body.block_ai_chat_chatwindow [data-content=local_ai_manager_infobox],
+body.block_ai_chat_chatwindow .local_ai_manager-ai-warning,
+body.block_ai_chat_dockright [data-content=local_ai_manager_infobox],
+body.block_ai_chat_dockright .local_ai_manager-ai-warning {
+  width: 100%;
+}
+body.block_ai_chat_chatwindow [data-content=local_ai_manager_infobox] div,
+body.block_ai_chat_chatwindow .local_ai_manager-ai-warning div,
+body.block_ai_chat_dockright [data-content=local_ai_manager_infobox] div,
+body.block_ai_chat_dockright .local_ai_manager-ai-warning div {
+  justify-content: space-between;
+}
 
 body.block_ai_chat_openfull .block_ai_chat_modal .modal-dialog {
   max-width: 95%;
