@@ -59,6 +59,7 @@ let personaInputprompt = {};
 let showPersona = false;
 let optionsForm = {};
 let showOptions = false;
+let isAdmin = false;
 let badge;
 let viewmode;
 let modalopen = false;
@@ -135,6 +136,7 @@ export const init = async(params) => {
     showPersona = params.showpersona;
     showOptions = params.showoptions;
     personaLink = params.personalink;
+    isAdmin = params.isadmin;
     badge = params.badge;
     // Disable badge.
     badge = false;
@@ -1141,7 +1143,7 @@ const addPersona = (copy, select) => {
 
 const manageInputs = (switchon, templateids = [], selectValue = 42) => {
     // Switch all inputs on.
-    if (switchon) {
+    if (switchon || isAdmin) {
         personaNewname.disabled = false;
         personaButtondelete.disabled = false;
         personaInputprompt.disabled = false;

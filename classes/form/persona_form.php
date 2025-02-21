@@ -146,7 +146,20 @@ class persona_form extends dynamic_form {
 
         $formdata = $this->get_data();
 
+        // Remove empty spaces and added "\u{2002}" in get_all_personas().
+        $formdata->name = str_replace("\u{2002}", "", trim($formdata->name));
+
         $context = $this->get_context_for_dynamic_submission();
+
+        // Admintemplates are saved with userid 0, so change if admin is editing admintemplate or adds new template.
+        if (is_siteadmin() && (
+            $this->personas[$formdata->template]->userid == "0"
+            || !isset($formdata->template)
+        )) {
+            $userid = "0";
+        } else {
+            $userid = $USER->id;
+        }
 
         // Selection: No persona.
         if ($formdata->template == 0 && $formdata->name == "") {
@@ -159,7 +172,7 @@ class persona_form extends dynamic_form {
 
         // Delete current persona.
         if ($formdata->delete == 1) {
-            $params = ['id' => $formdata->template, 'userid' => $USER->id];
+            $params = ['id' => $formdata->template, 'userid' => $userid];
             $DB->delete_records('block_ai_chat_personas', $params);
             // Check if selected should be deleted too.
             $params = ['contextid' => $formdata->contextid, 'personasid' => $formdata->template];
@@ -188,7 +201,7 @@ class persona_form extends dynamic_form {
             // Update if existing Persona exists and name has not changed.
             $record = new \stdClass();
             $record->id = $formdata->template;
-            $record->userid = $USER->id;
+            $record->userid = $userid;
             $record->prompt = $formdata->prompt;
             $record->userinfo = $formdata->userinfo;
             $record->timemodified = time();
@@ -197,7 +210,7 @@ class persona_form extends dynamic_form {
         } else {
             // If name is changed, create new entry.
             $record = new \stdClass();
-            $record->userid = $USER->id;
+            $record->userid = $userid;
             $record->name = $formdata->name;
             $record->prompt = $formdata->prompt;
             $record->userinfo = $formdata->userinfo;

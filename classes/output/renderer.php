@@ -60,6 +60,7 @@ class renderer extends plugin_renderer_base {
             && $block->instance->parentcontextid != 1);
         $params->userid = $USER->id;
         $params->contextid = $block->context->id;
+        $params->isadmin = is_siteadmin();
         $params->badge = [
                 'text' => get_string('private', 'block_ai_chat'),
                 'title' => get_string('badgeprivate', 'block_ai_chat'),
