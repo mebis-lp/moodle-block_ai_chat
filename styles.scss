@@ -78,7 +78,7 @@
        right: 0;
        padding: .5rem .75rem 2.5rem 2.75rem;
    }
-   .message:hover .copy {
+    .message:hover .copy {
        visibility: visible;
        cursor: pointer;
     }
@@ -214,12 +214,13 @@
         .infobox {
            display: flex;
            align-items: center;
-           flex-direction: row-reverse;
+           flex-direction: column;
            padding-bottom: .4rem;
            margin-top: -.5rem;
            z-index: 1;
            min-height: 2rem;
-           .local_ai_manager-infobox.alert.alert-success {
+           .local_ai_manager-infobox.alert.alert-success,
+           .local_ai_manager-ai-warning {
                color: #6c757d;
                background-color: inherit;
                font-size: .6rem;
@@ -300,6 +301,14 @@ body.block_ai_chat_dockright {
         width: 0;
         height: 0;
     }
+    [data-content="local_ai_manager_infobox"],
+    .local_ai_manager-ai-warning {
+        width: 100%;
+        div {
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+    }
 }
 
 body.block_ai_chat_openfull {
@@ -377,3 +386,4 @@ body.block_ai_chat_replacehelp {
 .select-spacer {
     font-size: .25rem;
 }
+

@@ -24,9 +24,10 @@ import * as manager from 'block_ai_chat/ai_manager';
 import {getString} from 'core/str';
 import {renderInfoBox} from 'local_ai_manager/infobox';
 import {renderUserQuota} from 'local_ai_manager/userquota';
+import {renderWarningBox} from 'local_ai_manager/warningbox';
 import {getAiConfig} from 'local_ai_manager/config';
 import LocalStorage from 'core/localstorage';
-import {escapeHTML, hash} from './helper';
+import {escapeHTML, hash, scrollToBottom} from './helper';
 import * as TinyAiUtils from 'tiny_ai/utils';
 import TinyAiEditorUtils from 'tiny_ai/editor_utils';
 import {constants as TinyAiConstants} from 'tiny_ai/constants';
@@ -217,12 +218,11 @@ async function showModal() {
         await getConversations();
 
         // Show conversation.
-        showConversation();
+        await showConversation();
 
         // Get conversationcontext message limit.
         let reply = await externalServices.getConversationcontextLimit(contextid);
         maxHistory = reply.limit;
-
 
         // Add listeners for dropdownmenus.
         // Actions.
@@ -270,15 +270,14 @@ async function showModal() {
         await renderInfoBox(
             'block_ai_chat', userid, '.block_ai_chat_modal_body [data-content="local_ai_manager_infobox"]', ['chat']
         );
+        // Show ai info warning.
+        const warningBoxSelector = '.local_ai_manager-ai-warning';
+        if (document.querySelector(warningBoxSelector)) {
+            await renderWarningBox(warningBoxSelector);
+        }
         // Show persona info.
         if (personaPrompt !== '') {
-            const targetElement = document.querySelector('.block_ai_chat_modal_body [data-content="local_ai_manager_infobox"]');
-            const templateContext = {
-                'persona': personaInfo,
-                'personainfourl': personaLink,
-            };
-            const {html, js} = await Templates.renderForPromise('block_ai_chat/persona_infobox', templateContext);
-            Templates.appendNodeContents(targetElement, html, js);
+            showUserinfo(true);
         }
 
         // Check if all permissions and settings are correct.
@@ -340,7 +339,7 @@ const getConversations = async() => {
  * Function to set conversation.
  * @param {*} id
  */
-const showConversation = (id = 0) => {
+const showConversation = async(id = 0) => {
     // Dissallow changing conversations when question running.
     if (aiAtWork) {
         return;
@@ -358,7 +357,8 @@ const showConversation = (id = 0) => {
     }
     clearMessages();
     setModalHeader();
-    showMessages();
+    await showMessages();
+    helper.renderMathjax();
 };
 // Make globally accessible since it is used to show history in dropdownmenuitem.mustache.
 document.showConversation = showConversation;
@@ -394,7 +394,12 @@ const enterQuestion = async(question) => {
     };
 
     // Check history for length limit.
-    const convHistory = await checkMessageHistoryLengthLimit(conversation.messages);
+    let convHistory = await checkMessageHistoryLengthLimit(conversation.messages);
+
+    // Since some models cant handle an empty system message, remove from convHistory.
+    if (personaPrompt.trim() === '') {
+        convHistory.shift();
+    }
 
     // Options, with conversation history.
     const options = {
@@ -433,7 +438,10 @@ const enterQuestion = async(question) => {
     });
 
     // Write back answer.
-    showReply(requestresult.result);
+    await showReply(requestresult.result);
+
+    // Render mathjax.
+    helper.renderMathjax();
 
     // Ai is done.
     aiAtWork = false;
@@ -465,12 +473,18 @@ const showReply = async(text) => {
     let awaitdivs = document.querySelectorAll('.block_ai_chat_modal .awaitanswer');
     const awaitdiv = awaitdivs[awaitdivs.length - 1];
     awaitdiv.classList.remove('awaitanswer');
+
+    // Check if answer is smaller than the viewport, if so scroll to bottom.
+    const container = document.querySelector('.block_ai_chat-output-wrapper');
+    if (field.scrollHeight < container.clientHeight) {
+        scrollToBottom();
+    }
 };
 
-const showMessages = () => {
-    conversation.messages.forEach((val) => {
-        showMessage(val.message, val.sender);
-    });
+const showMessages = async() => {
+    for (const item of conversation.messages) {
+        await showMessage(item.message, item.sender);
+    }
 };
 
 /**
@@ -544,7 +558,7 @@ const deleteCurrentDialog = () => {
                 const deleted = await externalServices.deleteConversation(contextid, userid, conversation.id);
                 if (deleted) {
                     removeFromHistory();
-                    showConversation();
+                    await showConversation();
                 }
             } catch (error) {
                 displayException(error);
@@ -569,9 +583,9 @@ const showHistory = async() => {
     clearMessages(true);
     setModalHeader(title);
     const btnBacklink = document.getElementById('block_ai_chat_backlink');
-    btnBacklink.addEventListener('click', () => {
+    btnBacklink.addEventListener('click', async() => {
         if (conversation.id !== 0) {
-            showConversation(conversation.id);
+            await showConversation(conversation.id);
         } else {
             newDialog();
         }
@@ -1069,11 +1083,12 @@ const showPersonasModal = () => {
         manageInputs(true);
     });
 
-    // Reload persona on submission.
+    // Reload persona and rewrite info on submission.
     personaForm.addEventListener(personaForm.events.FORM_SUBMITTED, async() => {
         let reply = await externalServices.reloadPersona(contextid);
         personaPrompt = reply.prompt;
         personaInfo = reply.info;
+        showUserinfo(false);
     });
 };
 
@@ -1148,5 +1163,25 @@ const manageInputs = (switchon, templateids = [], selectValue = 42) => {
         personaButtondelete.disabled = false;
         personaInputprompt.disabled = false;
         personaUserinfo.disabled = false;
+    }
+};
+
+const showUserinfo = async(first) => {
+    // If persona is updated, delete current infobox.
+    if (!first) {
+        const toDelete = document.querySelector('.local_ai_manager-infobox.alert.alert-info');
+        if (toDelete) {
+            toDelete.remove();
+        }
+    }
+
+    if (personaInfo.trim() != '') {
+        const targetElement = document.querySelector('.block_ai_chat_modal_body .infobox');
+        const templateContext = {
+            'persona': personaInfo,
+            'personainfourl': personaLink,
+        };
+        const {html, js} = await Templates.renderForPromise('block_ai_chat/persona_infobox', templateContext);
+        Templates.appendNodeContents(targetElement, html, js);
     }
 };

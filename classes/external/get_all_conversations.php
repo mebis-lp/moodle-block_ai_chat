@@ -76,18 +76,21 @@ class get_all_conversations extends external_api {
             if ($value->purpose !== 'chat') {
                 continue;
             }
+            $connectorfactory = \core\di::get(\local_ai_manager\local\connector_factory::class);
+            $chatpurpose = $connectorfactory->get_purpose_by_purpose_string('chat');
             $tmpmessages = [
                 [
-                    'message' => format_text($value->prompttext, FORMAT_MARKDOWN),
+                    'message' => $chatpurpose->format_output($value->prompttext),
                     'sender' => 'user',
                 ],
                 [
-                    'message' => format_text($value->promptcompletion, FORMAT_MARKDOWN),
+                    'message' => $chatpurpose->format_output($value->promptcompletion),
                     'sender' => 'ai',
                 ],
             ];
             if (empty($result[$value->itemid])) {
                 // Add systemprompt for first prompt.
+                // requestoptions are itemid forcenew, convcontext with message and sender system.
                 $allmessages = array_merge(json_decode($value->requestoptions, true)['conversationcontext'], $tmpmessages);
                 $result[$value->itemid] = [
                     'id' => $value->itemid,
@@ -107,11 +110,11 @@ class get_all_conversations extends external_api {
     }
 
     /**
-     * Describes the return structure of the service..
+     * Describes the return structure of the service.
      *
-     * @return external_
+     * @return external_multiple_structure
      */
-    public static function execute_returns() {
+    public static function execute_returns(): external_multiple_structure {
         return new external_multiple_structure(
             new external_single_structure([
                 'id' => new external_value(PARAM_INT, 'ID of conversation'),
