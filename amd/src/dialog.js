@@ -16,7 +16,8 @@
 import Modal from 'core/modal';
 import * as externalServices from 'block_ai_chat/webservices';
 import Templates from 'core/templates';
-import {alert as displayAlert, exception as displayException, deleteCancelPromise} from 'core/notification';
+import {alert as displayAlert, exception as displayException, deleteCancelPromise,
+    confirm as confirmModal} from 'core/notification';
 import ModalEvents from 'core/modal_events';
 import ModalForm from 'core_form/modalform';
 import * as helper from 'block_ai_chat/helper';
@@ -242,8 +243,19 @@ async function showModal() {
         });
         const btnDefinePersona = document.getElementById('block_ai_chat_define_persona');
         if (btnDefinePersona) {
-            btnDefinePersona.addEventListener('click', () => {
-                showPersonasModal();
+            btnDefinePersona.addEventListener('click', async() => {
+                if (isAdmin) {
+                    await confirmModal(
+                        getString('notice', 'block_ai_chat'),
+                        getString('personasystemtemplateedit', 'block_ai_chat'),
+                        getString('confirm', 'core'),
+                        null,
+                        showPersonasModal,
+                        null
+                    );
+                } else {
+                    await showPersonasModal();
+                }
             });
         }
         const btnOptions = document.getElementById('block_ai_chat_options');
@@ -983,13 +995,15 @@ const showPersonasModal = () => {
             const userinfos = JSON.parse(inputuserinfos.value);
             personaButtondelete = document.querySelector('[data-custom="delete"]');
 
+            personaNewname.value = personaNewname.value.trim();
+
             // Disable delete/name on system templates.
             manageInputs(false, templateids, select.value);
 
             // Now we can add a listener to reflect select[template] to textarea[prompt].
             select.addEventListener('change', (event) => {
                 let selectValue = event.target.value;
-                let selectText = event.target.options[select.selectedIndex].text;
+                let selectText = event.target.options[select.selectedIndex].text.trim();
 
                 // Enable all.
                 manageInputs(true);
@@ -1062,10 +1076,23 @@ const showPersonasModal = () => {
             // Make sure it is set 1 on deletion and to 0 on actual saving process.
             const actionbuttons = document.querySelectorAll('[data-action="save"]');
             actionbuttons.forEach((button) => {
-                button.addEventListener('click', (e) => {
+                button.addEventListener('click', async(e) => {
                     const deleteinput = document.querySelector('input[name="delete"]');
                     if (e.target.dataset.custom == 'delete') {
                         deleteinput.value = '1';
+                        if (e.target.dataset.confirmed !== "1") {
+                            e.stopPropagation();
+                            await confirmModal(getString('delete', 'core'),
+                                getString('areyousuredelete', 'block_ai_chat'),
+                                getString('delete', 'core'),
+                                null,
+                                () => {
+                                    e.target.dataset.confirmed = "1";
+                                    e.target.click();
+                                },
+                                null
+                            );
+                        }
                     } else {
                         deleteinput.value = '0';
                     }
@@ -1143,7 +1170,8 @@ const addPersona = (copy, select) => {
 
 const manageInputs = (switchon, templateids = [], selectValue = 42) => {
     // Switch all inputs on.
-    if (switchon || isAdmin) {
+    if ((switchon || isAdmin) && selectValue != 0) {
+        // Enable everything except for "No persona".
         personaNewname.disabled = false;
         personaButtondelete.disabled = false;
         personaInputprompt.disabled = false;

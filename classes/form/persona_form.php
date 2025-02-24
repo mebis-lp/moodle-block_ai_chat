@@ -18,6 +18,7 @@ namespace block_ai_chat\form;
 
 use core_form\dynamic_form;
 use context;
+use stdClass;
 use function DI\get;
 
 /**
@@ -146,11 +147,6 @@ class persona_form extends dynamic_form {
 
         $formdata = $this->get_data();
 
-        // Remove empty spaces and added "\u{2002}" in get_all_personas().
-        $formdata->name = str_replace("\u{2002}", "", trim($formdata->name));
-
-        $context = $this->get_context_for_dynamic_submission();
-
         // Admintemplates are saved with userid 0, so change if admin is editing admintemplate or adds new template.
         if (is_siteadmin() && (
             $this->personas[$formdata->template]->userid == "0"
@@ -250,13 +246,13 @@ class persona_form extends dynamic_form {
 
         // Check if a persona is selected for this instance.
         $param = [$this->blockcontextid];
-        $this->personaselected = $DB->get_record_select('block_ai_chat_personas_selected', 'contextid = ?', $param);
-        if ($this->personaselected) {
+        $personaselected = $DB->get_record_select('block_ai_chat_personas_selected', 'contextid = ?', $param);
+        if ($personaselected) {
             $data = [
-                'template' => $this->personaselected->personasid,
-                'name' => $this->personas[$this->personaselected->personasid]->name,
-                'prompt' => $this->personas[$this->personaselected->personasid]->prompt,
-                'userinfo' => $this->personas[$this->personaselected->personasid]->userinfo,
+                'template' => $personaselected->personasid,
+                'name' => $this->personas[$personaselected->personasid]->name,
+                'prompt' => $this->personas[$personaselected->personasid]->prompt,
+                'userinfo' => $this->personas[$personaselected->personasid]->userinfo,
             ];
         } else {
             $data = [

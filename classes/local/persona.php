@@ -90,7 +90,7 @@ class persona {
         $templateids = [];
         foreach ($personas as $key => $persona) {
             // Add space for form select formatting.
-            $names[$persona->id] = "\u{2002}" . $persona->name;
+            $names[$persona->id] = "&nbsp;" . $persona->name;
             $prompts[$persona->id] = $persona->prompt;
             $userinfos[$persona->id] = $persona->userinfo;
             // Get admintemplates with userid 0.
