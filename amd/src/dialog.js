@@ -18,6 +18,7 @@ import * as externalServices from 'block_ai_chat/webservices';
 import Templates from 'core/templates';
 import {alert as displayAlert, exception as displayException, deleteCancelPromise,
     confirm as confirmModal} from 'core/notification';
+import SaveCancelModal from 'core/modal_save_cancel';
 import ModalEvents from 'core/modal_events';
 import ModalForm from 'core_form/modalform';
 import * as helper from 'block_ai_chat/helper';
@@ -57,6 +58,7 @@ let personaNewname = {};
 let personaButtondelete = {};
 let personaUserinfo = {};
 let personaInputprompt = {};
+let systemTemplateHiddenInput = {};
 let showPersona = false;
 let optionsForm = {};
 let showOptions = false;
@@ -994,8 +996,16 @@ const showPersonasModal = () => {
             const inputuserinfos = document.querySelector('input[name="userinfos"]');
             const userinfos = JSON.parse(inputuserinfos.value);
             personaButtondelete = document.querySelector('[data-custom="delete"]');
+            systemTemplateHiddenInput = document.querySelector('[data-type="systemtemplate"]');
 
             personaNewname.value = personaNewname.value.trim();
+
+            // Sort personal templates to the end, so we can make two categories in the dropdown.
+            select.options.forEach((option) => {
+                if (!templateids.map(id => parseInt(id)).includes(parseInt(option.value)) && parseInt(option.value) !== 0) {
+                    select.options[select.options.length - 1].after(option);
+                }
+            });
 
             // Disable delete/name on system templates.
             manageInputs(false, templateids, select.value);
@@ -1004,7 +1014,6 @@ const showPersonasModal = () => {
             select.addEventListener('change', (event) => {
                 let selectValue = event.target.value;
                 let selectText = event.target.options[select.selectedIndex].text.trim();
-
                 // Enable all.
                 manageInputs(true);
 
@@ -1053,9 +1062,9 @@ const showPersonasModal = () => {
             select.insertBefore(systemtemplates, select.options[2]);
             // // Add usertemplates heading.
             if (useroptions) {
-                // Get last systemtemplate position
-                const maxValue = Math.max(...templateids.map(Number));
-                const lastSystemOption = Array.from(select.options).find(opt => Number(opt.value) === maxValue);
+                // Get last systemtemplate position.
+                const maxValue = Math.max(...templateids.map(id => parseInt(id)));
+                const lastSystemOption = Array.from(select.options).find(opt => parseInt(opt.value) === maxValue);
                 // Add heading.
                 const usertemplates = new Option(strUserTemplates, '', false, false);
                 usertemplates.disabled = true;
@@ -1095,6 +1104,33 @@ const showPersonasModal = () => {
                         }
                     } else {
                         deleteinput.value = '0';
+                        if (select.value == "" && isAdmin && e.target.dataset.confirmed !== "1") {
+                            e.stopPropagation();
+                            const modal = await SaveCancelModal.create({
+                                title: getString('systemorpersonal_title', 'block_ai_chat'),
+                                body: getString('systemorpersonal_question', 'block_ai_chat'),
+                                buttons: {
+                                    save: getString('systemtemplate', 'block_ai_chat'),
+                                    cancel: getString('personaltemplate', 'block_ai_chat')
+                                },
+                                removeOnClose: true,
+                                show: true
+                            });
+                            modal.getRoot().on(ModalEvents.save,
+                                () => {
+                                    systemTemplateHiddenInput.value = 1;
+                                    e.target.dataset.confirmed = "1";
+                                    e.target.click();
+                                }
+                            );
+                            modal.getRoot().on(ModalEvents.cancel,
+                                () => {
+                                    systemTemplateHiddenInput.value = 0;
+                                    e.target.dataset.confirmed = "1";
+                                    e.target.click();
+                                }
+                            );
+                        }
                     }
                 });
             });

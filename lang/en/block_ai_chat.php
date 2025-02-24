@@ -68,6 +68,7 @@ $string['noticenewconversation'] = 'Currently you can\'t open a new conversation
 $string['noticenewquestion'] = 'Currently you can\'t submit a new question';
 $string['openfull'] = 'Use full width';
 $string['personalink'] = 'Infolink to personas';
+$string['personaltemplate'] = 'Personal';
 $string['personasystemtemplateedit'] = '<h3>You are editing as admin!</h3>
 That means:<ul><li>You will only be able to edit system templates</li><li>Editing a system templates will <span class="text-danger">change it for every chatbot in the system</span></li><li>Deleting a system persona will <span class="text-danger">delete it from every chatbot on the system</span></li></ul>';
 $string['pluginname'] = 'AI Chat';
@@ -80,6 +81,9 @@ $string['showhistory'] = 'Show history';
 $string['showonpagetypes'] = 'Pagetypes on which the chat bot floating button should be shown';
 $string['showonpagetypesdesc'] = 'Insert a list of page types (one string per line) on which the floating button should be shown. Insert "*" to always show the block.';
 $string['submit'] = 'Submit';
+$string['systemorpersonal_question'] = 'Do you want to save this persona as system wide template or personal persona?';
+$string['systemorpersonal_title'] = 'System or personal persona';
+$string['systemtemplate'] = 'System';
 $string['systemtemplates'] = 'System templates';
 $string['template'] = 'Template';
 $string['userinfo'] = 'Info shown to users';
