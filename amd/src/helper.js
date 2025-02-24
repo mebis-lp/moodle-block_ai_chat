@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+import {typeset} from 'filter_mathjaxloader/loader';
+
 /**
  * Copy ai reply to clipboard.
  * @param {*} element
@@ -42,10 +44,18 @@ export const copyToClipboard = (element) => {
  */
 export const attachCopyListenerLast = () => {
     const elements = document.querySelectorAll(".block_ai_chat_modal .copy");
-    const last = elements[elements.length - 1];
-    last.addEventListener('click', function() {
-        copyToClipboard(last);
-    });
+    const lastquestion = elements[elements.length - 2];
+    if (lastquestion) {
+        lastquestion.addEventListener('click', function() {
+            copyToClipboard(lastquestion);
+        });
+    }
+    const lastanswer = elements[elements.length - 1];
+    if (lastanswer) {
+        lastanswer.addEventListener('click', function() {
+            copyToClipboard(lastanswer);
+        });
+    }
 };
 
 
@@ -104,4 +114,31 @@ export const hash = async(stringToHash) => {
     return Array.from(uint8ViewOfHash)
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
+};
+
+/**
+ * Render mathjax formulas.
+ *  @returns {void}
+ */
+export const renderMathjax = () => {
+    // Render formulas with mathjax 2.7.9.
+    if (typeof window.MathJax !== "undefined") {
+        // Change delimiters so they work with chatgpt.
+        window.MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            },
+        });
+        const content = document.querySelector('.block_ai_chat-output');
+        if (content) {
+            // Maybe somebody knows why it works if you use mathjax .Queue and typeset().
+            // I just know that it does.
+            // Claude says: This works because you're essentially giving MathJax two chances to render - the first call
+            // queues it up, and the second call (Moodle's built-in function) ensures it completes. While it might seem
+            // redundant, if it's working reliably, there's nothing wrong with this approach.
+            window.MathJax.Hub.Queue(["Typeset", window.MathJax.Hub, content]);
+            typeset(content);
+        }
+    }
 };

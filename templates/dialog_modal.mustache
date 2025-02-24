@@ -50,13 +50,16 @@ along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
                     <div class="gradient-overlay"></div>
                     <div class="infobox">
                         <div data-content="local_ai_manager_infobox"></div>
+                        <div class="local_ai_manager-ai-warning"></div>
                     </div>
                     <div class="block_ai_chat-output">
                     </div>
                 </div>
                 <div class="block_ai_chat-input-wrapper">
                     <div class="block_ai_chat-input">
-                        <img src="{{globals.config.wwwroot}}/blocks/ai_chat/pix/ai-icon.svg" alt="" class="ai_chat_icon">
+                        <button class="btn btn-icon ai_chat_icon_button" data-action="openaiutils" name="Open AI tools">
+                            <img src="{{globals.config.wwwroot}}/blocks/ai_chat/pix/ai-icon.svg" alt="" >
+                        </button>
                         <textarea class="form-control" id="block_ai_chat-input-id" rows="1" placeholder="{{#str}} input, block_ai_chat {{/str}}"></textarea>
                         <button type="submit" id="block_ai_chat-submit-id" class="btn btn-primary">
                             <i class="icon fa fa-arrow-right ml-2" aria-hidden="true"></i>

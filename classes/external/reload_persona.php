@@ -22,13 +22,13 @@ use core_external\external_single_structure;
 use core_external\external_value;
 
 /**
- * Class get_conversationcontext_limit.
+ * Class reload_persona.
  *
  * @package    block_ai_chat
  * @copyright  2024 Tobias Garske, ISB Bayern
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_conversationcontext_limit extends external_api {
+class reload_persona extends external_api {
 
     /**
      * Describes the parameters.
@@ -37,7 +37,7 @@ class get_conversationcontext_limit extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'contextid' => new external_value(PARAM_INT, 'Course contextid.', VALUE_REQUIRED),
+            'contextid' => new external_value(PARAM_INT, 'Block contextid.', VALUE_REQUIRED),
         ]);
     }
 
@@ -50,20 +50,14 @@ class get_conversationcontext_limit extends external_api {
      * @throws dml_exception
      */
     public static function execute(int $contextid): array {
-        global $DB;
         self::validate_parameters(self::execute_parameters(), [
             'contextid' => $contextid,
         ]);
         self::validate_context(\core\context_helper::instance_by_id($contextid));
         require_capability('local/ai_manager:use', \context::instance_by_id($contextid));
-        $conversationcontext = $DB->get_record('block_ai_chat_options', ['contextid' => $contextid, 'name' => 'historycontextmax']);
-        if ($conversationcontext) {
-            $limit = $conversationcontext->value;
-        } else {
-            $limit = 5;
-        }
 
-        return ['limit' => $limit];
+        [$personaprompt, $personainfo] = \block_ai_chat\local\persona::get_current_persona($contextid);
+        return ['prompt' => $personaprompt, 'info' => $personainfo];
     }
 
     /**
@@ -73,7 +67,9 @@ class get_conversationcontext_limit extends external_api {
      */
     public static function execute_returns() {
         return new external_single_structure([
-            'limit' => new external_value(PARAM_INT, 'Max messages for conversationcontext.'),
+            'prompt' => new external_value(PARAM_TEXT, 'Personaprompt.'),
+            'info' => new external_value(PARAM_TEXT, 'Personaprompt.'),
         ]);
     }
 }
+

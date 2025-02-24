@@ -16,17 +16,23 @@
 import Modal from 'core/modal';
 import * as externalServices from 'block_ai_chat/webservices';
 import Templates from 'core/templates';
-import {alert as displayAlert, exception as displayException, deleteCancelPromise} from 'core/notification';
+import {alert as displayAlert, exception as displayException, deleteCancelPromise,
+    confirm as confirmModal} from 'core/notification';
+import SaveCancelModal from 'core/modal_save_cancel';
 import ModalEvents from 'core/modal_events';
+import ModalForm from 'core_form/modalform';
 import * as helper from 'block_ai_chat/helper';
 import * as manager from 'block_ai_chat/ai_manager';
 import {getString} from 'core/str';
 import {renderInfoBox} from 'local_ai_manager/infobox';
 import {renderUserQuota} from 'local_ai_manager/userquota';
+import {renderWarningBox} from 'local_ai_manager/warningbox';
 import {getAiConfig} from 'local_ai_manager/config';
 import LocalStorage from 'core/localstorage';
-import {escapeHTML, hash} from './helper';
-import Config from 'core/config';
+import {escapeHTML, hash, scrollToBottom} from './helper';
+import * as TinyAiUtils from 'tiny_ai/utils';
+import TinyAiEditorUtils from 'tiny_ai/editor_utils';
+import {constants as TinyAiConstants} from 'tiny_ai/constants';
 
 // Declare variables.
 const VIEW_CHATWINDOW = 'block_ai_chat_chatwindow';
@@ -40,6 +46,23 @@ let strHistory;
 let strNewDialog;
 let strToday;
 let strYesterday;
+let strDefinePersona;
+let strNewPersona;
+let strUserTemplates;
+let strSystemTemplates;
+let personaForm = {};
+let personaPrompt = '';
+let personaInfo = '';
+let personaLink = '';
+let personaNewname = {};
+let personaButtondelete = {};
+let personaUserinfo = {};
+let personaInputprompt = {};
+let systemTemplateHiddenInput = {};
+let showPersona = false;
+let optionsForm = {};
+let showOptions = false;
+let isAdmin = false;
 let badge;
 let viewmode;
 let modalopen = false;
@@ -53,13 +76,13 @@ let conversation = {
 let allConversations = [];
 // Userid.
 let userid = 0;
-// Course context id.
+// Block context id.
 let contextid = 0;
 // First load.
 let firstLoad = true;
 // AI in process of answering.
 let aiAtWork = false;
-// Maximum history included in query.
+// Maximum history included in query, should be reset via webservice.
 let maxHistory = 5;
 // Remember warnings for maximum history in this session.
 let maxHistoryWarnings = new Set();
@@ -107,8 +130,18 @@ export const init = async(params) => {
     contextid = params.contextid;
     strNewDialog = params.new;
     strHistory = params.history;
+    strDefinePersona = params.persona;
+    strNewPersona = params.newpersona;
+    strUserTemplates = params.usertemplates;
+    strSystemTemplates = params.systemtemplates;
+    personaPrompt = params.personaprompt;
+    personaInfo = params.personainfo;
+    showPersona = params.showpersona;
+    showOptions = params.showoptions;
+    personaLink = params.personalink;
+    isAdmin = params.isadmin;
     badge = params.badge;
-    // Disable bdage.
+    // Disable badge.
     badge = false;
 
     // Get configuration.
@@ -116,11 +149,13 @@ export const init = async(params) => {
     tenantConfig = aiConfig;
     chatConfig = aiConfig.purposes.find(p => p.purpose === "chat");
 
-    // Build modal.
+    // Build chat dialog modal.
     modal = await DialogModal.create({
         templateContext: {
             title: strNewDialog,
             badge: badge,
+            showPersona: showPersona,
+            showOptions: showOptions,
         },
     });
 
@@ -188,11 +223,11 @@ async function showModal() {
         await getConversations();
 
         // Show conversation.
-        showConversation();
+        await showConversation();
 
         // Get conversationcontext message limit.
-        let conversationcontextLimit = await externalServices.getConversationcontextLimit(contextid);
-        maxHistory = conversationcontextLimit.limit;
+        let reply = await externalServices.getConversationcontextLimit(contextid);
+        maxHistory = reply.limit;
 
         // Add listeners for dropdownmenus.
         // Actions.
@@ -208,6 +243,29 @@ async function showModal() {
         btnShowHistory.addEventListener('click', () => {
             showHistory();
         });
+        const btnDefinePersona = document.getElementById('block_ai_chat_define_persona');
+        if (btnDefinePersona) {
+            btnDefinePersona.addEventListener('click', async() => {
+                if (isAdmin) {
+                    await confirmModal(
+                        getString('notice', 'block_ai_chat'),
+                        getString('personasystemtemplateedit', 'block_ai_chat'),
+                        getString('confirm', 'core'),
+                        null,
+                        showPersonasModal,
+                        null
+                    );
+                } else {
+                    await showPersonasModal();
+                }
+            });
+        }
+        const btnOptions = document.getElementById('block_ai_chat_options');
+        if (btnOptions) {
+            btnOptions.addEventListener('click', () => {
+                showOptionsModal();
+            });
+        }
         // Views.
         const btnChatwindow = document.getElementById(VIEW_CHATWINDOW);
         btnChatwindow.addEventListener('click', () => {
@@ -228,6 +286,15 @@ async function showModal() {
         await renderInfoBox(
             'block_ai_chat', userid, '.block_ai_chat_modal_body [data-content="local_ai_manager_infobox"]', ['chat']
         );
+        // Show ai info warning.
+        const warningBoxSelector = '.local_ai_manager-ai-warning';
+        if (document.querySelector(warningBoxSelector)) {
+            await renderWarningBox(warningBoxSelector);
+        }
+        // Show persona info.
+        if (personaPrompt !== '') {
+            showUserinfo(true);
+        }
 
         // Check if all permissions and settings are correct.
         const message = await userAllowed();
@@ -235,6 +302,37 @@ async function showModal() {
             const notice = await getString('notice', 'block_ai_chat');
             await displayAlert(notice, message);
         }
+
+        const aiUtilsButton = document.querySelector('[data-action="openaiutils"]');
+        const uniqid = Math.random().toString(16).slice(2);
+
+        await TinyAiUtils.init(uniqid, TinyAiConstants.modalModes.standalone);
+        aiUtilsButton.addEventListener('click', async() => {
+            // We try to find selected text or images and inject it into the AI tools.
+            const selectionObject = window.getSelection();
+            const range = selectionObject.getRangeAt(0);
+            const container = document.createElement('div');
+            container.appendChild(range.cloneContents());
+            const images = container.querySelectorAll('img');
+            if (images.length > 0 && images[0].src) {
+                // If there are more than one we just use the first one.
+                const image = images[0];
+                // This should work for both external and data urls.
+                const fetchResult = await fetch(image.src);
+                const data = await fetchResult.blob();
+                TinyAiUtils.getDatamanager(uniqid).setSelectionImg(data);
+            }
+
+            // If currently there is text selected we inject it.
+            if (selectionObject.toString() && selectionObject.toString().length > 0) {
+                TinyAiUtils.getDatamanager(uniqid).setSelection(selectionObject.toString());
+            }
+
+            const editorUtils = new TinyAiEditorUtils(uniqid, 'block_ai_chat', contextid, userid, null);
+            TinyAiUtils.setEditorUtils(uniqid, editorUtils);
+            await editorUtils.displayDialogue();
+        });
+
         firstLoad = false;
     }
 
@@ -257,7 +355,7 @@ const getConversations = async() => {
  * Function to set conversation.
  * @param {*} id
  */
-const showConversation = (id = 0) => {
+const showConversation = async(id = 0) => {
     // Dissallow changing conversations when question running.
     if (aiAtWork) {
         return;
@@ -275,7 +373,8 @@ const showConversation = (id = 0) => {
     }
     clearMessages();
     setModalHeader();
-    showMessages();
+    await showMessages();
+    helper.renderMathjax();
 };
 // Make globally accessible since it is used to show history in dropdownmenuitem.mustache.
 document.showConversation = showConversation;
@@ -303,24 +402,25 @@ const enterQuestion = async(question) => {
     // Add to conversation, answer not yet available.
     showMessage(question, 'self', false);
 
-    // For first message, add a system message.
-    if (conversation.messages.length === 0) {
-        const currentUserLanguage = Config.language.substring(0, 2);
-        const LangNames = new Intl.DisplayNames('en', {type: 'language'});
-        conversation.messages.push({
-            'message': 'Answer in ' + LangNames.of(currentUserLanguage),
-            'sender': 'system',
-        });
-    }
+    // For first message, add the personaprompt, even if empty.
+    // Since we dont know if the personaPrompt was changed, always replace it.
+    conversation.messages[0] = {
+        'message': personaPrompt,
+        'sender': 'system'
+    };
 
-    // Ceck history for length limit.
-    const convHistory = await checkMessageHistoryLengthLimit(conversation.messages);
+    // Check history for length limit.
+    let convHistory = await checkMessageHistoryLengthLimit(conversation.messages);
+
+    // Since some models cant handle an empty system message, remove from convHistory.
+    if (personaPrompt.trim() === '') {
+        convHistory.shift();
+    }
 
     // Options, with conversation history.
     const options = {
         'component': 'block_ai_chat',
-        'contextid': contextid,
-        'conversationcontext': convHistory,
+        'conversationcontext': convHistory
     };
 
     // For a new conversation, get an id.
@@ -340,11 +440,11 @@ const enterQuestion = async(question) => {
     options.itemid = conversation.id;
 
     // Send to local_ai_manager.
-    let requestresult = await manager.askLocalAiManager('chat', question, options);
+    let requestresult = await manager.askLocalAiManager('chat', question, contextid, options);
 
     // Handle errors.
     if (requestresult.code != 200) {
-        requestresult = await errorHandling(requestresult, question, options);
+        requestresult = await errorHandling(requestresult, question, contextid, options);
     }
 
     // Attach copy listener.
@@ -354,7 +454,10 @@ const enterQuestion = async(question) => {
     });
 
     // Write back answer.
-    showReply(requestresult.result);
+    await showReply(requestresult.result);
+
+    // Render mathjax.
+    helper.renderMathjax();
 
     // Ai is done.
     aiAtWork = false;
@@ -386,12 +489,18 @@ const showReply = async(text) => {
     let awaitdivs = document.querySelectorAll('.block_ai_chat_modal .awaitanswer');
     const awaitdiv = awaitdivs[awaitdivs.length - 1];
     awaitdiv.classList.remove('awaitanswer');
+
+    // Check if answer is smaller than the viewport, if so scroll to bottom.
+    const container = document.querySelector('.block_ai_chat-output-wrapper');
+    if (field.scrollHeight < container.clientHeight) {
+        scrollToBottom();
+    }
 };
 
-const showMessages = () => {
-    conversation.messages.forEach((val) => {
-        showMessage(val.message, val.sender);
-    });
+const showMessages = async() => {
+    for (const item of conversation.messages) {
+        await showMessage(item.message, item.sender);
+    }
 };
 
 /**
@@ -423,10 +532,8 @@ const showMessage = async(text, sender = '', answer = true) => {
     const {html, js} = await Templates.renderForPromise('block_ai_chat/message', templateData);
     Templates.appendNodeContents('.block_ai_chat-output', html, js);
 
-    // Add copy listener for replys.
-    if (sender === '') {
-        helper.attachCopyListenerLast();
-    }
+    // Add copy listener for question and reply.
+    helper.attachCopyListenerLast();
 
     // Scroll the modal content to the bottom.
     helper.scrollToBottom();
@@ -467,7 +574,7 @@ const deleteCurrentDialog = () => {
                 const deleted = await externalServices.deleteConversation(contextid, userid, conversation.id);
                 if (deleted) {
                     removeFromHistory();
-                    showConversation();
+                    await showConversation();
                 }
             } catch (error) {
                 displayException(error);
@@ -492,9 +599,9 @@ const showHistory = async() => {
     clearMessages(true);
     setModalHeader(title);
     const btnBacklink = document.getElementById('block_ai_chat_backlink');
-    btnBacklink.addEventListener('click', () => {
+    btnBacklink.addEventListener('click', async() => {
         if (conversation.id !== 0) {
-            showConversation(conversation.id);
+            await showConversation(conversation.id);
         } else {
             newDialog();
         }
@@ -698,10 +805,11 @@ const clickSubmitButton = () => {
  * Handle error from local_ai_manager.
  * @param {*} requestresult
  * @param {*} question
+ * @param {*} contextid
  * @param {*} options
  * @returns {object}
  */
-const errorHandling = async(requestresult, question, options) => {
+const errorHandling = async(requestresult, question, contextid, options) => {
 
     // If code 409, conversationid is already taken, try get new a one.
     if (requestresult.code == 409) {
@@ -714,7 +822,7 @@ const errorHandling = async(requestresult, question, options) => {
                 displayException(error);
             }
             // Retry with new id.
-            requestresult = await manager.askLocalAiManager('chat', question, options);
+            requestresult = await manager.askLocalAiManager('chat', question, contextid, options);
             return requestresult;
         }
     }
@@ -846,5 +954,300 @@ const handleScreenWidthChange = (e) => {
     } else {
         body.classList.remove(VIEW_CHATWINDOW, VIEW_OPENFULL, VIEW_DOCKRIGHT);
         body.classList.add(viewmode);
+    }
+};
+
+/**
+ * Show personas modal.
+ */
+const showPersonasModal = () => {
+    // Add a dynamic form to add a systemprompt/persona to a block instance.
+    // Always create the dynamic form modal, since it is being destroyed.
+    personaForm = new ModalForm({
+        formClass: "block_ai_chat\\form\\persona_form",
+        moduleName: "block_ai_chat/modal_save_delete_cancel",
+        args: {
+            contextid: contextid,
+        },
+        modalConfig: {
+            title: strDefinePersona,
+        },
+    });
+
+    // Show modal.
+    personaForm.show();
+
+    // If select[template] is changed, change textarea[prompt].
+    // For this, we want to get the value of the hidden input with name="prompts".
+    // So we wait for the modalForm() to be LOADED to get the modal object.
+    // On the modal object we wait for the bodyRendered event to read the input.
+    personaForm.addEventListener(personaForm.events.LOADED, () => {
+        personaForm.modal.getRoot().on(ModalEvents.bodyRendered, () => {
+            const inputprompts = document.querySelector('input[name="prompts"]');
+            const prompts = JSON.parse(inputprompts.value);
+            const select = document.querySelector('select[name="template"]');
+            const addpersona = document.querySelector('#add_persona');
+            const copypersona = document.querySelector('#copy_persona');
+            personaNewname = document.querySelector('input[name="name"]');
+            personaInputprompt = document.querySelector('textarea[name="prompt"]');
+            personaUserinfo = document.querySelector('textarea[name="userinfo"]');
+            const inputtemplateids = document.querySelector('input[name="templateids"]');
+            const templateids = JSON.parse(inputtemplateids.value);
+            const inputuserinfos = document.querySelector('input[name="userinfos"]');
+            const userinfos = JSON.parse(inputuserinfos.value);
+            personaButtondelete = document.querySelector('[data-custom="delete"]');
+            systemTemplateHiddenInput = document.querySelector('[data-type="systemtemplate"]');
+
+            personaNewname.value = personaNewname.value.trim();
+
+            // Sort personal templates to the end, so we can make two categories in the dropdown.
+            select.options.forEach((option) => {
+                if (!templateids.map(id => parseInt(id)).includes(parseInt(option.value)) && parseInt(option.value) !== 0) {
+                    select.options[select.options.length - 1].after(option);
+                }
+            });
+
+            // Disable delete/name on system templates.
+            manageInputs(false, templateids, select.value);
+
+            // Now we can add a listener to reflect select[template] to textarea[prompt].
+            select.addEventListener('change', (event) => {
+                let selectValue = event.target.value;
+                let selectText = event.target.options[select.selectedIndex].text.trim();
+                // Enable all.
+                manageInputs(true);
+
+                // Reflect prompt, name and userinfos.
+                if (typeof prompts[selectValue] !== 'undefined') {
+                    personaInputprompt.value = prompts[selectValue];
+                    // For personaNewname, get_formdata needs setAttribute,
+                    // but .value is used to repopulate after placeholder is used.
+                    personaNewname.value = selectText;
+                    personaNewname.setAttribute('placeholder', '');
+                    personaNewname.setAttribute('value', selectText);
+                    personaUserinfo.value = userinfos[selectValue];
+                    personaUserinfo.disabled = false;
+                    personaInputprompt.disabled = false;
+                } else {
+                    // Should be selection "No Persona"
+                    personaNewname.setAttribute('value', '');
+                    personaInputprompt.value = '';
+                    personaInputprompt.disabled = true;
+                    personaUserinfo.value = '';
+                    personaUserinfo.disabled = true;
+                }
+                // Disable delete/name on system templates.
+                manageInputs(false, templateids, selectValue);
+            });
+
+            // Remove newpersona signifier option on click.
+            select.addEventListener('click', () => {
+                let option = document.querySelector('.new-persona-placeholder');
+                if (option) {
+                    select.removeChild(option);
+                }
+            });
+
+            // Add headlines and spacing to the template select element.
+            // But before adding options make a comparison to check for usertemplates.
+            const useroptions = select.options.length > templateids.length;
+            // Add spacing after "No persona".
+            const spacer = new Option('', '', false, false);
+            spacer.disabled = true;
+            spacer.classList.add('select-spacer');
+            select.insertBefore(spacer, select.options[1]);
+            // Add systemtemplates heading.
+            const systemtemplates = new Option(strSystemTemplates, '', false, false);
+            systemtemplates.disabled = true;
+            select.insertBefore(systemtemplates, select.options[2]);
+            // // Add usertemplates heading.
+            if (useroptions) {
+                // Get last systemtemplate position.
+                const maxValue = Math.max(...templateids.map(id => parseInt(id)));
+                const lastSystemOption = Array.from(select.options).find(opt => parseInt(opt.value) === maxValue);
+                // Add heading.
+                const usertemplates = new Option(strUserTemplates, '', false, false);
+                usertemplates.disabled = true;
+                select.insertBefore(usertemplates, lastSystemOption.nextSibling);
+            }
+
+            // Add listener to addPersona icon.
+            addpersona.addEventListener('click', () => {
+                addPersona(false, select);
+            });
+
+            // Add listener to copyPersona icon.
+            copypersona.addEventListener('click', () => {
+                addPersona(true, select);
+            });
+
+            // To use process_dynamic_submission() for deletion, we use a save button but add a delete hidden input.
+            // Make sure it is set 1 on deletion and to 0 on actual saving process.
+            const actionbuttons = document.querySelectorAll('[data-action="save"]');
+            actionbuttons.forEach((button) => {
+                button.addEventListener('click', async(e) => {
+                    const deleteinput = document.querySelector('input[name="delete"]');
+                    if (e.target.dataset.custom == 'delete') {
+                        deleteinput.value = '1';
+                        if (e.target.dataset.confirmed !== "1") {
+                            e.stopPropagation();
+                            await confirmModal(getString('delete', 'core'),
+                                getString('areyousuredelete', 'block_ai_chat'),
+                                getString('delete', 'core'),
+                                null,
+                                () => {
+                                    e.target.dataset.confirmed = "1";
+                                    e.target.click();
+                                },
+                                null
+                            );
+                        }
+                    } else {
+                        deleteinput.value = '0';
+                        if (select.value == "" && isAdmin && e.target.dataset.confirmed !== "1") {
+                            e.stopPropagation();
+                            const modal = await SaveCancelModal.create({
+                                title: getString('systemorpersonal_title', 'block_ai_chat'),
+                                body: getString('systemorpersonal_question', 'block_ai_chat'),
+                                buttons: {
+                                    save: getString('systemtemplate', 'block_ai_chat'),
+                                    cancel: getString('personaltemplate', 'block_ai_chat')
+                                },
+                                removeOnClose: true,
+                                show: true
+                            });
+                            modal.getRoot().on(ModalEvents.save,
+                                () => {
+                                    systemTemplateHiddenInput.value = 1;
+                                    e.target.dataset.confirmed = "1";
+                                    e.target.click();
+                                }
+                            );
+                            modal.getRoot().on(ModalEvents.cancel,
+                                () => {
+                                    systemTemplateHiddenInput.value = 0;
+                                    e.target.dataset.confirmed = "1";
+                                    e.target.click();
+                                }
+                            );
+                        }
+                    }
+                });
+            });
+        });
+    });
+
+    // Enable admintemplate name input on save.
+    personaForm.addEventListener(personaForm.events.SUBMIT_BUTTON_PRESSED, () => {
+        manageInputs(true);
+    });
+
+
+    // Also enable admintemplate name input on error.
+    personaForm.addEventListener(personaForm.events.SERVER_VALIDATION_ERROR, () => {
+        manageInputs(true);
+    });
+
+    // Reload persona and rewrite info on submission.
+    personaForm.addEventListener(personaForm.events.FORM_SUBMITTED, async() => {
+        let reply = await externalServices.reloadPersona(contextid);
+        personaPrompt = reply.prompt;
+        personaInfo = reply.info;
+        showUserinfo(false);
+    });
+};
+
+
+/**
+ * Show options modal.
+ */
+const showOptionsModal = () => {
+    // Add a dynamic form to add options.
+    // Always create the dynamic form modal, since it is being destroyed.
+    optionsForm = new ModalForm({
+        formClass: "block_ai_chat\\form\\options_form",
+        moduleName: "core/modal_save_cancel",
+        args: {
+            contextid: contextid,
+        },
+        modalConfig: {
+            title: getString('options'),
+        },
+    });
+
+    // Show modal.
+    optionsForm.show();
+};
+
+/**
+ * Click on add new persona, make input writable and reset if no copy.
+ * @param {bool} copy
+ * @param {HTMLElement} select
+ */
+const addPersona = (copy, select) => {
+    // Enable inputs and set a placeholder.
+    personaNewname.disabled = false;
+    personaNewname.placeholder = strNewPersona;
+    personaNewname.value = '';
+    personaInputprompt.disabled = false;
+    personaUserinfo.disabled = false;
+    if (!copy) {
+        personaInputprompt.value = '';
+        personaUserinfo.value = '';
+    }
+    // Add option to signify new persona.
+    let option = document.querySelector('.new-persona-placeholder');
+    if (!option) {
+        let signifierOption = new Option(strNewPersona, '', true, true);
+        signifierOption.classList.add('new-persona-placeholder');
+        select.add(signifierOption);
+    }
+};
+
+const manageInputs = (switchon, templateids = [], selectValue = 42) => {
+    // Switch all inputs on.
+    if ((switchon || isAdmin) && selectValue != 0) {
+        // Enable everything except for "No persona".
+        personaNewname.disabled = false;
+        personaButtondelete.disabled = false;
+        personaInputprompt.disabled = false;
+        personaUserinfo.disabled = false;
+        return;
+    }
+    // Abort on reload if validation failed.
+    if (document.querySelector('.is-invalid') !== null) {
+        return;
+    }
+    // Switch input between admin and user templates.
+    if (templateids.includes(selectValue) || selectValue == 0) {
+        personaNewname.disabled = true;
+        personaButtondelete.disabled = true;
+        personaInputprompt.disabled = true;
+        personaUserinfo.disabled = true;
+    } else {
+        personaNewname.disabled = false;
+        personaButtondelete.disabled = false;
+        personaInputprompt.disabled = false;
+        personaUserinfo.disabled = false;
+    }
+};
+
+const showUserinfo = async(first) => {
+    // If persona is updated, delete current infobox.
+    if (!first) {
+        const toDelete = document.querySelector('.local_ai_manager-infobox.alert.alert-info');
+        if (toDelete) {
+            toDelete.remove();
+        }
+    }
+
+    if (personaInfo.trim() != '') {
+        const targetElement = document.querySelector('.block_ai_chat_modal_body .infobox');
+        const templateContext = {
+            'persona': personaInfo,
+            'personainfourl': personaLink,
+        };
+        const {html, js} = await Templates.renderForPromise('block_ai_chat/persona_infobox', templateContext);
+        Templates.appendNodeContents(targetElement, html, js);
     }
 };

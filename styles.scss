@@ -78,7 +78,7 @@
        right: 0;
        padding: .5rem .75rem 2.5rem 2.75rem;
    }
-   .message.ai:hover .copy {
+    .message:hover .copy {
        visibility: visible;
        cursor: pointer;
     }
@@ -136,10 +136,9 @@
         margin-top: .15rem;
         padding: 0 .1rem 0 .1rem;
         position: relative;
-        .ai_chat_icon {
+        .ai_chat_icon_button {
             position: absolute;
-            top: 1.2rem;
-            left: .5rem;
+            top: 0.6rem;
         }
     }
     .block_ai_chat-input textarea {
@@ -158,7 +157,7 @@
             text-overflow: ellipsis;
         }
     }
-    .block_ai_chat-input button {
+    .block_ai_chat-input button[type="submit"] {
         position: absolute;
         display: flex;
         bottom: .5rem;
@@ -215,17 +214,21 @@
         .infobox {
            display: flex;
            align-items: center;
-           flex-direction: row-reverse;
+           flex-direction: column;
            padding-bottom: .4rem;
            margin-top: -.5rem;
            z-index: 1;
            min-height: 2rem;
-           .local_ai_manager-infobox.alert.alert-success {
+           .local_ai_manager-infobox.alert.alert-success,
+           .local_ai_manager-ai-warning {
                color: #6c757d;
                background-color: inherit;
                font-size: .6rem;
                padding: 0;
                margin: 0;
+           }
+           .local_ai_manager-infobox {
+                margin-top: .5rem;
            }
        }
     }
@@ -298,6 +301,14 @@ body.block_ai_chat_dockright {
         width: 0;
         height: 0;
     }
+    [data-content="local_ai_manager_infobox"],
+    .local_ai_manager-ai-warning {
+        width: 100%;
+        div {
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+    }
 }
 
 body.block_ai_chat_openfull {
@@ -362,3 +373,17 @@ body.block_ai_chat_replacehelp {
         bottom: 1.9rem;
     }
 }
+
+#add_persona,
+#copy_persona {
+    font-size: 1.25rem;
+    &:hover {
+        cursor: pointer;
+        filter: invert(30%);
+    }
+}
+
+.select-spacer {
+    font-size: .25rem;
+}
+

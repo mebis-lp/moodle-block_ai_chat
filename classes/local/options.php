@@ -1,3 +1,4 @@
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -13,26 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-import {makeRequest} from 'local_ai_manager/make_request';
+namespace block_ai_chat\local;
+
 
 /**
- * Get the async answer from the local_ai_manager.
+ * Class helper
  *
- * @param {string} purpose
- * @param {string} prompt
- * @param {number} contextid
- * @param {array} options
- * @returns {string}
+ * @package    block_ai_chat
+ * @copyright  2025 Tobias Garske, ISB Bayern
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-export const askLocalAiManager = async(purpose, prompt, contextid, options = []) => {
-    let result = {};
-    try {
-        result = await makeRequest(purpose, prompt, 'block_ai_chat', contextid, options);
-    } catch (error) {
-        result.code = 'aiconnector';
-        result.result = error.error + " " + error.message;
-        // For devs.
-        result.result += error.backtrace;
+class options {
+
+    /**
+     * Get current chat options for blockinstance.
+     * @param int $blockinstanceid
+     * @return array
+     */
+    public static function get_options($blockinstanceid): array {
+        global $DB;
+
+        return $DB->get_records_select('block_ai_chat_options', 'contextid = ?', [$blockinstanceid]);
     }
-    return result;
-};
+
+}
