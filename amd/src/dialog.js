@@ -15,6 +15,7 @@
 
 import Modal from 'core/modal';
 import * as externalServices from 'block_ai_chat/webservices';
+import config from 'core/config';
 import Templates from 'core/templates';
 import {alert as displayAlert, exception as displayException, deleteCancelPromise,
     confirm as confirmModal} from 'core/notification';
@@ -918,7 +919,7 @@ const userAllowed = async() => {
     if (tenantConfig.userconfirmed === false) {
         message = await getString('error_http403notconfirmed', 'local_ai_manager');
         message += ". ";
-        const link = window.location.origin + '/local/ai_manager/confirm_ai_usage.php';
+        const link = config.wwwroot + '/local/ai_manager/confirm_ai_usage.php';
         message += await getString('confirm_ai_usage', 'block_ai_chat', link);
         return message;
     }
