@@ -311,6 +311,9 @@ async function showModal() {
         aiUtilsButton.addEventListener('click', async() => {
             // We try to find selected text or images and inject it into the AI tools.
             const selectionObject = window.getSelection();
+            if (selectionObject.rangeCount === 0) {
+                return;
+            }
             const range = selectionObject.getRangeAt(0);
             const container = document.createElement('div');
             container.appendChild(range.cloneContents());
