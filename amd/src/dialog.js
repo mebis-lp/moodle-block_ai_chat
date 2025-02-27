@@ -311,25 +311,26 @@ async function showModal() {
         aiUtilsButton.addEventListener('click', async() => {
             // We try to find selected text or images and inject it into the AI tools.
             const selectionObject = window.getSelection();
-            if (selectionObject.rangeCount === 0) {
-                return;
-            }
-            const range = selectionObject.getRangeAt(0);
-            const container = document.createElement('div');
-            container.appendChild(range.cloneContents());
-            const images = container.querySelectorAll('img');
-            if (images.length > 0 && images[0].src) {
-                // If there are more than one we just use the first one.
-                const image = images[0];
-                // This should work for both external and data urls.
-                const fetchResult = await fetch(image.src);
-                const data = await fetchResult.blob();
-                TinyAiUtils.getDatamanager(uniqid).setSelectionImg(data);
-            }
+            if (selectionObject.rangeCount > 0) {
+                // Safari browser does not really comply with MDN standard and sometimes has
+                // rangeCount === 0. So we have to check for this to avoid running into an error.
+                const range = selectionObject.getRangeAt(0);
+                const container = document.createElement('div');
+                container.appendChild(range.cloneContents());
+                const images = container.querySelectorAll('img');
+                if (images.length > 0 && images[0].src) {
+                    // If there are more than one we just use the first one.
+                    const image = images[0];
+                    // This should work for both external and data urls.
+                    const fetchResult = await fetch(image.src);
+                    const data = await fetchResult.blob();
+                    TinyAiUtils.getDatamanager(uniqid).setSelectionImg(data);
+                }
 
-            // If currently there is text selected we inject it.
-            if (selectionObject.toString() && selectionObject.toString().length > 0) {
-                TinyAiUtils.getDatamanager(uniqid).setSelection(selectionObject.toString());
+                // If currently there is text selected we inject it.
+                if (selectionObject.toString() && selectionObject.toString().length > 0) {
+                    TinyAiUtils.getDatamanager(uniqid).setSelection(selectionObject.toString());
+                }
             }
 
             const editorUtils = new TinyAiEditorUtils(uniqid, 'block_ai_chat', contextid, userid, null);
