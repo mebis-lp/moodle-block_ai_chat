@@ -29,6 +29,11 @@
 
 .block_ai_chat_modal .modal-dialog {
   min-height: 500px;
+  display: flex;
+  align-items: end;
+}
+.block_ai_chat_modal .modal-dialog .modal-content {
+  min-height: 500px;
 }
 .block_ai_chat_modal .modal-header {
   width: 100%;
@@ -269,7 +274,7 @@ body.block_ai_chat_chatwindow .block_ai_chat_modal .modal-dialog {
   position: fixed;
   max-height: calc(100vh - 6rem);
   right: 2rem;
-  bottom: 3rem;
+  bottom: 5.5rem;
   filter: drop-shadow(3px 3px 4px black);
 }
 body.block_ai_chat_chatwindow a#block_ai_chat_chatwindow {
@@ -298,6 +303,7 @@ body.block_ai_chat_chatwindow .local_ai_manager-ai-warning div,
 body.block_ai_chat_dockright [data-content=local_ai_manager_infobox] div,
 body.block_ai_chat_dockright .local_ai_manager-ai-warning div {
   justify-content: space-between;
+  align-items: flex-start;
 }
 
 body.block_ai_chat_openfull .block_ai_chat_modal .modal-dialog {
@@ -351,6 +357,9 @@ body.block_ai_chat_replacehelp #page-footer [data-region=footer-container-popove
 }
 body.block_ai_chat_replacehelp #ai_chat_button {
   bottom: 1.9rem;
+}
+body.block_ai_chat_replacehelp .block_ai_chat_modal .modal-dialog {
+  bottom: 3rem;
 }
 
 #add_persona,

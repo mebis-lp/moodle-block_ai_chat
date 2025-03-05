@@ -34,6 +34,12 @@
 .block_ai_chat_modal{
     .modal-dialog {
         min-height: 500px;
+        display: flex;
+        align-items: end;
+        .modal-content {
+            min-height: 500px;
+        }
+
     }
     .modal-header {
         width: 100%;
@@ -286,7 +292,7 @@ body.block_ai_chat_chatwindow {
         position: fixed;
         max-height: calc(100vh - 6rem);
         right: 2rem;
-        bottom: 3rem;
+        bottom: 5.5rem;
         filter: drop-shadow(3px 3px 4px black);
     }
     a#block_ai_chat_chatwindow {
@@ -371,6 +377,9 @@ body.block_ai_chat_replacehelp {
     }
     #ai_chat_button {
         bottom: 1.9rem;
+    }
+    .block_ai_chat_modal .modal-dialog {
+        bottom: 3rem;
     }
 }
 
