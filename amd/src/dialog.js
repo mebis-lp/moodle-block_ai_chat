@@ -105,15 +105,6 @@ class DialogModal extends Modal {
         modalConfig.isVerticallyCentered = false;
 
         super.configure(modalConfig);
-
-        // Accept our own custom arguments too.
-        if (modalConfig.titletest) {
-            this.setTitletest(modalConfig.titletest);
-        }
-    }
-
-    setTitletest(value) {
-        this.titletest = value;
     }
 
     hide() {
@@ -409,19 +400,26 @@ const enterQuestion = async(question) => {
 
     // For first message, add the personaprompt, even if empty.
     // Since we dont know if the personaPrompt was changed, always replace it.
-    conversation.messages[0] = {
-        'message': personaPrompt,
-        'sender': 'system'
-    };
+    if (typeof conversation.messages[0] == 'undefined' || conversation.messages[0].sender !== 'system') {
+        conversation.messages.unshift({
+            'message': personaPrompt,
+            'sender': 'system'
+        });
+    } else {
+        // Replace personaPrompt.
+        conversation.messages[0] = {
+            'message': personaPrompt,
+            'sender': 'system'
+        };
+    }
 
     // Check history for length limit.
     let convHistory = await checkMessageHistoryLengthLimit(conversation.messages);
 
     // Since some models cant handle an empty system message, remove from convHistory.
-    if (personaPrompt.trim() === '') {
+    if (personaPrompt.trim() === '' && convHistory[0].sender === 'system') {
         convHistory.shift();
     }
-
     // Options, with conversation history.
     const options = {
         'component': 'block_ai_chat',
@@ -469,6 +467,10 @@ const enterQuestion = async(question) => {
 
     // Save new question and answer.
     if (requestresult.code == 200) {
+        // If new conversation, sanitize the prompt for modal title and history.
+        if (conversation.messages.length == 0) {
+            question = escapeHTML(question);
+        }
         saveConversationLocally(question, requestresult.result);
     }
 
@@ -609,8 +611,8 @@ const showHistory = async() => {
             await showConversation(conversation.id);
         } else {
             newDialog();
+            clearMessages();
         }
-        clearMessages();
         setModalHeader();
     });
 
@@ -621,9 +623,15 @@ const showHistory = async() => {
     // Iterate over conversations and group by date.
     let groupedByDate = {};
     allConversations.forEach((convo) => {
-        if (typeof convo.messages[1] !== 'undefined') {
-            // Get first prompt.
-            let title = convo.messages[1].message;
+
+        if (typeof convo.messages[0] !== 'undefined') {
+            // Get first prompt for title.
+            let title = '';
+            if (convo.messages[0].sender == 'system') {
+                title = convo.messages[1].message;
+            } else {
+                title = convo.messages[0].message;
+            }
 
             // Get date and sort convos into a date array.
             const now = new Date();
@@ -737,7 +745,11 @@ const setModalHeader = (setTitle = '') => {
     let title = '';
     if (modalheader !== null && (conversation.messages.length > 0 || setTitle.length)) {
         if (!setTitle.length) {
-            title = conversation.messages[1].message;
+            if (conversation.messages[0].sender == 'system') {
+                title = conversation.messages[1].message;
+            } else {
+                title = conversation.messages[0].message;
+            }
         } else {
             title = setTitle;
         }

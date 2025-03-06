@@ -80,7 +80,7 @@ class get_all_conversations extends external_api {
             $chatpurpose = $connectorfactory->get_purpose_by_purpose_string('chat');
             $tmpmessages = [
                 [
-                    'message' => $chatpurpose->format_output($value->prompttext),
+                    'message' => htmlspecialchars($value->prompttext),
                     'sender' => 'user',
                 ],
                 [

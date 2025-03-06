@@ -206,7 +206,7 @@
   align-items: center;
   flex-direction: column;
   padding-bottom: 0.4rem;
-  margin-top: -0.5rem;
+  margin-top: -1rem;
   z-index: 1;
   min-height: 2rem;
 }
@@ -298,6 +298,7 @@ body.block_ai_chat_chatwindow .local_ai_manager-ai-warning div,
 body.block_ai_chat_dockright [data-content=local_ai_manager_infobox] div,
 body.block_ai_chat_dockright .local_ai_manager-ai-warning div {
   justify-content: space-between;
+  align-items: flex-start;
 }
 
 body.block_ai_chat_openfull .block_ai_chat_modal .modal-dialog {
