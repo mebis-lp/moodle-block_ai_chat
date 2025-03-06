@@ -130,10 +130,11 @@
 .block_ai_chat_modal .block_ai_chat-input .ai_chat_icon_button {
   position: absolute;
   top: 0.6rem;
+  left: 0.55rem;
 }
 .block_ai_chat_modal .block_ai_chat-input textarea {
   height: inherit;
-  padding: 1rem 4.1rem 1rem 2.2rem;
+  padding: 1rem 4.1rem 1rem 2.7rem;
   resize: none;
   overflow: auto;
   line-height: 1.5rem;
