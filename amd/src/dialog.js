@@ -1182,6 +1182,12 @@ const showOptionsModal = () => {
 
     // Show modal.
     optionsForm.show();
+
+    // Reload options on submission.
+    optionsForm.addEventListener(optionsForm.events.FORM_SUBMITTED, async() => {
+        let reply = await externalServices.getConversationcontextLimit(contextid);
+        maxHistory = reply.limit;
+    });
 };
 
 /**
